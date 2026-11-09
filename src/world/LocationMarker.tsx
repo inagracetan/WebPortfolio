@@ -38,38 +38,49 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
     return null
   }
 
-  const handleClick = (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleClick = (e: React.MouseEvent | any) => {
+    if (e && e.stopPropagation) e.stopPropagation()
     playClick()
     setLocation(location.id)
 
     // Open corresponding modal when clicking the marker
     let targetModal: ActiveModal = 'PROJECTS'
-    if (location.category === 'WORKSPACE') targetModal = 'RESUME'
-    else if (location.category === 'PROJECTS') targetModal = 'PROJECTS'
-    else if (location.category === 'TECH') targetModal = 'SKILLS'
-    else if (location.category === 'UNIVERSITY') targetModal = 'EXPERIENCE'
-    else if (location.category === 'CONTACT') targetModal = 'CONTACT'
+    if (location.category === 'WORKSPACE' || location.id === 'workspace') targetModal = 'RESUME'
+    else if (location.category === 'PROJECTS' || location.id === 'projects') targetModal = 'PROJECTS'
+    else if (location.category === 'TECH' || location.id === 'tech') targetModal = 'TECH'
+    else if (location.category === 'UNIVERSITY' || location.id === 'university') targetModal = 'EXPERIENCE'
+    else if (location.category === 'CONTACT' || location.id === 'contact') targetModal = 'CONTACT'
 
     openModal(targetModal)
   }
 
-  const handlePointerEnter = () => {
+  const handlePointerEnter = (e?: any) => {
+    if (e && e.stopPropagation) e.stopPropagation()
     setIsHovered(true)
+    if (typeof document !== 'undefined') {
+      document.body.style.cursor = 'pointer'
+    }
     playHover()
   }
 
-  const handlePointerLeave = () => {
+  const handlePointerLeave = (e?: any) => {
+    if (e && e.stopPropagation) e.stopPropagation()
     setIsHovered(false)
+    if (typeof document !== 'undefined') {
+      document.body.style.cursor = 'default'
+    }
   }
 
   return (
     <group position={[position[0], 0, position[2]]}>
-      {/* 3D Floating Crystal Pin */}
+      {/* 3D Floating Crystal Pin (Fully clickable in 3D viewport) */}
       <mesh
         ref={crystalRef}
         position={[0, position[1], 0]}
         scale={isSelected || isHovered ? 1.3 : 1.0}
+        onClick={handleClick}
+        onPointerOver={handlePointerEnter}
+        onPointerOut={handlePointerLeave}
       >
         <octahedronGeometry args={[0.3, 0]} />
         <meshStandardMaterial
@@ -86,6 +97,9 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
         ref={ringRef}
         position={[0, position[1], 0]}
         rotation={[Math.PI / 2, 0, 0]}
+        onClick={handleClick}
+        onPointerOver={handlePointerEnter}
+        onPointerOut={handlePointerLeave}
       >
         <torusGeometry args={[0.55, 0.03, 8, 24]} />
         <meshStandardMaterial
@@ -96,7 +110,13 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
       </mesh>
 
       {/* Ground Projection Ring */}
-      <mesh position={[0, 0.12, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh
+        position={[0, 0.12, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        onClick={handleClick}
+        onPointerOver={handlePointerEnter}
+        onPointerOut={handlePointerLeave}
+      >
         <ringGeometry args={[0.7, 0.85, 16]} />
         <meshBasicMaterial
           color={location.color}

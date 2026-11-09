@@ -43,12 +43,12 @@ The centerpiece location—the **Personal Workspace**—is an architectural 3D r
 * **`ESC`**: Close active modal window
 
 ### Mobile & Touch Devices
-* **Virtual Joystick**: Clamped dynamic touch joystick on the bottom-left for character movement.
-* **`[E]` Action Button**: Dynamic glowing button that pulses when near an interactive object.
+* **Translucent Virtual Joystick**: Semi-transparent, lightweight touch joystick with luminous direction indicator on the bottom-left for character movement without obstructing the 3D world.
+* **`[E]` Action Button**: Dynamic glowing button on the bottom-right that pulses when near an interactive object.
 * **`[⚡]` Sprint Button**: Toggle walk/sprint speed.
-* **Quick Menu Button**: Dedicated thumb-accessible button to immediately open the recruiter directory.
+* **Unified Menu Header**: Single, accessible header `MENU` button to immediately open the portfolio directory.
 * **Haptic Feedback**: Subtle vibration cues on interactions (supported mobile devices).
-* **Elevated HUD**: Bottom waypoint carousel elevated above touch controls to prevent finger collisions.
+* **Elevated HUD**: Bottom waypoint toolbar positioned above touch controls to prevent finger collisions.
 
 ---
 

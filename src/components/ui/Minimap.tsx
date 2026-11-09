@@ -1,13 +1,15 @@
-import React, { useState } from 'react'
+import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Map, ChevronUp, ChevronDown } from 'lucide-react'
-import { useCharacterStore } from '@/characters/useCharacterStore'
+import { characterStore, useCharacterStore } from '@/characters/useCharacterStore'
+import { DESTINATION_WAYPOINTS } from '@/characters/spawnConfig'
 import { useGameStore } from '@/hooks/useGameStore'
 import { locationsData } from '@/locations/locationsData'
 import { soundEngine } from '@/utilities/audio'
 
 export const Minimap: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(true)
+  const isTeleportingRef = useRef(false)
   const { playerPosition, playerRotation } = useCharacterStore()
   const { isUiModalOpen, activeLocation, setLocation, currentScreen } = useGameStore()
 
@@ -29,8 +31,42 @@ export const Minimap: React.FC = () => {
 
   const playerDot = toMinimap(playerPosition[0], playerPosition[2])
 
+  // Radar destination selection: Teleports character to destination safe ground
+  const handleSelectDestination = (locId: string) => {
+    if (isTeleportingRef.current) return
+    soundEngine.playClick()
+
+    const dest = DESTINATION_WAYPOINTS[locId] || DESTINATION_WAYPOINTS['main']
+    const [px, , pz] = characterStore.getState().playerPosition
+    const currentDist = Math.hypot(px - dest.arrivalPosition[0], pz - dest.arrivalPosition[2])
+
+    // Update active location and navigation state
+    setLocation(dest.id)
+
+    // Teleport character only if not already at the destination
+    if (currentDist > 2.5) {
+      isTeleportingRef.current = true
+      soundEngine.playLocationTransition()
+
+      // Guarantee follow camera mode at destination
+      characterStore.setCameraMode('FOLLOW')
+
+      // Transport character to valid ground outside building geometry
+      characterStore.teleportTo(dest.arrivalPosition, dest.arrivalRotation)
+
+      setTimeout(() => {
+        isTeleportingRef.current = false
+      }, 350)
+    }
+
+    // On narrow mobile screens, collapse radar to return to exploration interface
+    if (typeof window !== 'undefined' && window.innerWidth < 640) {
+      setIsExpanded(false)
+    }
+  }
+
   return (
-    <div className="fixed top-20 right-4 z-30 hidden sm:block pointer-events-auto select-none">
+    <div className="fixed top-18 sm:top-20 right-3 sm:right-4 z-30 pointer-events-auto select-none">
       <div className="bg-deep-navy-card/90 border border-sky-blue/30 rounded-sm shadow-xl backdrop-blur-xl overflow-hidden hud-corner-tl hud-corner-br">
         {/* Header */}
         <div className="flex items-center justify-between px-3 py-1.5 bg-deep-navy/80 border-b border-sky-blue/15 text-[10px] font-mono text-sky-light">
@@ -70,7 +106,7 @@ export const Minimap: React.FC = () => {
                 <div className="absolute h-full w-[1px] bg-sky-blue" />
               </div>
 
-              {/* 5 Island Location Nodes (Updates radar highlight without teleporting the character) */}
+              {/* 5 Island Location Nodes (Teleports character to predefined safe arrival position) */}
               {locationsData.map((loc) => {
                 const nodePos = toMinimap(loc.coordinates[0], loc.coordinates[2])
                 const isSelected = activeLocation.id === loc.id
@@ -78,11 +114,8 @@ export const Minimap: React.FC = () => {
                   <button
                     key={loc.id}
                     type="button"
-                    title={`${loc.name} (Select on Radar)`}
-                    onClick={() => {
-                      soundEngine.playClick()
-                      setLocation(loc.id)
-                    }}
+                    title={`Teleport to ${loc.name}`}
+                    onClick={() => handleSelectDestination(loc.id)}
                     style={{
                       left: `${nodePos.x}px`,
                       top: `${nodePos.y}px`,

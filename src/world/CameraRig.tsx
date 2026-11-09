@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import { OrbitControls } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
@@ -15,8 +15,34 @@ export const CameraRig: React.FC = () => {
   const targetVec = useRef(new THREE.Vector3(0, 1.2, 0))
   const posVec = useRef(new THREE.Vector3(12, 10, 12))
 
+  // Track previous player position for smooth teleport follow-camera tracking
+  const prevPlayerPos = useRef(new THREE.Vector3(...characterStore.getState().playerPosition))
+
   // Track previous location to detect fast-travel transitions
   const lastLocationId = useRef(activeLocation.id)
+
+  // Synchronize camera eye position and target instantly on teleport to avoid clipping or disorientation
+  useEffect(() => {
+    const unsubscribe = characterStore.onTeleport((newPos) => {
+      if (controlsRef.current) {
+        const dx = newPos[0] - prevPlayerPos.current.x
+        const dy = newPos[1] - prevPlayerPos.current.y
+        const dz = newPos[2] - prevPlayerPos.current.z
+
+        // Offset camera position by player displacement so relative third-person distance & angle are preserved
+        controlsRef.current.object.position.x += dx
+        controlsRef.current.object.position.y += dy
+        controlsRef.current.object.position.z += dz
+
+        const targetY = newPos[1] + 1.1
+        controlsRef.current.target.set(newPos[0], targetY, newPos[2])
+        targetVec.current.set(newPos[0], targetY, newPos[2])
+        controlsRef.current.update()
+      }
+      prevPlayerPos.current.set(newPos[0], newPos[1], newPos[2])
+    })
+    return unsubscribe
+  }, [])
 
   useFrame((_, delta) => {
     if (!controlsRef.current) return

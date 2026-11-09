@@ -9,6 +9,7 @@ export type ActiveModal =
   | 'ABOUT'
   | 'PROJECTS'
   | 'SKILLS'
+  | 'TECH'
   | 'EXPERIENCE'
   | 'CONTACT'
   | 'SETTINGS'

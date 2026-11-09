@@ -74,7 +74,7 @@ export const characterStore = {
 
   // Explicit fast-travel / teleport to specific coordinates
   teleportTo: (coords: [number, number, number], rot = 0) => {
-    const targetPos: [number, number, number] = [coords[0], coords[1] + 0.45, coords[2]]
+    const targetPos: [number, number, number] = [coords[0], coords[1], coords[2]]
     state = {
       ...state,
       playerPosition: targetPos,

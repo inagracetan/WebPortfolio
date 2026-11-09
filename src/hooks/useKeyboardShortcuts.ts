@@ -3,6 +3,7 @@ import { gameStore } from './useGameStore'
 import { objectInspectionStore } from '@/interactions/useObjectInspection'
 import { characterStore } from '@/characters/useCharacterStore'
 import { locationsData } from '@/locations/locationsData'
+import { DESTINATION_WAYPOINTS } from '@/characters/spawnConfig'
 
 export function useKeyboardShortcuts() {
   useEffect(() => {
@@ -46,11 +47,14 @@ export function useKeyboardShortcuts() {
           break
 
         case 'Home':
-        case '0':
+        case '0': {
           e.preventDefault()
-          gameStore.setLocation('workspace')
-          characterStore.teleportTo([0, 0.45, 1.8])
+          const dest = DESTINATION_WAYPOINTS['main']
+          gameStore.setLocation(dest.id)
+          characterStore.setCameraMode('FOLLOW')
+          characterStore.teleportTo(dest.arrivalPosition, dest.arrivalRotation)
           break
+        }
 
         case 'v':
         case 'V':
@@ -67,12 +71,12 @@ export function useKeyboardShortcuts() {
           if (locationsData[index]) {
             e.preventDefault()
             const loc = locationsData[index]
-            gameStore.setLocation(loc.id)
-            characterStore.teleportTo([
-              loc.coordinates[0],
-              loc.coordinates[1] + 0.45,
-              loc.coordinates[2] + 1.2,
-            ])
+            const dest = DESTINATION_WAYPOINTS[loc.id]
+            if (dest) {
+              gameStore.setLocation(dest.id)
+              characterStore.setCameraMode('FOLLOW')
+              characterStore.teleportTo(dest.arrivalPosition, dest.arrivalRotation)
+            }
           }
           break
         }

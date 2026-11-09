@@ -2,9 +2,36 @@ import React, { useRef } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { ForestTree, PathLantern, GlowingBush } from '../FoliageAndProps'
+import { useGameStore } from '@/hooks/useGameStore'
+import { useSound } from '@/hooks/useSound'
 
 export const TechCenter: React.FC = () => {
   const crystalSpireRef = useRef<THREE.Mesh>(null)
+  const { openModal, setLocation, isUiModalOpen } = useGameStore()
+  const { playHover, playClick } = useSound()
+
+  const handleTechCenterClick = (e: any) => {
+    if (e && e.stopPropagation) e.stopPropagation()
+    if (isUiModalOpen) return
+    playClick()
+    setLocation('tech')
+    openModal('TECH')
+  }
+
+  const handlePointerEnter = (e: any) => {
+    if (e && e.stopPropagation) e.stopPropagation()
+    if (typeof document !== 'undefined') {
+      document.body.style.cursor = 'pointer'
+    }
+    playHover()
+  }
+
+  const handlePointerLeave = (e: any) => {
+    if (e && e.stopPropagation) e.stopPropagation()
+    if (typeof document !== 'undefined') {
+      document.body.style.cursor = 'default'
+    }
+  }
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime()
@@ -17,7 +44,14 @@ export const TechCenter: React.FC = () => {
   return (
     <group position={[13, 0.6, 5]}>
       {/* Foundation Platform Deck */}
-      <mesh position={[0, 0.1, 0]} receiveShadow castShadow>
+      <mesh
+        position={[0, 0.1, 0]}
+        receiveShadow
+        castShadow
+        onClick={handleTechCenterClick}
+        onPointerOver={handlePointerEnter}
+        onPointerOut={handlePointerLeave}
+      >
         <cylinderGeometry args={[4.4, 4.1, 0.25, 8]} />
         <meshStandardMaterial color="#0f172a" roughness={0.5} flatShading />
       </mesh>
@@ -31,14 +65,27 @@ export const TechCenter: React.FC = () => {
           [-1.8, 1.8],
           [1.8, 1.8],
         ].map(([x, z], idx) => (
-          <mesh key={idx} position={[x, 1.3, z]} castShadow>
+          <mesh
+            key={idx}
+            position={[x, 1.3, z]}
+            castShadow
+            onClick={handleTechCenterClick}
+            onPointerOver={handlePointerEnter}
+            onPointerOut={handlePointerLeave}
+          >
             <boxGeometry args={[0.16, 2.4, 0.16]} />
             <meshStandardMaterial color="#1e293b" metalness={0.6} flatShading />
           </mesh>
         ))}
 
         {/* Floating Geometric Glass Canopy */}
-        <mesh position={[0, 2.6, 0]} castShadow>
+        <mesh
+          position={[0, 2.6, 0]}
+          castShadow
+          onClick={handleTechCenterClick}
+          onPointerOver={handlePointerEnter}
+          onPointerOut={handlePointerLeave}
+        >
           <boxGeometry args={[4.0, 0.12, 4.0]} />
           <meshStandardMaterial
             color="#38bdf8"
@@ -52,13 +99,26 @@ export const TechCenter: React.FC = () => {
       </group>
 
       {/* Glowing Circuit Floor Pattern */}
-      <mesh position={[0, 0.24, 0]} rotation={[-Math.PI / 2, 0, 0]}>
+      <mesh
+        position={[0, 0.24, 0]}
+        rotation={[-Math.PI / 2, 0, 0]}
+        onClick={handleTechCenterClick}
+        onPointerOver={handlePointerEnter}
+        onPointerOut={handlePointerLeave}
+      >
         <ringGeometry args={[1.6, 1.9, 8]} />
         <meshBasicMaterial color="#00f0ff" />
       </mesh>
 
-      {/* Central Quantum Data Crystal Spire */}
-      <mesh ref={crystalSpireRef} position={[0, 2.2, 0]} castShadow>
+      {/* Central Quantum Data Crystal Spire (Interactive Core) */}
+      <mesh
+        ref={crystalSpireRef}
+        position={[0, 2.2, 0]}
+        castShadow
+        onClick={handleTechCenterClick}
+        onPointerOver={handlePointerEnter}
+        onPointerOut={handlePointerLeave}
+      >
         <octahedronGeometry args={[0.65, 0]} />
         <meshStandardMaterial
           color="#00f0ff"
@@ -69,7 +129,14 @@ export const TechCenter: React.FC = () => {
         />
       </mesh>
       {/* Crystal Base Plinth */}
-      <mesh position={[0, 0.6, 0]} castShadow receiveShadow>
+      <mesh
+        position={[0, 0.6, 0]}
+        castShadow
+        receiveShadow
+        onClick={handleTechCenterClick}
+        onPointerOver={handlePointerEnter}
+        onPointerOut={handlePointerLeave}
+      >
         <cylinderGeometry args={[0.8, 1.0, 0.8, 8]} />
         <meshStandardMaterial color="#1e293b" roughness={0.4} flatShading />
       </mesh>
@@ -82,7 +149,14 @@ export const TechCenter: React.FC = () => {
         { pos: [-1.0, 0.6, 1.38] as [number, number, number], rot: Math.PI * 0.8, color: '#00f0ff', label: 'CLOUD & SEC' },
         { pos: [1.0, 0.6, 1.38] as [number, number, number], rot: -Math.PI * 0.8, color: '#10b981', label: 'PRODUCTIVITY' },
       ].map((tablet, idx) => (
-        <group key={idx} position={tablet.pos} rotation={[0, tablet.rot, 0]}>
+        <group
+          key={idx}
+          position={tablet.pos}
+          rotation={[0, tablet.rot, 0]}
+          onClick={handleTechCenterClick}
+          onPointerOver={handlePointerEnter}
+          onPointerOut={handlePointerLeave}
+        >
           <mesh castShadow receiveShadow>
             <boxGeometry args={[0.75, 1.1, 0.14]} />
             <meshStandardMaterial color="#0f172a" roughness={0.3} metalness={0.6} flatShading />

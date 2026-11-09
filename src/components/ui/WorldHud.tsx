@@ -40,11 +40,11 @@ export const WorldHud: React.FC = () => {
   // Inspect current location's portfolio content
   const handleInspectLocation = () => {
     let targetModal: ActiveModal = 'PROJECTS'
-    if (activeLocation.category === 'WORKSPACE') targetModal = 'RESUME'
-    else if (activeLocation.category === 'PROJECTS') targetModal = 'PROJECTS'
-    else if (activeLocation.category === 'TECH') targetModal = 'SKILLS'
-    else if (activeLocation.category === 'UNIVERSITY') targetModal = 'EXPERIENCE'
-    else if (activeLocation.category === 'CONTACT') targetModal = 'CONTACT'
+    if (activeLocation.category === 'WORKSPACE' || activeLocation.id === 'workspace') targetModal = 'RESUME'
+    else if (activeLocation.category === 'PROJECTS' || activeLocation.id === 'projects') targetModal = 'PROJECTS'
+    else if (activeLocation.category === 'TECH' || activeLocation.id === 'tech') targetModal = 'TECH'
+    else if (activeLocation.category === 'UNIVERSITY' || activeLocation.id === 'university') targetModal = 'EXPERIENCE'
+    else if (activeLocation.category === 'CONTACT' || activeLocation.id === 'contact') targetModal = 'CONTACT'
 
     openModal(targetModal)
   }
@@ -78,59 +78,57 @@ export const WorldHud: React.FC = () => {
         )}
       </AnimatePresence>
 
-      {/* Simplified, Clean Bottom HUD Toolbar */}
-      <div className="fixed bottom-24 md:bottom-6 left-0 right-0 z-20 px-4 pointer-events-none">
+      {/* Dedicated Bottom HUD Toolbar: Placed strictly ABOVE mobile joystick on mobile (z-40) */}
+      <div className="fixed bottom-[156px] landscape:bottom-3 md:bottom-6 left-0 right-0 z-40 px-2.5 sm:px-4 pointer-events-none">
         <div className="max-w-xl mx-auto flex justify-center">
           <motion.div
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.25 }}
-            className="pointer-events-auto flex items-center justify-between gap-3 px-4 py-2 bg-deep-navy-card/95 border border-sky-blue/30 rounded-full shadow-xl backdrop-blur-xl text-xs font-mono text-warm-ivory"
+            className="pointer-events-auto flex items-center justify-between gap-1.5 sm:gap-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-deep-navy-card/95 border border-sky-blue/30 rounded-full shadow-2xl backdrop-blur-xl text-xs font-mono text-warm-ivory select-none"
           >
             {/* Current Active Location Indicator */}
-            <div className="flex items-center gap-2 min-w-0 pr-2 border-r border-sky-blue/15">
-              <Compass className="w-4 h-4 text-electric-blue flex-shrink-0 animate-pulse" />
-              <span className="font-semibold text-warm-ivory truncate max-w-[140px] sm:max-w-[200px]">
+            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 pr-1.5 sm:pr-2 border-r border-sky-blue/15">
+              <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-electric-blue flex-shrink-0 animate-pulse" />
+              <span className="font-semibold text-warm-ivory truncate text-[11px] sm:text-xs max-w-[105px] xs:max-w-[150px] sm:max-w-[200px]">
                 {activeLocation.name}
               </span>
             </div>
 
             {/* Actions: View Details, Camera, Respawn */}
-            <div className="flex items-center gap-1.5 flex-shrink-0">
+            <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
               <button
                 type="button"
                 onClick={handleInspectLocation}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-bold transition-all cursor-pointer shadow-sm"
+                className="flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-bold text-[10px] sm:text-xs transition-all cursor-pointer shadow-sm active:scale-95 min-h-[30px]"
                 title={`View ${activeLocation.name} portfolio details`}
               >
-                <Eye className="w-3.5 h-3.5" />
+                <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 <span>DETAILS</span>
               </button>
 
               <button
                 type="button"
                 onClick={toggleCameraMode}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-sky-blue text-warm-ivory-dim hover:text-warm-ivory rounded-full transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-sky-blue text-warm-ivory-dim hover:text-warm-ivory rounded-full text-[10px] sm:text-xs transition-colors cursor-pointer active:scale-95 min-h-[30px]"
                 title={cameraMode === 'FOLLOW' ? 'Switch to Free Orbit camera' : 'Switch to Follow camera'}
               >
                 {cameraMode === 'FOLLOW' ? (
-                  <Video className="w-3.5 h-3.5 text-electric-blue" />
+                  <Video className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-electric-blue" />
                 ) : (
-                  <EyeOff className="w-3.5 h-3.5" />
+                  <EyeOff className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
                 )}
-                <span className="hidden sm:inline text-[11px]">
-                  {cameraMode === 'FOLLOW' ? 'FOLLOW' : 'ORBIT'}
-                </span>
+                <span>{cameraMode === 'FOLLOW' ? 'FOLLOW' : 'ORBIT'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleRespawn}
-                className="flex items-center gap-1 px-2.5 py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full transition-colors cursor-pointer"
+                className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full text-[10px] sm:text-xs transition-colors cursor-pointer active:scale-95 min-h-[30px]"
                 title="Respawn avatar at Main Island spawn point"
               >
-                <RotateCcw className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline text-[11px]">RESPAWN</span>
+                <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                <span>RESPAWN</span>
               </button>
             </div>
           </motion.div>
