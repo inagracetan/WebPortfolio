@@ -25,6 +25,8 @@ export const Navigation: React.FC = () => {
     toggleMenu,
     currentScreen,
     isUiModalOpen,
+    activeLocation,
+    setLocation,
   } = useGameStore()
 
   // STRICT REQUIREMENT (Phase 5): Hide completely when ANY modal or popup is open
@@ -32,8 +34,8 @@ export const Navigation: React.FC = () => {
     return null
   }
 
-  // Home handler: Explicitly returns character to the main island spawn point
-  const handleHomeClick = () => {
+  // Quick Respawn handler: Explicitly returns character to the main island spawn point
+  const handleRespawnClick = () => {
     characterStore.spawnOnMainIsland()
   }
 
@@ -67,15 +69,20 @@ export const Navigation: React.FC = () => {
             aria-label="Main Portfolio Navigation"
             className="pointer-events-auto hidden md:flex items-center gap-1 px-2.5 py-1 bg-deep-navy-card/90 border border-sky-blue/25 rounded-full shadow-lg backdrop-blur-md text-xs font-mono"
           >
-            {/* 1. Home (Returns character to main island spawn point) */}
+            {/* 1. Personal Workspace (First and most prominent location option - no reset/respawn) */}
             <button
               type="button"
-              onClick={handleHomeClick}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
-              title="Return to Main Island Spawn"
+              onClick={() => setLocation('workspace')}
+              className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all cursor-pointer ${
+                activeLocation.id === 'workspace'
+                  ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/40 shadow-sm'
+                  : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10'
+              }`}
+              title="Personal Workspace (Creative Studio & Villa Hub)"
+              aria-label="Personal Workspace"
             >
               <Home className="w-3.5 h-3.5 text-electric-blue" />
-              <span>HOME</span>
+              <span><span className="hidden xl:inline">PERSONAL </span>WORKSPACE</span>
             </button>
 
             {/* 2. About (Opens About Me modal without teleporting) */}
@@ -142,7 +149,7 @@ export const Navigation: React.FC = () => {
             <Tooltip content="Respawn Avatar on Main Island">
               <button
                 type="button"
-                onClick={handleHomeClick}
+                onClick={handleRespawnClick}
                 className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/25 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full text-xs font-mono transition-colors cursor-pointer backdrop-blur-md"
                 aria-label="Respawn Character on Main Island"
               >

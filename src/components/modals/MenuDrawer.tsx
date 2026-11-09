@@ -23,6 +23,7 @@ export const MenuDrawer: React.FC = () => {
     openModal,
     enterWorld,
     currentScreen,
+    setLocation,
   } = useGameStore()
 
   const navItems: {
@@ -34,16 +35,16 @@ export const MenuDrawer: React.FC = () => {
     isPrimary?: boolean
   }[] = [
     {
-      label: 'Home // Main Island',
+      label: 'Personal Workspace',
       action: () => {
         if (currentScreen === 'WELCOME') {
           enterWorld()
         }
-        characterStore.spawnOnMainIsland()
+        setLocation('workspace')
         setMenuOpen(false)
       },
       icon: <Home className="w-4 h-4 text-electric-blue" />,
-      badge: 'SPAWN',
+      badge: 'STUDIO VILLA',
       isPrimary: true,
     },
     {

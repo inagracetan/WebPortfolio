@@ -4,10 +4,10 @@ import { useCharacterStore } from '@/characters/useCharacterStore'
 import { INTERACTIVE_OBJECTS } from '@/interactions/interactiveObjectsData'
 import { objectInspectionStore } from '@/interactions/useObjectInspection'
 import { useGameStore } from '@/hooks/useGameStore'
-import { Hand, Zap, Sparkles, Menu } from 'lucide-react'
+import { Hand, Zap, Sparkles } from 'lucide-react'
 
 export const MobileControls: React.FC = () => {
-  const { currentScreen, isUiModalOpen, toggleMenu } = useGameStore()
+  const { currentScreen, isUiModalOpen } = useGameStore()
   const { playerPosition } = useCharacterStore()
 
   const [joystickActive, setJoystickActive] = useState(false)
@@ -133,48 +133,38 @@ export const MobileControls: React.FC = () => {
 
   return (
     <div className="fixed inset-0 z-30 pointer-events-none md:hidden flex justify-between items-end p-5 pb-8 select-none">
-      {/* 1. Left: Virtual Touch Joystick */}
+      {/* 1. Left: Virtual Touch Joystick (Translucent, Lightweight & Unobtrusive) */}
       <div
         ref={joystickBaseRef}
         onTouchStart={handleTouchStart}
         onTouchMove={handleTouchMove}
         onTouchEnd={handleTouchEnd}
-        className={`pointer-events-auto touch-none relative w-28 h-28 rounded-full border-2 flex items-center justify-center backdrop-blur-md transition-colors ${
+        className={`pointer-events-auto touch-none relative w-28 h-28 rounded-full border flex items-center justify-center transition-all ${
           joystickActive
-            ? 'bg-deep-navy/80 border-electric-blue shadow-[0_0_20px_rgba(0,240,255,0.4)]'
-            : 'bg-deep-navy/60 border-sky-blue/30'
+            ? 'bg-electric-blue/15 border-electric-blue/60 backdrop-blur-xs shadow-[0_0_20px_rgba(0,240,255,0.25)]'
+            : 'bg-white/[0.07] border-white/30 backdrop-blur-xs shadow-[inset_0_0_12px_rgba(255,255,255,0.05)]'
         }`}
       >
-        {/* Center Origin Dot */}
-        <div className="w-2 h-2 rounded-full bg-sky-light/40" />
+        {/* Subtle Center Origin Indicator */}
+        <div className="w-2 h-2 rounded-full bg-white/40 ring-1 ring-white/20" />
 
-        {/* Movable Joystick Knob */}
+        {/* Movable Joystick Knob (Semi-transparent with glowing core) */}
         <div
-          className="absolute w-12 h-12 rounded-full bg-electric-blue/40 border border-electric-blue flex items-center justify-center shadow-md transform"
+          className={`absolute w-12 h-12 rounded-full border flex items-center justify-center backdrop-blur-xs transition-shadow shadow-md ${
+            joystickActive
+              ? 'bg-electric-blue/25 border-electric-blue/80 shadow-[0_0_12px_rgba(0,240,255,0.4)]'
+              : 'bg-white/20 border-white/40'
+          }`}
           style={{
             transform: `translate(${knobPos.x}px, ${knobPos.y}px)`,
           }}
         >
-          <div className="w-5 h-5 rounded-full bg-electric-blue shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
+          <div className="w-4 h-4 rounded-full bg-electric-blue/80 shadow-[0_0_8px_rgba(0,240,255,0.8)]" />
         </div>
       </div>
 
-      {/* 2. Right: Action Buttons (Interact, Sprint & Quick Menu) */}
+      {/* 2. Right: Action Buttons (Interact & Sprint — Redundant Menu Button Removed) */}
       <div className="pointer-events-auto flex flex-col items-center gap-2.5">
-        {/* Quick Menu Button for Direct Portfolio Access */}
-        <button
-          type="button"
-          onClick={() => {
-            triggerHaptic(15)
-            toggleMenu()
-          }}
-          className="w-10 h-10 rounded-full border border-sky-blue/30 bg-deep-navy/85 text-warm-ivory hover:text-electric-blue flex items-center justify-center shadow-md active:scale-95 cursor-pointer backdrop-blur-md"
-          aria-label="Open Portfolio Directory Menu"
-          title="Open Portfolio Menu"
-        >
-          <Menu className="w-4 h-4 text-electric-blue" />
-        </button>
-
         {/* Dedicated Interaction Button */}
         <button
           type="button"
