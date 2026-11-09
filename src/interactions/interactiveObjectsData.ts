@@ -88,7 +88,7 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     details: {
       heading: 'FEATURED PROJECTS SHOWCASE',
       description:
-        'Explore verified projects including MusuanTrack, CMU Faculty Availability System, Flutter & Firebase Scheduling, Security Risk Analysis, and EC Mabao Payroll.',
+        'Explore verified projects including City Agriculture Admin Procurement Monitoring System, CMU Faculty Availability and Appointment System, MusuanTrack, Security Risk Analysis, and EC Mabao Payroll.',
     },
   },
   {
@@ -138,16 +138,16 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     cameraTarget: [-11.2, 1.1, 3.8],
   },
   {
-    id: 'proj-flutter-firebase',
-    name: 'Flutter & Firebase Real-Time Scheduling System',
-    sublabel: 'Cross-Platform Real-Time Sync',
-    prompt: 'INSPECT SCHEDULING SYSTEM',
+    id: 'proj-city-agriculture',
+    name: 'City Agriculture Admin Procurement Monitoring System',
+    sublabel: 'Administrative Software // Database Tracking',
+    prompt: 'INSPECT PROCUREMENT SYSTEM',
     locationId: 'projects',
     position: [-14.8, 0.9, 6.2],
     radius: 2.2,
-    iconName: 'Calendar',
+    iconName: 'Boxes',
     modalType: 'PROJECT_DETAIL',
-    projectId: 'flutter-firebase-scheduling',
+    projectId: 'city-agriculture-procurement',
     cameraTarget: [-14.8, 1.1, 6.2],
   },
   {

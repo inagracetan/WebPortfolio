@@ -3,11 +3,11 @@ import { touchControlsStore } from '@/characters/touchControlsStore'
 import { useCharacterStore } from '@/characters/useCharacterStore'
 import { INTERACTIVE_OBJECTS } from '@/interactions/interactiveObjectsData'
 import { objectInspectionStore } from '@/interactions/useObjectInspection'
-import { gameStore } from '@/hooks/useGameStore'
+import { useGameStore } from '@/hooks/useGameStore'
 import { Hand, Zap, Sparkles, Menu } from 'lucide-react'
 
 export const MobileControls: React.FC = () => {
-  const { currentScreen } = gameStore.getState()
+  const { currentScreen, isUiModalOpen, toggleMenu } = useGameStore()
   const { playerPosition } = useCharacterStore()
 
   const [joystickActive, setJoystickActive] = useState(false)
@@ -127,7 +127,7 @@ export const MobileControls: React.FC = () => {
     }
   }
 
-  if (currentScreen === 'LOADING' || currentScreen === 'WELCOME') {
+  if (isUiModalOpen || currentScreen === 'LOADING' || currentScreen === 'WELCOME') {
     return null
   }
 
@@ -166,7 +166,7 @@ export const MobileControls: React.FC = () => {
           type="button"
           onClick={() => {
             triggerHaptic(15)
-            gameStore.toggleMenu()
+            toggleMenu()
           }}
           className="w-10 h-10 rounded-full border border-sky-blue/30 bg-deep-navy/85 text-warm-ivory hover:text-electric-blue flex items-center justify-center shadow-md active:scale-95 cursor-pointer backdrop-blur-md"
           aria-label="Open Portfolio Directory Menu"

@@ -8,7 +8,7 @@ import { useGameStore } from '@/hooks/useGameStore'
 export const PersonalWorkspace: React.FC = () => {
   const waterRef = useRef<THREE.Mesh>(null)
   const { graphicsQuality } = useGameStore()
-  const isEco = graphicsQuality === 'eco'
+  const isEco = graphicsQuality === 'low'
 
   useFrame((state) => {
     const t = state.clock.getElapsedTime()

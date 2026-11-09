@@ -14,6 +14,8 @@ export type ActiveModal =
   | 'CONTROLS'
   | null
 
+export type GraphicsQuality = 'low' | 'medium' | 'high'
+
 interface GameState {
   currentScreen: AppScreen
   activeModal: ActiveModal
@@ -22,10 +24,20 @@ interface GameState {
   isSoundMuted: boolean
   isMenuOpen: boolean
   hasEnteredWorld: boolean
-  graphicsQuality: 'high' | 'eco'
+  graphicsQuality: GraphicsQuality
+  isUiModalOpen: boolean
 }
 
 type Listener = (state: GameState) => void
+
+function detectDefaultGraphics(): GraphicsQuality {
+  if (typeof window === 'undefined') return 'medium'
+  if (window.innerWidth < 768) return 'low'
+  if (typeof navigator !== 'undefined' && navigator.hardwareConcurrency && navigator.hardwareConcurrency <= 4) {
+    return 'medium'
+  }
+  return 'high'
+}
 
 let state: GameState = {
   currentScreen: 'LOADING',
@@ -35,7 +47,8 @@ let state: GameState = {
   isSoundMuted: false,
   isMenuOpen: false,
   hasEnteredWorld: false,
-  graphicsQuality: typeof window !== 'undefined' && window.innerWidth < 768 ? 'eco' : 'high',
+  graphicsQuality: detectDefaultGraphics(),
+  isUiModalOpen: false,
 }
 
 const listeners = new Set<Listener>()
@@ -60,6 +73,7 @@ export const gameStore = {
       activeModal: modal,
       selectedProjectId: projectId ?? null,
       isMenuOpen: false,
+      isUiModalOpen: true,
     }
     notify()
   },
@@ -71,10 +85,16 @@ export const gameStore = {
       ...state,
       activeModal: null,
       selectedProjectId: null,
+      isUiModalOpen: state.isMenuOpen,
     }
     notify()
   },
+  setUiModalOpen: (open: boolean) => {
+    state = { ...state, isUiModalOpen: open }
+    notify()
+  },
   setLocation: (locationId: string) => {
+    if (state.activeLocation.id === locationId) return
     const loc = locationsData.find((l) => l.id === locationId)
     if (loc) {
       soundEngine.playLocationTransition()
@@ -90,30 +110,31 @@ export const gameStore = {
   },
   toggleMenu: () => {
     soundEngine.playClick()
-    state = { ...state, isMenuOpen: !state.isMenuOpen }
+    const nextMenu = !state.isMenuOpen
+    state = { ...state, isMenuOpen: nextMenu, isUiModalOpen: nextMenu || state.activeModal !== null }
     notify()
   },
   setMenuOpen: (open: boolean) => {
-    state = { ...state, isMenuOpen: open }
+    state = { ...state, isMenuOpen: open, isUiModalOpen: open || state.activeModal !== null }
     notify()
   },
   enterWorld: () => {
     soundEngine.playEnter()
     soundEngine.startAmbientBgm()
-    state = { ...state, currentScreen: 'WORLD', hasEnteredWorld: true }
+    state = { ...state, currentScreen: 'WORLD', hasEnteredWorld: true, isUiModalOpen: false }
     notify()
   },
   explorePortfolio: () => {
     soundEngine.playClick()
-    state = { ...state, currentScreen: 'EXPLORE', activeModal: 'PROJECTS' }
+    state = { ...state, currentScreen: 'WORLD', activeModal: 'PROJECTS', isUiModalOpen: true }
     notify()
   },
   resetToWelcome: () => {
     soundEngine.playClick()
-    state = { ...state, currentScreen: 'WELCOME', activeModal: null, isMenuOpen: false }
+    state = { ...state, currentScreen: 'WELCOME', activeModal: null, isMenuOpen: false, isUiModalOpen: false }
     notify()
   },
-  setGraphicsQuality: (quality: 'high' | 'eco') => {
+  setGraphicsQuality: (quality: GraphicsQuality) => {
     soundEngine.playClick()
     state = { ...state, graphicsQuality: quality }
     notify()
@@ -138,6 +159,7 @@ export function useGameStore() {
     setScreen: gameStore.setScreen,
     openModal: gameStore.openModal,
     closeModal: gameStore.closeModal,
+    setUiModalOpen: gameStore.setUiModalOpen,
     setLocation: gameStore.setLocation,
     toggleMute: gameStore.toggleMute,
     toggleMenu: gameStore.toggleMenu,
@@ -148,4 +170,3 @@ export function useGameStore() {
     setGraphicsQuality: gameStore.setGraphicsQuality,
   }
 }
-

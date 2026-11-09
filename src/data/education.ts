@@ -1,21 +1,21 @@
-import type { EducationItem } from './types'
+import type { EducationItem, SeminarTrainingItem } from './types'
 
 export const educationData: EducationItem[] = [
   {
     id: 'cmu-bsit-networking',
     degree: 'Bachelor of Science in Information Technology',
     institution: 'Central Mindanao University',
-    period: 'Undergraduate Program',
+    period: 'July 2026',
     location: 'Musuan, Maramag, Bukidnon, Philippines',
-    specialization: 'Data Networking',
+    specialization: 'Major in Data Networking',
     type: 'DEGREE',
     details: [
-      'Specialization in Data Networking: network design, switching and routing fundamentals, IP addressing, and network security.',
-      'Comprehensive coursework across IT Support, System Maintenance, Software Engineering, and Database Management.',
-      'Developed MusuanTrack (Campus Navigation App in Flutter/Dart) and CMU Faculty Availability and Appointment System (Capstone).',
-      'Completed academic projects in enterprise system analysis (EC Mabao Corporation) and security risk management assessment.',
+      'College Scholar — Central Mindanao University.',
+      'Major in Data Networking: network design, switching, IP addressing, DHCP, VLAN configuration, and Active Directory.',
+      'Developed City Agriculture Admin Procurement Monitoring System and CMU Faculty Availability and Appointment System (Capstone).',
+      'Coursework and practical foundations across Database Management, System Administration, and Technical Support.',
     ],
-    clarificationNote: 'Confirmed academic degree track at Central Mindanao University.',
+    clarificationNote: 'Confirmed academic degree track at Central Mindanao University (July 2026, College Scholar).',
   },
   {
     id: 'aws-academy-cloud-foundations',
@@ -61,5 +61,33 @@ export const educationData: EducationItem[] = [
       'Introduction to Group Policy Objects (GPOs) for centralized configuration and baseline security management.',
     ],
     clarificationNote: 'Foundational academic knowledge of directory services and system administration.',
+  },
+]
+
+export const seminarsTrainingsData: SeminarTrainingItem[] = [
+  {
+    id: 'avalanche-team1',
+    title: 'Avalanche Team1 University Connect',
+    date: 'November 3, 2026',
+    venue: 'Central Mindanao University, Bukidnon, Philippines',
+  },
+  {
+    id: 'dost-sarai',
+    title: 'DOST SARAI Training',
+    date: 'March 13, 2026',
+    venue: 'Department of Science and Technology',
+    details: ['SARAI System', 'Google Earth Engine'],
+  },
+  {
+    id: 'planting-seeds-excellence',
+    title: 'Planting Seeds of Excellence: Customer Service for Agricultural Stakeholders (Seminar)',
+    date: 'April 10, 2026',
+    venue: 'City Agriculture Office - LGU Malaybalay, Bukidnon',
+  },
+  {
+    id: 'cmu-it-seminars',
+    title: 'Information Technology Seminars and Workshops',
+    date: 'Academic Curriculum',
+    venue: 'Conducted by Central Mindanao University',
   },
 ]

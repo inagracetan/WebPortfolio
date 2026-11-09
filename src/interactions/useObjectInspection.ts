@@ -54,6 +54,7 @@ export const objectInspectionStore = {
       activeProjectDetail: project,
       activeSkillGroupDetail: skillGroup,
     }
+    gameStore.setUiModalOpen(true)
     notify()
   },
   closeInspection: () => {
@@ -66,6 +67,7 @@ export const objectInspectionStore = {
       activeProjectDetail: null,
       activeSkillGroupDetail: null,
     }
+    gameStore.setUiModalOpen(gameStore.getState().activeModal !== null || gameStore.getState().isMenuOpen)
     notify()
   },
 }

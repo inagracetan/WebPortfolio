@@ -11,7 +11,7 @@ export const WorldCanvas: React.FC = () => {
   // - High: capped at 2.0 (crisp high-DPI desktop/iPad)
   // - Eco / Mobile: capped at 1.25 (saves significant GPU fill-rate & prevents thermal throttling)
   const dpr = useMemo<[number, number]>(() => {
-    return graphicsQuality === 'eco' ? [1, 1.25] : [1, 2]
+    return graphicsQuality === 'low' ? [1, 1.25] : graphicsQuality === 'medium' ? [1, 1.5] : [1, 2]
   }, [graphicsQuality])
 
   return (

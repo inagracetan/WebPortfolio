@@ -11,6 +11,7 @@ import {
   Mail,
   Server,
   Code2,
+  Phone,
 } from 'lucide-react'
 
 export const AboutMeModal: React.FC = () => {
@@ -36,13 +37,21 @@ export const AboutMeModal: React.FC = () => {
               Hello, I'm Ina Grace Tan.
             </h3>
             <p className="text-xs text-sky-light mt-1 font-mono">
-              BS Information Technology (Data Networking) &bull; Central Mindanao University
+              BS Information Technology (Major in Data Networking) &bull; Central Mindanao University
             </p>
           </div>
 
-          <div className="flex items-center gap-2 px-3 py-1.5 bg-sky-blue/10 border border-sky-blue/30 rounded text-xs font-mono text-electric-blue">
-            <MapPin className="w-4 h-4 text-sky-light flex-shrink-0" />
-            <span>BUKIDNON, PHILIPPINES</span>
+          <div className="flex flex-col gap-1.5 text-xs font-mono">
+            <div className="flex items-center gap-2 px-3 py-1.5 bg-sky-blue/10 border border-sky-blue/30 rounded text-electric-blue">
+              <Phone className="w-3.5 h-3.5 text-sky-light flex-shrink-0" />
+              <a href={`tel:${contactData.phone}`} className="hover:underline">
+                {contactData.phoneFormatted}
+              </a>
+            </div>
+            <div className="flex items-center gap-2 px-3 py-1 bg-deep-navy border border-sky-blue/20 rounded text-warm-ivory-dim text-[11px]">
+              <MapPin className="w-3 h-3 text-sky-light flex-shrink-0" />
+              <span>{contactData.location}</span>
+            </div>
           </div>
         </div>
 
@@ -149,11 +158,18 @@ export const AboutMeModal: React.FC = () => {
         </div>
 
         {/* Footer contact shortcut */}
-        <div className="pt-2 border-t border-sky-blue/15 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 font-mono text-xs text-warm-ivory-dim">
-          <span className="flex items-center gap-1.5 text-sky-light">
-            <Mail className="w-3.5 h-3.5" />
-            {contactData.email}
-          </span>
+        <div className="pt-2 border-t border-sky-blue/15 flex flex-wrap items-center justify-between gap-2 font-mono text-xs text-warm-ivory-dim">
+          <div className="flex flex-wrap items-center gap-3">
+            <a href={`tel:${contactData.phone}`} className="flex items-center gap-1.5 text-electric-blue hover:underline">
+              <Phone className="w-3.5 h-3.5" />
+              <span>{contactData.phoneFormatted}</span>
+            </a>
+            <span className="text-sky-light/40">&bull;</span>
+            <a href={`mailto:${contactData.email}`} className="flex items-center gap-1.5 text-sky-light hover:underline">
+              <Mail className="w-3.5 h-3.5" />
+              <span>{contactData.email}</span>
+            </a>
+          </div>
           <span className="text-electric-blue flex items-center gap-1.5">
             <CheckCircle2 className="w-3.5 h-3.5 text-muted-green-light" />
             <span>Open for IT Support, Networking &amp; Dev Roles</span>

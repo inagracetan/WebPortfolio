@@ -13,7 +13,12 @@ export const CherryPetals: React.FC<CherryPetalsProps> = ({
   areaCenter = [-2.5, 2.5, 1.5],
 }) => {
   const { graphicsQuality } = useGameStore()
-  const effectiveCount = graphicsQuality === 'eco' ? Math.min(count, 35) : count
+  const effectiveCount =
+    graphicsQuality === 'low'
+      ? Math.min(count, 30)
+      : graphicsQuality === 'medium'
+      ? Math.min(count, 60)
+      : count
   const pointsRef = useRef<THREE.Points>(null)
 
   // Seeded deterministic generation for particle distribution

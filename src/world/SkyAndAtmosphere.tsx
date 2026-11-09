@@ -10,7 +10,7 @@ export const SkyAndAtmosphere: React.FC = () => {
   const { graphicsQuality } = useGameStore()
 
   // Generate glowing floating particles / dust motes
-  const particleCount = graphicsQuality === 'eco' ? 50 : 140
+  const particleCount = graphicsQuality === 'low' ? 50 : graphicsQuality === 'medium' ? 90 : 140
   const [positions, scales] = useMemo(() => {
     const pos = new Float32Array(particleCount * 3)
     const sca = new Float32Array(particleCount)

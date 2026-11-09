@@ -11,7 +11,6 @@ export const Navigation: React.FC = () => {
     openModal,
     toggleMenu,
     currentScreen,
-    resetToWelcome,
     activeLocation,
   } = useGameStore()
 
@@ -22,9 +21,10 @@ export const Navigation: React.FC = () => {
         <div className="flex items-center gap-3 pointer-events-auto">
           <button
             type="button"
-            onClick={resetToWelcome}
+            onClick={() => openModal('RESUME')}
             className="group flex items-center gap-2.5 px-3 py-1.5 bg-deep-navy/85 hover:bg-deep-navy border border-sky-blue/30 hover:border-electric-blue rounded-sm backdrop-blur-md transition-all shadow-md cursor-pointer"
-            aria-label="INA.EXE Home"
+            aria-label="INA.EXE Profile Overview"
+            title="Open Candidate Overview"
           >
             <div className="w-2.5 h-2.5 rounded-full bg-electric-blue shadow-[0_0_8px_rgba(0,240,255,0.8)] group-hover:scale-110 transition-transform" />
             <div className="flex items-baseline gap-1.5">

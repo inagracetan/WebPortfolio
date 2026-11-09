@@ -30,8 +30,8 @@ export const InteractionPrompt: React.FC = () => {
     return nearest
   }, [playerPosition])
 
-  // Don't display prompt if any modal is currently active
-  if (!nearestObject || gameStore.getState().activeModal || activeInspectionModal) {
+  // Don't display prompt if any modal or inspection is currently active
+  if (!nearestObject || gameStore.getState().isUiModalOpen || activeInspectionModal) {
     return null
   }
 
@@ -42,7 +42,7 @@ export const InteractionPrompt: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-24 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+      <div className="fixed bottom-36 md:bottom-28 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
         <motion.button
           initial={{ opacity: 0, y: 15, scale: 0.92 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}

@@ -68,6 +68,8 @@ export interface ContactInfo {
   university: string
   location: string
   email: string
+  phone: string
+  phoneFormatted: string
   availability: string
   bio: string
   interests: string[]
@@ -77,4 +79,12 @@ export interface ContactInfo {
     handle: string
     status?: string
   }[]
+}
+
+export interface SeminarTrainingItem {
+  id: string
+  title: string
+  date: string
+  venue: string
+  details?: string[]
 }

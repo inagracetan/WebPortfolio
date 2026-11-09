@@ -1,29 +1,29 @@
 import React, { useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { experienceData } from '@/data/experience'
-import { educationData } from '@/data/education'
+import { educationData, seminarsTrainingsData } from '@/data/education'
 import { useGameStore } from '@/hooks/useGameStore'
-import { Briefcase, GraduationCap, MapPin, Calendar, CheckCircle2, Info, BookOpen } from 'lucide-react'
+import { Briefcase, GraduationCap, MapPin, Calendar, CheckCircle2, Info, BookOpen, Award } from 'lucide-react'
 
 export const ExperienceModal: React.FC = () => {
   const { activeModal, closeModal } = useGameStore()
-  const [activeTab, setActiveTab] = useState<'EXPERIENCE' | 'EDUCATION'>('EXPERIENCE')
+  const [activeTab, setActiveTab] = useState<'EXPERIENCE' | 'EDUCATION' | 'SEMINARS'>('EXPERIENCE')
 
   return (
     <Modal
       isOpen={activeModal === 'EXPERIENCE'}
       onClose={closeModal}
       title="EXPERIENCE & EDUCATION ARCHIVES"
-      subtitle="Verified professional freelance history & academic foundation at Central Mindanao University"
+      subtitle="Verified professional freelance history, internship & academic foundation at Central Mindanao University"
       badge="TIMELINE"
       maxWidth="3xl"
     >
       {/* Tab Switcher */}
-      <div className="flex items-center gap-2 pb-3 border-b border-sky-blue/15">
+      <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-sky-blue/15">
         <button
           type="button"
           onClick={() => setActiveTab('EXPERIENCE')}
-          className={`flex items-center gap-2 px-4 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
             activeTab === 'EXPERIENCE'
               ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
               : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
@@ -35,7 +35,7 @@ export const ExperienceModal: React.FC = () => {
         <button
           type="button"
           onClick={() => setActiveTab('EDUCATION')}
-          className={`flex items-center gap-2 px-4 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
+          className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
             activeTab === 'EDUCATION'
               ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
               : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
@@ -43,6 +43,18 @@ export const ExperienceModal: React.FC = () => {
         >
           <GraduationCap className="w-3.5 h-3.5" />
           <span>EDUCATION &amp; COURSEWORK</span>
+        </button>
+        <button
+          type="button"
+          onClick={() => setActiveTab('SEMINARS')}
+          className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
+            activeTab === 'SEMINARS'
+              ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
+              : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
+          }`}
+        >
+          <Award className="w-3.5 h-3.5" />
+          <span>SEMINARS &amp; TRAININGS</span>
         </button>
       </div>
 
@@ -169,6 +181,50 @@ export const ExperienceModal: React.FC = () => {
                 )}
               </div>
             ))}
+          </div>
+        )}
+
+        {activeTab === 'SEMINARS' && (
+          <div className="space-y-4">
+            <div className="p-3 bg-deep-navy/80 border border-sky-blue/20 rounded-sm flex items-start gap-2.5 text-xs text-sky-light">
+              <Award className="w-4 h-4 text-electric-blue flex-shrink-0 mt-0.5" />
+              <p className="font-mono text-[11px] text-warm-ivory-dim">
+                Verified technical seminars, specialized technology trainings, and customer service workshops attended (from Tan_IG_CV.pdf).
+              </p>
+            </div>
+
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {seminarsTrainingsData.map((st) => (
+                <div
+                  key={st.id}
+                  className="p-4 bg-deep-navy/70 border border-sky-blue/20 rounded-sm space-y-2 font-mono text-xs"
+                >
+                  <h4 className="font-bold text-warm-ivory text-sm leading-snug">
+                    {st.title}
+                  </h4>
+                  <div className="flex items-center gap-1.5 text-electric-blue text-xs font-semibold">
+                    <Calendar className="w-3.5 h-3.5" />
+                    <span>{st.date}</span>
+                  </div>
+                  <div className="flex items-center gap-1.5 text-sky-light text-[11px]">
+                    <MapPin className="w-3 h-3 text-sky-light/80" />
+                    <span>{st.venue}</span>
+                  </div>
+                  {st.details && (
+                    <div className="flex flex-wrap gap-1 pt-1.5 border-t border-sky-blue/10">
+                      {st.details.map((d, i) => (
+                        <span
+                          key={i}
+                          className="px-2 py-0.5 bg-sky-blue/15 text-sky-light text-[10px] rounded border border-sky-blue/25"
+                        >
+                          {d}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
           </div>
         )}
       </div>

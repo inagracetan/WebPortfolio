@@ -9,14 +9,7 @@ export const ProjectsModal: React.FC = () => {
   const { activeModal, closeModal, selectedProjectId } = useGameStore()
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
 
-  const categories = [
-    'ALL',
-    'Mobile & Geolocation',
-    'Web & Systems',
-    'Mobile & Cloud',
-    'Cybersecurity & Auditing',
-    'Systems & Enterprise',
-  ]
+  const categories = ['ALL', ...Array.from(new Set(projectsData.map((p) => p.category)))]
 
   const filteredProjects = projectsData.filter((p) => {
     if (selectedCategory === 'ALL') return true

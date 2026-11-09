@@ -1,28 +1,42 @@
 import type { ContactInfo } from './types'
 
 export const contactData: ContactInfo = {
-  name: 'Ina Grace Tan',
-  title: 'BS Information Technology | Data Networking Specialization',
+  name: 'INA GRACE D. TAN',
+  title: 'Bachelor of Science in Information Technology | Major in Data Networking',
   degree: 'Bachelor of Science in Information Technology',
   specialization: 'Data Networking',
   university: 'Central Mindanao University',
-  location: 'Bukidnon, Philippines',
+  location: 'P3A Pob. Valencia City, Bukidnon',
   email: 'inagracetan@gmail.com',
-  availability: 'Open for opportunities in IT Support, Networking, Software Development, Cloud & Cybersecurity',
-  bio: 'Bachelor of Science in Information Technology student/graduate from Central Mindanao University, specializing in Data Networking. Passionate about IT support, network systems, mobile application development (Flutter/Dart), cloud computing, and cybersecurity. Dedicated to solving technical challenges with clean execution, structured documentation, and reliable systems.',
+  phone: '09552900484',
+  phoneFormatted: '0955-290-0484',
+  availability: 'Open for opportunities in Database Management, Network Configuration, System Development, and Technical Support',
+  bio: 'Bachelor of Science in Information Technology graduate with a specialization in Data Networking. Equipped with a foundation in database management, network configuration, system development, and technical support through academic projects and internship experience. Eager to contribute technical skills, solve real-world IT challenges, and grow professionally in a collaborative environment.',
   interests: [
-    'IT Support & Troubleshooting',
+    'Database Management & Systems',
     'Data Networking & Routing',
-    'Mobile & Software Development',
-    'Cloud Computing (AWS)',
-    'Cybersecurity & Risk Management',
+    'System & Mobile Development',
+    'Technical Support & Troubleshooting',
+    'Data Encoding & Record Management',
   ],
   socialLinks: [
+    {
+      platform: 'Mobile Phone',
+      url: 'tel:09552900484',
+      handle: '0955-290-0484',
+      status: 'Direct Cellular Voice & SMS',
+    },
     {
       platform: 'Email',
       url: 'mailto:inagracetan@gmail.com',
       handle: 'inagracetan@gmail.com',
-      status: 'Direct Communication Frequency',
+      status: 'Direct Email Transmission',
+    },
+    {
+      platform: 'Address',
+      url: 'https://maps.google.com/?q=Valencia+City+Bukidnon',
+      handle: 'P3A Pob. Valencia City, Bukidnon',
+      status: 'Permanent Residence',
     },
     {
       platform: 'GitHub',

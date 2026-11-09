@@ -158,7 +158,7 @@ export function useCharacterController() {
         currentPos.current.z,
         targetDeltaX,
         targetDeltaZ,
-        0.35 // Player capsule radius
+        0.25 // Player capsule radius
       )
 
       currentPos.current.x = newX

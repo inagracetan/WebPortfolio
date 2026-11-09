@@ -19,34 +19,35 @@ export interface BridgeCorridor {
   width: number
 }
 
-// Island center circles (walkable ground zones)
+// Island center circles (walkable ground zones matching actual visual geometry)
 const ISLAND_ZONES: BoundingCircle2D[] = [
-  { x: 0, z: 0, radius: 6.3 }, // Central Workspace Island
-  { x: -13, z: 5, radius: 4.3 }, // Project Lab Island
-  { x: 13, z: 5, radius: 4.3 }, // Tech Center Island
-  { x: -10, z: -11, radius: 4.4 }, // University Island
-  { x: 11, z: -10, radius: 4.2 }, // Contact Station Island
+  { x: 0, z: 0, radius: 7.2 }, // Central Workspace Island (cylinder radius 6.8 + lawn margin)
+  { x: -13, z: 5, radius: 5.2 }, // Project Lab Island
+  { x: 13, z: 5, radius: 5.2 }, // Tech Center Island
+  { x: -10, z: -11, radius: 5.2 }, // University Island
+  { x: 11, z: -10, radius: 5.0 }, // Contact Station Island
 ]
 
-// Connecting Bridge Corridors (walkable pathways between islands)
+// Connecting Bridge Corridors:
+// Extends from central island origin (0, 0) directly into each island's center to ensure
+// seamless connectivity without any physics dead zones or seams.
 const BRIDGE_CORRIDORS: BridgeCorridor[] = [
-  // Workspace -> Project Lab
-  { startX: -4.5, startZ: 2.0, endX: -10.5, endZ: 4.8, width: 2.2 },
-  // Workspace -> Tech Center
-  { startX: 4.5, startZ: 2.0, endX: 10.5, endZ: 4.8, width: 2.2 },
-  // Workspace -> University
-  { startX: -3.5, startZ: -3.5, endX: -8.5, endZ: -9.5, width: 2.2 },
-  // Workspace -> Contact Station
-  { startX: 3.5, startZ: -3.5, endX: 8.5, endZ: -9.0, width: 2.2 },
+  // Workspace -> Project Lab (West)
+  { startX: 0, startZ: 0, endX: -13, endZ: 5, width: 3.8 },
+  // Workspace -> Tech Center (East)
+  { startX: 0, startZ: 0, endX: 13, endZ: 5, width: 3.8 },
+  // Workspace -> University (North-West)
+  { startX: 0, startZ: 0, endX: -10, endZ: -11, width: 3.8 },
+  // Workspace -> Contact Station (North-East)
+  { startX: 0, startZ: 0, endX: 11, endZ: -10, width: 3.8 },
 ]
 
-// Solid Obstacle Boxes (walls, solid furniture, structures that block movement)
-// NOTE: Specifically crafted so the Personal Workspace can be entered and explored freely!
+// Solid Obstacle Boxes (physical structures that block movement)
 const SOLID_OBSTACLES: BoundingBox2D[] = [
-  // Personal Workspace: Pool Water Basin Basin boundary (so player walks ON the deck, not inside water)
+  // Personal Workspace: Pool Water Basin boundary (player walks ON the deck, not inside water)
   { minX: -2.3, maxX: -0.1, minZ: 0.3, maxZ: 1.9 },
 
-  // Personal Workspace: Solid back wall (keeps player inside the building / on deck)
+  // Personal Workspace: Solid back wall
   { minX: -1.0, maxX: 2.2, minZ: -2.2, maxZ: -2.0 },
   // Personal Workspace: Desk collision (allows walking right up to the desk without clipping)
   { minX: 0.3, maxX: 1.5, minZ: -0.8, maxZ: -0.3 },
@@ -54,7 +55,7 @@ const SOLID_OBSTACLES: BoundingBox2D[] = [
   { minX: -0.8, maxX: -0.4, minZ: -1.6, maxZ: -0.4 },
 
   // Project Lab: Server racks
-  { minX: -14.2, maxX: -11.8, minZ: 2.0, maxZ: 2.7 },
+  { minX: -14.1, maxX: -11.9, minZ: 2.1, maxZ: 2.7 },
 
   // Tech Center: Back structural wall
   { minX: 11.2, maxX: 14.8, minZ: 3.1, maxZ: 3.4 },
@@ -70,7 +71,7 @@ const SOLID_OBSTACLES: BoundingBox2D[] = [
 export function getTerrainHeight(x: number, z: number): number {
   // Workspace ground deck
   const distWorkspace = Math.hypot(x, z)
-  if (distWorkspace <= 6.3) {
+  if (distWorkspace <= 7.2) {
     // Stepping up to the entrance deck / stairs
     if (x >= 0.0 && x <= 2.2 && z >= -1.5 && z <= 0.8) {
       return 0.5 // Upper studio floor
@@ -84,47 +85,47 @@ export function getTerrainHeight(x: number, z: number): number {
 
   // Project Lab
   const distProject = Math.hypot(x - (-13), z - 5)
-  if (distProject <= 4.3) {
+  if (distProject <= 5.2) {
     return 0.5
   }
 
   // Tech Center
   const distTech = Math.hypot(x - 13, z - 5)
-  if (distTech <= 4.3) {
+  if (distTech <= 5.2) {
     return 0.65
   }
 
   // University
   const distUniversity = Math.hypot(x - (-10), z - (-11))
-  if (distUniversity <= 4.4) {
+  if (distUniversity <= 5.2) {
     return 1.1
   }
 
   // Contact Station
   const distContact = Math.hypot(x - 11, z - (-10))
-  if (distContact <= 4.2) {
+  if (distContact <= 5.0) {
     return 1.3
   }
 
   // Linear height lerp along bridges
-  if (x < -4.5 && z > 1.5) {
-    // Bridge to Project Lab
-    const factor = Math.min(Math.max((x - (-4.5)) / (-13 - (-4.5)), 0), 1)
+  if (x < -2.0 && z > 0.5) {
+    // Bridge to Project Lab: (0, 0) -> (-13, 5)
+    const factor = Math.min(Math.max((x - 0) / (-13 - 0), 0), 1)
     return 0.35 + factor * 0.15
   }
-  if (x > 4.5 && z > 1.5) {
-    // Bridge to Tech Center
-    const factor = Math.min(Math.max((x - 4.5) / (13 - 4.5), 0), 1)
+  if (x > 2.0 && z > 0.5) {
+    // Bridge to Tech Center: (0, 0) -> (13, 5)
+    const factor = Math.min(Math.max((x - 0) / (13 - 0), 0), 1)
     return 0.35 + factor * 0.3
   }
-  if (x < -3.0 && z < -3.0) {
-    // Bridge to University
-    const factor = Math.min(Math.max((z - (-3.5)) / (-11 - (-3.5)), 0), 1)
+  if (x < -1.5 && z < -2.0) {
+    // Bridge to University: (0, 0) -> (-10, -11)
+    const factor = Math.min(Math.max((z - 0) / (-11 - 0), 0), 1)
     return 0.35 + factor * 0.75
   }
-  if (x > 3.0 && z < -3.0) {
-    // Bridge to Contact Station
-    const factor = Math.min(Math.max((z - (-3.5)) / (-10 - (-3.5)), 0), 1)
+  if (x > 1.5 && z < -2.0) {
+    // Bridge to Contact Station: (0, 0) -> (11, -10)
+    const factor = Math.min(Math.max((z - 0) / (-10 - 0), 0), 1)
     return 0.35 + factor * 0.95
   }
 
@@ -141,7 +142,7 @@ function distToSegment(px: number, pz: number, x1: number, z1: number, x2: numbe
 }
 
 // Checks if position is within any walkable island or bridge
-export function isPositionWalkable(x: number, z: number, playerRadius = 0.35): boolean {
+export function isPositionWalkable(x: number, z: number, playerRadius = 0.25): boolean {
   // 1. Check if inside any island zone
   for (const island of ISLAND_ZONES) {
     const d = Math.hypot(x - island.x, z - island.z)
@@ -162,7 +163,7 @@ export function isPositionWalkable(x: number, z: number, playerRadius = 0.35): b
 }
 
 // Checks if position collides with any solid obstacle
-export function checkObstacleCollision(x: number, z: number, playerRadius = 0.35): boolean {
+export function checkObstacleCollision(x: number, z: number, playerRadius = 0.25): boolean {
   for (const box of SOLID_OBSTACLES) {
     if (
       x + playerRadius > box.minX &&
@@ -176,33 +177,48 @@ export function checkObstacleCollision(x: number, z: number, playerRadius = 0.35
   return false
 }
 
-// Resolves collision with sliding response
+// Resolves collision with sliding response and sub-stepping for smooth diagonal locomotion
 export function resolveMovement(
   currentX: number,
   currentZ: number,
   deltaX: number,
   deltaZ: number,
-  playerRadius = 0.35
+  playerRadius = 0.25
 ): [number, number] {
   const targetX = currentX + deltaX
   const targetZ = currentZ + deltaZ
 
-  // 1. Try full movement
+  // 1. Try full movement step
   if (isPositionWalkable(targetX, targetZ, playerRadius) && !checkObstacleCollision(targetX, targetZ, playerRadius)) {
     return [targetX, targetZ]
   }
 
-  // 2. Try sliding along X axis
+  // 2. Try axis-aligned sliding
   if (isPositionWalkable(targetX, currentZ, playerRadius) && !checkObstacleCollision(targetX, currentZ, playerRadius)) {
     return [targetX, currentZ]
   }
 
-  // 3. Try sliding along Z axis
   if (isPositionWalkable(currentX, targetZ, playerRadius) && !checkObstacleCollision(currentX, targetZ, playerRadius)) {
     return [currentX, targetZ]
+  }
+
+  // 3. Sub-stepping / fractional sliding for natural movement along angled bridge corridors
+  const subSteps = 4
+  for (let s = subSteps - 1; s >= 1; s--) {
+    const fraction = s / subSteps
+    const subX = currentX + deltaX * fraction
+    const subZ = currentZ + deltaZ * fraction
+    if (isPositionWalkable(subX, subZ, playerRadius) && !checkObstacleCollision(subX, subZ, playerRadius)) {
+      return [subX, subZ]
+    }
+    if (isPositionWalkable(subX, currentZ, playerRadius) && !checkObstacleCollision(subX, currentZ, playerRadius)) {
+      return [subX, currentZ]
+    }
+    if (isPositionWalkable(currentX, subZ, playerRadius) && !checkObstacleCollision(currentX, subZ, playerRadius)) {
+      return [currentX, subZ]
+    }
   }
 
   // 4. Blocked completely
   return [currentX, currentZ]
 }
-

@@ -183,28 +183,39 @@ export const SettingsModal: React.FC = () => {
             </div>
           </div>
 
-          <div className="grid grid-cols-2 gap-2 pt-1">
+          <div className="grid grid-cols-3 gap-2 pt-1">
             <button
               type="button"
               onClick={() => setGraphicsQuality('high')}
-              className={`p-2.5 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
+              className={`p-2 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
                 graphicsQuality === 'high'
-                  ? 'bg-electric-blue/15 border-electric-blue text-electric-blue font-semibold'
+                  ? 'bg-electric-blue/15 border-electric-blue text-electric-blue font-semibold shadow-[0_0_10px_rgba(0,240,255,0.2)]'
                   : 'bg-deep-navy border-sky-blue/15 text-warm-ivory-dim hover:text-warm-ivory'
               }`}
             >
-              HIGH FIDELITY (60 FPS)
+              HIGH FIDELITY
             </button>
             <button
               type="button"
-              onClick={() => setGraphicsQuality('eco')}
-              className={`p-2.5 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
-                graphicsQuality === 'eco'
-                  ? 'bg-electric-blue/15 border-electric-blue text-electric-blue font-semibold'
+              onClick={() => setGraphicsQuality('medium')}
+              className={`p-2 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
+                graphicsQuality === 'medium'
+                  ? 'bg-electric-blue/15 border-electric-blue text-electric-blue font-semibold shadow-[0_0_10px_rgba(0,240,255,0.2)]'
                   : 'bg-deep-navy border-sky-blue/15 text-warm-ivory-dim hover:text-warm-ivory'
               }`}
             >
-              ECO / BATTERY SAVER
+              BALANCED
+            </button>
+            <button
+              type="button"
+              onClick={() => setGraphicsQuality('low')}
+              className={`p-2 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
+                graphicsQuality === 'low'
+                  ? 'bg-electric-blue/15 border-electric-blue text-electric-blue font-semibold shadow-[0_0_10px_rgba(0,240,255,0.2)]'
+                  : 'bg-deep-navy border-sky-blue/15 text-warm-ivory-dim hover:text-warm-ivory'
+              }`}
+            >
+              ECO / BATTERY
             </button>
           </div>
         </div>
