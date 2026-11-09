@@ -4,12 +4,12 @@ import { OrbitControls } from '@react-three/drei'
 import type { OrbitControls as OrbitControlsImpl } from 'three-stdlib'
 import * as THREE from 'three'
 import { useGameStore } from '@/hooks/useGameStore'
-import { useCharacterStore } from '@/characters/useCharacterStore'
+import { characterStore, useCharacterStore } from '@/characters/useCharacterStore'
 
 export const CameraRig: React.FC = () => {
   const controlsRef = useRef<OrbitControlsImpl>(null)
   const { currentScreen, activeLocation } = useGameStore()
-  const { playerPosition, cameraMode } = useCharacterStore()
+  const { cameraMode } = useCharacterStore()
 
   // Target camera focus position and camera eye position
   const targetVec = useRef(new THREE.Vector3(0, 1.2, 0))
@@ -35,7 +35,7 @@ export const CameraRig: React.FC = () => {
 
       if (cameraMode === 'FOLLOW') {
         // Third-person camera tracking: Follows the character position directly
-        const [px, py, pz] = playerPosition
+        const [px, py, pz] = characterStore.getState().playerPosition
         targetVec.current.set(px, py + 1.1, pz)
 
         // Smoothly glide camera target towards player

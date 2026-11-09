@@ -3,7 +3,8 @@ import { useFrame } from '@react-three/fiber'
 import { Html } from '@react-three/drei'
 import * as THREE from 'three'
 import type { InteractiveObjectItem } from '@/interactions/types'
-import { useCharacterStore } from '@/characters/useCharacterStore'
+import { characterStore } from '@/characters/useCharacterStore'
+import { useGameStore } from '@/hooks/useGameStore'
 import { objectInspectionStore } from '@/interactions/useObjectInspection'
 import { useSound } from '@/hooks/useSound'
 
@@ -15,19 +16,15 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
   const markerRef = useRef<THREE.Mesh>(null)
   const ringRef = useRef<THREE.Mesh>(null)
   const [isHovered, setIsHovered] = useState(false)
+  const [isNearby, setIsNearby] = useState(false)
 
-  const { playerPosition, teleportTo } = useCharacterStore()
+  const { isUiModalOpen } = useGameStore()
   const { playHover, playClick } = useSound()
 
-  // Calculate distance between player avatar and this interactive object
-  const dist = Math.hypot(
-    playerPosition[0] - item.position[0],
-    playerPosition[2] - item.position[2]
-  )
-  const isNearby = dist <= item.radius
-
   useFrame((state) => {
+    if (isUiModalOpen) return
     const t = state.clock.getElapsedTime()
+
     if (markerRef.current) {
       markerRef.current.rotation.y = t * 1.8
       markerRef.current.position.y = item.position[1] + 0.35 + Math.sin(t * 3 + item.position[0]) * 0.08
@@ -35,15 +32,29 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
     if (ringRef.current) {
       ringRef.current.rotation.z = -t * 1.2
     }
+
+    // Proximity evaluation inside useFrame
+    const [px, , pz] = characterStore.getState().playerPosition
+    const nearby = Math.hypot(px - item.position[0], pz - item.position[2]) <= item.radius
+    if (nearby !== isNearby) {
+      setIsNearby(nearby)
+    }
   })
+
+  if (isUiModalOpen) {
+    return null
+  }
 
   const handleTrigger = (e: React.MouseEvent) => {
     e.stopPropagation()
     playClick()
 
-    // If far away, walk/warp to object first
-    if (dist > item.radius) {
-      teleportTo([item.position[0], item.position[1] - 0.2, item.position[2] + 0.8])
+    const [px, , pz] = characterStore.getState().playerPosition
+    const currentDist = Math.hypot(px - item.position[0], pz - item.position[2])
+
+    // If slightly out of radius, step close to object
+    if (currentDist > item.radius) {
+      characterStore.teleportTo([item.position[0], item.position[1] - 0.2, item.position[2] + 0.8])
     }
 
     objectInspectionStore.openInspection(item)
@@ -107,4 +118,3 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
     </group>
   )
 }
-

@@ -4,13 +4,14 @@ import { Sparkles, ArrowRight } from 'lucide-react'
 import { useCharacterStore } from '@/characters/useCharacterStore'
 import { INTERACTIVE_OBJECTS } from '@/interactions/interactiveObjectsData'
 import { objectInspectionStore, useObjectInspection } from '@/interactions/useObjectInspection'
-import { gameStore } from '@/hooks/useGameStore'
+import { useGameStore } from '@/hooks/useGameStore'
 import { useSound } from '@/hooks/useSound'
 import type { InteractiveObjectItem } from '@/interactions/types'
 
 export const InteractionPrompt: React.FC = () => {
   const { playerPosition } = useCharacterStore()
   const { activeInspectionModal } = useObjectInspection()
+  const { isUiModalOpen } = useGameStore()
   const { playClick, playHover } = useSound()
 
   const nearestObject = useMemo(() => {
@@ -31,7 +32,7 @@ export const InteractionPrompt: React.FC = () => {
   }, [playerPosition])
 
   // Don't display prompt if any modal or inspection is currently active
-  if (!nearestObject || gameStore.getState().isUiModalOpen || activeInspectionModal) {
+  if (!nearestObject || isUiModalOpen || activeInspectionModal) {
     return null
   }
 

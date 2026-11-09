@@ -2,6 +2,7 @@ import { useEffect, useRef } from 'react'
 import { useFrame, useThree } from '@react-three/fiber'
 import * as THREE from 'three'
 import { characterStore } from './useCharacterStore'
+import { MAIN_ISLAND_SPAWN_POSITION, MAIN_ISLAND_SPAWN_ROTATION } from './spawnConfig'
 import { touchControlsStore } from './touchControlsStore'
 import { resolveMovement, getTerrainHeight } from './collisionSystem'
 import { soundEngine } from '@/utilities/audio'
@@ -92,9 +93,18 @@ export function useCharacterController() {
     }
   }, [])
 
-  // Current avatar position and rotation refs
-  const currentPos = useRef(new THREE.Vector3(0, 0.45, 1.8))
-  const currentRot = useRef(0)
+  // Current avatar position and rotation refs initialized from centralized spawn config
+  const currentPos = useRef(new THREE.Vector3(...MAIN_ISLAND_SPAWN_POSITION))
+  const currentRot = useRef(MAIN_ISLAND_SPAWN_ROTATION)
+
+  // Synchronize internal physics refs with centralized spawn & teleport actions
+  useEffect(() => {
+    const unsubscribe = characterStore.onTeleport((newPos, newRot) => {
+      currentPos.current.set(newPos[0], newPos[1], newPos[2])
+      currentRot.current = newRot
+    })
+    return unsubscribe
+  }, [])
 
   // Reusable vectors for performance
   const moveDir = useRef(new THREE.Vector3())

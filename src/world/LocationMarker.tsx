@@ -16,12 +16,13 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
   const ringRef = useRef<THREE.Mesh>(null)
   const [isHovered, setIsHovered] = useState(false)
 
-  const { activeLocation, setLocation, openModal } = useGameStore()
+  const { activeLocation, setLocation, openModal, isUiModalOpen } = useGameStore()
   const { playHover, playClick } = useSound()
 
   const isSelected = activeLocation.id === location.id
 
   useFrame((state) => {
+    if (isUiModalOpen) return
     const t = state.clock.getElapsedTime()
     if (crystalRef.current) {
       crystalRef.current.rotation.y = t * 1.5
@@ -32,6 +33,10 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
       ringRef.current.rotation.x = Math.sin(t) * 0.2
     }
   })
+
+  if (isUiModalOpen) {
+    return null
+  }
 
   const handleClick = (e: React.MouseEvent) => {
     e.stopPropagation()

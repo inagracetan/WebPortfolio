@@ -33,19 +33,19 @@ const ISLAND_ZONES: BoundingCircle2D[] = [
 // seamless connectivity without any physics dead zones or seams.
 const BRIDGE_CORRIDORS: BridgeCorridor[] = [
   // Workspace -> Project Lab (West)
-  { startX: 0, startZ: 0, endX: -13, endZ: 5, width: 3.8 },
+  { startX: 0, startZ: 0, endX: -13, endZ: 5, width: 4.8 },
   // Workspace -> Tech Center (East)
-  { startX: 0, startZ: 0, endX: 13, endZ: 5, width: 3.8 },
+  { startX: 0, startZ: 0, endX: 13, endZ: 5, width: 4.8 },
   // Workspace -> University (North-West)
-  { startX: 0, startZ: 0, endX: -10, endZ: -11, width: 3.8 },
+  { startX: 0, startZ: 0, endX: -10, endZ: -11, width: 4.8 },
   // Workspace -> Contact Station (North-East)
-  { startX: 0, startZ: 0, endX: 11, endZ: -10, width: 3.8 },
+  { startX: 0, startZ: 0, endX: 11, endZ: -10, width: 4.8 },
 ]
 
 // Solid Obstacle Boxes (physical structures that block movement)
 const SOLID_OBSTACLES: BoundingBox2D[] = [
-  // Personal Workspace: Pool Water Basin boundary (player walks ON the deck, not inside water)
-  { minX: -2.3, maxX: -0.1, minZ: 0.3, maxZ: 1.9 },
+  // Personal Workspace: Pool Water Basin interior (clear walkway around perimeter & spawn)
+  { minX: -2.05, maxX: -0.35, minZ: 0.5, maxZ: 1.7 },
 
   // Personal Workspace: Solid back wall
   { minX: -1.0, maxX: 2.2, minZ: -2.2, maxZ: -2.0 },
@@ -142,11 +142,11 @@ function distToSegment(px: number, pz: number, x1: number, z1: number, x2: numbe
 }
 
 // Checks if position is within any walkable island or bridge
-export function isPositionWalkable(x: number, z: number, playerRadius = 0.25): boolean {
+export function isPositionWalkable(x: number, z: number, _playerRadius = 0.25): boolean {
   // 1. Check if inside any island zone
   for (const island of ISLAND_ZONES) {
     const d = Math.hypot(x - island.x, z - island.z)
-    if (d <= island.radius - playerRadius) {
+    if (d <= island.radius) {
       return true
     }
   }
@@ -177,7 +177,7 @@ export function checkObstacleCollision(x: number, z: number, playerRadius = 0.25
   return false
 }
 
-// Resolves collision with sliding response and sub-stepping for smooth diagonal locomotion
+// Resolves collision with sliding response, corridor alignment, and sub-stepping for smooth locomotion
 export function resolveMovement(
   currentX: number,
   currentZ: number,
@@ -193,7 +193,24 @@ export function resolveMovement(
     return [targetX, targetZ]
   }
 
-  // 2. Try axis-aligned sliding
+  // 2. Try sliding along angled bridge corridors (natural movement along diagonal paths)
+  for (const bridge of BRIDGE_CORRIDORS) {
+    const bx = bridge.endX - bridge.startX
+    const bz = bridge.endZ - bridge.startZ
+    const blen = Math.hypot(bx, bz)
+    if (blen > 0) {
+      const dirX = bx / blen
+      const dirZ = bz / blen
+      const dot = deltaX * dirX + deltaZ * dirZ
+      const projX = currentX + dirX * dot
+      const projZ = currentZ + dirZ * dot
+      if (isPositionWalkable(projX, projZ, playerRadius) && !checkObstacleCollision(projX, projZ, playerRadius)) {
+        return [projX, projZ]
+      }
+    }
+  }
+
+  // 3. Try axis-aligned sliding
   if (isPositionWalkable(targetX, currentZ, playerRadius) && !checkObstacleCollision(targetX, currentZ, playerRadius)) {
     return [targetX, currentZ]
   }
@@ -202,7 +219,7 @@ export function resolveMovement(
     return [currentX, targetZ]
   }
 
-  // 3. Sub-stepping / fractional sliding for natural movement along angled bridge corridors
+  // 4. Sub-stepping / fractional sliding for natural movement around obstacle corners
   const subSteps = 4
   for (let s = subSteps - 1; s >= 1; s--) {
     const fraction = s / subSteps
@@ -219,6 +236,6 @@ export function resolveMovement(
     }
   }
 
-  // 4. Blocked completely
+  // 5. Blocked completely
   return [currentX, currentZ]
 }

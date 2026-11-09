@@ -2,9 +2,11 @@ import { useState, useEffect } from 'react'
 import type { LocationWaypoint } from '@/locations/types'
 import { locationsData } from '@/locations/locationsData'
 import { soundEngine } from '@/utilities/audio'
+import { characterStore } from '@/characters/useCharacterStore'
 
 export type AppScreen = 'LOADING' | 'WELCOME' | 'EXPLORE' | 'WORLD'
 export type ActiveModal =
+  | 'ABOUT'
   | 'PROJECTS'
   | 'SKILLS'
   | 'EXPERIENCE'
@@ -121,6 +123,7 @@ export const gameStore = {
   enterWorld: () => {
     soundEngine.playEnter()
     soundEngine.startAmbientBgm()
+    characterStore.spawnOnMainIsland()
     state = { ...state, currentScreen: 'WORLD', hasEnteredWorld: true, isUiModalOpen: false }
     notify()
   },

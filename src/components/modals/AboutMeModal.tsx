@@ -2,6 +2,7 @@ import React from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
 import { contactData } from '@/data/contact'
+import { useGameStore } from '@/hooks/useGameStore'
 import {
   MapPin,
   Network,
@@ -16,11 +17,23 @@ import {
 
 export const AboutMeModal: React.FC = () => {
   const { activeInspectionModal, closeInspection } = useObjectInspection()
+  const { activeModal, closeModal } = useGameStore()
+
+  const isOpen = activeModal === 'ABOUT' || activeInspectionModal === 'ABOUT_ME'
+
+  const handleClose = () => {
+    if (activeModal === 'ABOUT') {
+      closeModal()
+    }
+    if (activeInspectionModal === 'ABOUT_ME') {
+      closeInspection()
+    }
+  }
 
   return (
     <Modal
-      isOpen={activeInspectionModal === 'ABOUT_ME'}
-      onClose={closeInspection}
+      isOpen={isOpen}
+      onClose={handleClose}
       title="ABOUT ME // INA GRACE TAN"
       subtitle="BS Information Technology — Data Networking Specialization"
       badge="PROFILE"

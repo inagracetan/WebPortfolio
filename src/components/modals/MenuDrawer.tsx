@@ -2,11 +2,8 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
-  Compass,
   FolderGit2,
   Code2,
-  Briefcase,
-  GraduationCap,
   Mail,
   FileText,
   Settings,
@@ -14,10 +11,10 @@ import {
   Keyboard,
   User,
   Home,
+  RotateCcw,
 } from 'lucide-react'
 import { useGameStore, type ActiveModal } from '@/hooks/useGameStore'
-import { useCharacterStore } from '@/characters/useCharacterStore'
-import { locationsData } from '@/locations/locationsData'
+import { characterStore } from '@/characters/useCharacterStore'
 
 export const MenuDrawer: React.FC = () => {
   const {
@@ -25,11 +22,8 @@ export const MenuDrawer: React.FC = () => {
     setMenuOpen,
     openModal,
     enterWorld,
-    setLocation,
-    activeLocation,
+    currentScreen,
   } = useGameStore()
-
-  const { teleportTo } = useCharacterStore()
 
   const navItems: {
     label: string
@@ -40,86 +34,90 @@ export const MenuDrawer: React.FC = () => {
     isPrimary?: boolean
   }[] = [
     {
-      label: '3D World Exploration',
-      action: () => enterWorld(),
-      icon: <Compass className="w-4 h-4 text-electric-blue" />,
-      badge: 'EXPLORE',
+      label: 'Home // Main Island',
+      action: () => {
+        if (currentScreen === 'WELCOME') {
+          enterWorld()
+        }
+        characterStore.spawnOnMainIsland()
+        setMenuOpen(false)
+      },
+      icon: <Home className="w-4 h-4 text-electric-blue" />,
+      badge: 'SPAWN',
       isPrimary: true,
     },
     {
-      label: 'About Me & Background',
-      modal: 'RESUME', // Or About Me
-      action: () => openModal('RESUME'),
-      icon: <User className="w-4 h-4 text-warm-ivory" />,
+      label: 'About Me',
+      action: () => {
+        openModal('ABOUT')
+        setMenuOpen(false)
+      },
+      icon: <User className="w-4 h-4 text-sky-light" />,
       badge: 'INA GRACE TAN',
     },
     {
+      label: 'Curriculum Vitae (CV)',
+      action: () => {
+        openModal('RESUME')
+        setMenuOpen(false)
+      },
+      icon: <FileText className="w-4 h-4 text-electric-blue" />,
+      badge: 'PDF / PRINT',
+    },
+    {
       label: 'Featured Projects',
-      modal: 'PROJECTS',
+      action: () => {
+        openModal('PROJECTS')
+        setMenuOpen(false)
+      },
       icon: <FolderGit2 className="w-4 h-4 text-sky-light" />,
       badge: '5 PROJECTS',
     },
     {
       label: 'Technical Skills Matrix',
-      modal: 'SKILLS',
+      action: () => {
+        openModal('SKILLS')
+        setMenuOpen(false)
+      },
       icon: <Code2 className="w-4 h-4 text-muted-green-light" />,
-      badge: '5 DOMAINS',
+      badge: '6 DOMAINS',
     },
     {
-      label: 'Work Experience',
-      modal: 'EXPERIENCE',
-      icon: <Briefcase className="w-4 h-4 text-sky-light" />,
-      badge: 'FREELANCE',
-    },
-    {
-      label: 'Education & Coursework',
-      modal: 'EXPERIENCE',
-      icon: <GraduationCap className="w-4 h-4 text-warm-ivory" />,
-      badge: 'CMU & AWS',
-    },
-    {
-      label: 'Contact & Transmissions',
-      modal: 'CONTACT',
-      icon: <Mail className="w-4 h-4 text-electric-blue" />,
-      badge: 'OPEN FOR ROLES',
-    },
-    {
-      label: 'Curriculum Vitae Dossier',
-      modal: 'RESUME',
-      icon: <FileText className="w-4 h-4 text-warm-ivory" />,
-      badge: 'PRINT / PDF',
+      label: 'Contact & Direct Telephone',
+      action: () => {
+        openModal('CONTACT')
+        setMenuOpen(false)
+      },
+      icon: <Mail className="w-4 h-4 text-warm-ivory" />,
+      badge: '0955-290-0484',
     },
     {
       label: 'Controls & Keybindings',
-      modal: 'CONTROLS',
-      icon: <Keyboard className="w-4 h-4 text-sky-light" />,
+      action: () => {
+        openModal('CONTROLS')
+        setMenuOpen(false)
+      },
+      icon: <Keyboard className="w-4 h-4 text-sky-light/80" />,
     },
     {
       label: 'System Settings & Audio',
-      modal: 'SETTINGS',
+      action: () => {
+        openModal('SETTINGS')
+        setMenuOpen(false)
+      },
       icon: <Settings className="w-4 h-4 text-warm-ivory-dim" />,
     },
   ]
 
-  const handleWaypointWarp = (locId: string) => {
-    const loc = locationsData.find((l) => l.id === locId)
-    if (loc) {
-      setLocation(loc.id)
-      teleportTo([loc.coordinates[0], loc.coordinates[1] + 0.45, loc.coordinates[2] + 1.2])
-      setMenuOpen(false)
-    }
-  }
-
   const handleReturnToSpawn = () => {
-    setLocation('workspace')
-    teleportTo([0, 0.45, 1.8])
+    characterStore.spawnOnMainIsland()
     setMenuOpen(false)
   }
 
   return (
     <AnimatePresence>
       {isMenuOpen && (
-        <div className="fixed inset-0 z-50 overflow-hidden">
+        <div className="fixed inset-0 z-50 overflow-hidden select-none">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
@@ -139,45 +137,33 @@ export const MenuDrawer: React.FC = () => {
           >
             <div>
               {/* Header */}
-              <div className="flex items-center justify-between pb-5 border-b border-sky-blue/15 mb-5">
+              <div className="flex items-center justify-between pb-4 border-b border-sky-blue/15 mb-4">
                 <div>
-                  <h3 className="font-display font-extrabold text-lg text-warm-ivory tracking-wide flex items-center gap-2">
+                  <h3 className="font-display font-bold text-base text-warm-ivory tracking-wide flex items-center gap-2">
                     <Sparkles className="w-4 h-4 text-electric-blue" />
-                    <span>SYSTEM DIRECTORY</span>
+                    <span>PORTFOLIO DIRECTORY</span>
                   </h3>
-                  <p className="font-mono text-xs text-sky-light/70 tracking-widest mt-0.5">
-                    RECRUITER ACCESS // INA.EXE
+                  <p className="font-mono text-[11px] text-sky-light/70 tracking-wider mt-0.5">
+                    INA GRACE TAN &bull; BS IT (DATA NETWORKING)
                   </p>
                 </div>
                 <button
                   type="button"
                   onClick={() => setMenuOpen(false)}
-                  className="p-2 text-warm-ivory-dim hover:text-electric-blue hover:bg-white/5 rounded-sm transition-colors cursor-pointer"
+                  className="p-1.5 text-warm-ivory-dim hover:text-electric-blue hover:bg-white/5 rounded-full transition-colors cursor-pointer"
                   aria-label="Close menu"
                 >
                   <X className="w-5 h-5" />
                 </button>
               </div>
 
-              {/* Recruiter Quick Access Notice */}
-              <div className="mb-4 p-2.5 bg-sky-blue/10 border border-sky-blue/20 rounded text-[11px] font-mono text-sky-light">
-                Direct portfolio index for quick review without 3D world navigation.
-              </div>
-
-              {/* Navigation Items */}
+              {/* Navigation Items (6 Core Sections) */}
               <div className="space-y-1.5 mb-6">
                 {navItems.map((item, idx) => (
                   <button
                     key={idx}
                     type="button"
-                    onClick={() => {
-                      if (item.action) {
-                        item.action()
-                      } else if (item.modal) {
-                        openModal(item.modal)
-                      }
-                      setMenuOpen(false)
-                    }}
+                    onClick={item.action}
                     className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-sm border transition-all font-mono text-xs tracking-wider group text-left cursor-pointer ${
                       item.isPrimary
                         ? 'bg-electric-blue/15 hover:bg-electric-blue border-electric-blue text-electric-blue hover:text-deep-navy font-bold'
@@ -201,52 +187,26 @@ export const MenuDrawer: React.FC = () => {
                 ))}
               </div>
 
-              {/* Island Waypoints Fast Travel & Return to Main Island */}
-              <div className="pt-4 border-t border-sky-blue/15">
-                <div className="flex items-center justify-between mb-2.5 font-mono text-[11px] text-sky-light/80 uppercase">
-                  <span>Island Waypoints [1-5]</span>
-                  <button
-                    type="button"
-                    onClick={handleReturnToSpawn}
-                    className="text-electric-blue hover:underline flex items-center gap-1 cursor-pointer"
-                  >
-                    <Home className="w-3 h-3" />
-                    <span>Return to Spawn</span>
-                  </button>
+              {/* Respawn / Return to Main Island Action */}
+              <div className="p-3 bg-deep-navy/60 border border-sky-blue/15 rounded flex items-center justify-between font-mono text-xs">
+                <div className="flex items-center gap-2 text-warm-ivory">
+                  <RotateCcw className="w-3.5 h-3.5 text-electric-blue" />
+                  <span>Main Island Spawn Point</span>
                 </div>
-
-                <div className="grid grid-cols-1 gap-1.5">
-                  {locationsData.map((loc, idx) => {
-                    const isActive = activeLocation.id === loc.id
-                    return (
-                      <button
-                        key={loc.id}
-                        type="button"
-                        onClick={() => handleWaypointWarp(loc.id)}
-                        className={`flex items-center justify-between px-3 py-2 rounded text-xs font-mono transition-all text-left border cursor-pointer ${
-                          isActive
-                            ? 'bg-electric-blue/15 border-electric-blue text-electric-blue font-bold'
-                            : 'bg-deep-navy/40 border-transparent text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy'
-                        }`}
-                      >
-                        <div className="flex items-center gap-2 truncate">
-                          <span className="text-electric-blue font-bold">[{idx + 1}]</span>
-                          <span className="truncate">{loc.name}</span>
-                        </div>
-                        <span className="text-[10px] opacity-70 ml-2">
-                          {loc.badge.split(' // ')[1]}
-                        </span>
-                      </button>
-                    )
-                  })}
-                </div>
+                <button
+                  type="button"
+                  onClick={handleReturnToSpawn}
+                  className="px-2.5 py-1 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy rounded text-[11px] font-bold border border-electric-blue/30 transition-colors cursor-pointer"
+                >
+                  RESPAWN
+                </button>
               </div>
             </div>
 
             {/* Footer */}
             <div className="mt-8 pt-4 border-t border-sky-blue/15 font-mono text-[11px] text-warm-ivory-dim/60 flex items-center justify-between">
               <span>INA GRACE TAN &bull; BUKIDNON, PH</span>
-              <span className="text-electric-blue font-bold">SYSTEM ACTIVE</span>
+              <span className="text-electric-blue font-bold">READY FOR ROLES</span>
             </div>
           </motion.aside>
         </div>

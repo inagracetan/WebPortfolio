@@ -320,7 +320,7 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
   {
     id: 'contact-terminal',
     name: 'Direct Transmission Terminal',
-    sublabel: 'inagracetan@gmail.com // Direct Inquiry',
+    sublabel: '0955-290-0484 • inagracetan@gmail.com',
     prompt: 'OPEN CONTACT FREQUENCY',
     locationId: 'contact',
     position: [12.4, 1.45, -9.2],

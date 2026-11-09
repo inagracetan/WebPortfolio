@@ -47,7 +47,7 @@ export const EnvironmentLighting: React.FC = () => {
         intensity={2.2}
         distance={7}
         color="#fef08a"
-        castShadow={isHighQuality}
+        castShadow={false}
       />
 
       {/* Workspace Pool Aqua Glow */}
