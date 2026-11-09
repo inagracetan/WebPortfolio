@@ -1,0 +1,80 @@
+export interface Project {
+  id: string
+  title: string
+  subtitle: string
+  category: string
+  description: string
+  features: string[]
+  metrics?: string
+  role: string
+  techStack: string[]
+  links: {
+    github?: string
+    demo?: string
+    external?: string
+  }
+  featured: boolean
+  locationId: string
+  previewImage?: string
+  statusBadge?: string
+  isCapstone?: boolean
+  documentationNotes?: string
+}
+
+export interface SkillItem {
+  name: string
+  level: number // 1 - 100 honest representation
+  highlight?: boolean
+  tag: string
+  proficiencyLabel: string // e.g. "Practical Experience", "Academic Coursework", "Foundational"
+}
+
+export interface SkillGroup {
+  id: string
+  title: string
+  description: string
+  icon: string
+  skills: SkillItem[]
+}
+
+export interface ExperienceItem {
+  id: string
+  role: string
+  organization: string
+  period: string
+  location: string
+  summary: string
+  responsibilities: string[]
+  technologies: string[]
+}
+
+export interface EducationItem {
+  id: string
+  degree: string
+  institution: string
+  period: string
+  location: string
+  specialization?: string
+  type: 'DEGREE' | 'COURSEWORK' | 'TECHNICAL_KNOWLEDGE'
+  details: string[]
+  clarificationNote?: string
+}
+
+export interface ContactInfo {
+  name: string
+  title: string
+  degree: string
+  specialization: string
+  university: string
+  location: string
+  email: string
+  availability: string
+  bio: string
+  interests: string[]
+  socialLinks: {
+    platform: string
+    url: string
+    handle: string
+    status?: string
+  }[]
+}

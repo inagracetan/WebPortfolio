@@ -1,0 +1,103 @@
+@import "tailwindcss";
+
+@theme {
+  /* Color Palette - INA.EXE */
+  --color-sky-blue: #38bdf8;
+  --color-sky-light: #7dd3fc;
+  --color-sky-dark: #0284c7;
+
+  --color-muted-green: #52796f;
+  --color-muted-green-light: #84a98c;
+  --color-muted-green-dark: #354f52;
+
+  --color-warm-ivory: #faf8f5;
+  --color-warm-ivory-dim: #ded6c9;
+  --color-warm-ivory-dark: #f0eae1;
+
+  --color-deep-navy: #0b1120;
+  --color-deep-navy-card: #0f172a;
+  --color-deep-navy-border: #1e293b;
+  --color-deep-navy-surface: #131d33;
+
+  --color-electric-blue: #00f0ff;
+  --color-electric-blue-hover: #38bdf8;
+  --color-electric-blue-glow: rgba(0, 240, 255, 0.4);
+
+  /* Typography */
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-display: 'Outfit', 'Plus Jakarta Sans', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* Custom Transitions */
+  --ease-game: cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* Base custom styles */
+:root {
+  color-scheme: dark;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: var(--color-deep-navy);
+  color: var(--color-warm-ivory);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* Custom Indie Game UI Utilities */
+.hud-panel {
+  background: rgba(15, 23, 42, 0.75);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(56, 189, 248, 0.15);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37), inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+
+.hud-panel-active {
+  border-color: rgba(0, 240, 255, 0.4);
+  box-shadow: 0 0 20px rgba(0, 240, 255, 0.15), inset 0 0 0 1px rgba(0, 240, 255, 0.2);
+}
+
+.hud-corner-tl::before,
+.hud-corner-br::after {
+  content: '';
+  position: absolute;
+  width: 8px;
+  height: 8px;
+  pointer-events: none;
+}
+
+.hud-corner-tl::before {
+  top: -1px;
+  left: -1px;
+  border-top: 2px solid var(--color-electric-blue);
+  border-left: 2px solid var(--color-electric-blue);
+}
+
+.hud-corner-br::after {
+  bottom: -1px;
+  right: -1px;
+  border-bottom: 2px solid var(--color-electric-blue);
+  border-right: 2px solid var(--color-electric-blue);
+}
+
+/* Subtle game grid pattern */
+.bg-game-grid {
+  background-image: radial-gradient(rgba(56, 189, 248, 0.1) 1px, transparent 1px);
+  background-size: 24px 24px;
+}
+
+/* Scanlines overlay */
+.scanlines {
+  background: linear-gradient(
+    to bottom,
+    rgba(255,255,255,0),
+    rgba(255,255,255,0) 50%,
+    rgba(0, 0, 0, 0.2) 50%,
+    rgba(0, 0, 0, 0.2)
+  );
+  background-size: 100% 4px;
+  pointer-events: none;
+}
+

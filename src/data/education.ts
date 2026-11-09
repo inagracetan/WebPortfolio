@@ -1,0 +1,65 @@
+import type { EducationItem } from './types'
+
+export const educationData: EducationItem[] = [
+  {
+    id: 'cmu-bsit-networking',
+    degree: 'Bachelor of Science in Information Technology',
+    institution: 'Central Mindanao University',
+    period: 'Undergraduate Program',
+    location: 'Musuan, Maramag, Bukidnon, Philippines',
+    specialization: 'Data Networking',
+    type: 'DEGREE',
+    details: [
+      'Specialization in Data Networking: network design, switching and routing fundamentals, IP addressing, and network security.',
+      'Comprehensive coursework across IT Support, System Maintenance, Software Engineering, and Database Management.',
+      'Developed MusuanTrack (Campus Navigation App in Flutter/Dart) and CMU Faculty Availability and Appointment System (Capstone).',
+      'Completed academic projects in enterprise system analysis (EC Mabao Corporation) and security risk management assessment.',
+    ],
+    clarificationNote: 'Confirmed academic degree track at Central Mindanao University.',
+  },
+  {
+    id: 'aws-academy-cloud-foundations',
+    degree: 'AWS Academy Cloud Coursework',
+    institution: 'AWS Academy / Central Mindanao University',
+    period: 'Academic Coursework Completed',
+    location: 'Central Mindanao University',
+    specialization: 'Cloud Infrastructure & Core Services',
+    type: 'COURSEWORK',
+    details: [
+      'Completed comprehensive AWS Academy cloud modules covering compute (Amazon EC2), object storage (Amazon S3), and virtual networking (Amazon VPC).',
+      'Studied cloud architecture fundamentals, cloud economics, high availability concepts, and managed database services.',
+      'Completed hands-on laboratory exercises configured through the official AWS Academy learning platform.',
+    ],
+    clarificationNote: 'Note: Completed as official academic coursework within the university curriculum; not a commercial vendor certification.',
+  },
+  {
+    id: 'aws-academy-cloud-security',
+    degree: 'AWS Academy Cloud Security Coursework',
+    institution: 'AWS Academy / Central Mindanao University',
+    period: 'Academic Coursework Completed',
+    location: 'Central Mindanao University',
+    specialization: 'Cloud Security & Governance',
+    type: 'COURSEWORK',
+    details: [
+      'Studied cloud security compliance models, shared responsibility framework, and defensive architectural patterns.',
+      'Hands-on laboratory training in AWS Identity and Access Management (IAM) policies, roles, and least-privilege access controls.',
+      'Explored cloud data encryption (at rest and in transit), audit logging with AWS CloudTrail, and cloud monitoring.',
+    ],
+    clarificationNote: 'Note: Completed as official academic coursework within the university curriculum; not a commercial vendor certification.',
+  },
+  {
+    id: 'active-directory-fundamentals',
+    degree: 'Active Directory Fundamentals & System Administration',
+    institution: 'Central Mindanao University — IT Curriculum',
+    period: 'Technical Coursework',
+    location: 'Central Mindanao University',
+    specialization: 'Directory Services & Administration',
+    type: 'TECHNICAL_KNOWLEDGE',
+    details: [
+      'Foundational understanding of Active Directory Domain Services (AD DS), domain controllers, and hierarchical forest/domain structure.',
+      'Knowledge of managing Organizational Units (OUs), creating and organizing user and group security accounts.',
+      'Introduction to Group Policy Objects (GPOs) for centralized configuration and baseline security management.',
+    ],
+    clarificationNote: 'Foundational academic knowledge of directory services and system administration.',
+  },
+]
