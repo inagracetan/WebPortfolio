@@ -154,7 +154,7 @@ export const ContactModal: React.FC = () => {
                 Residential Location
               </span>
               <span className="text-warm-ivory font-medium">
-                {contactData.location} (Central Mindanao University, Bukidnon)
+                {contactData.location}
               </span>
             </div>
           </div>
