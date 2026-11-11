@@ -1,6 +1,6 @@
 import React from 'react'
 import { motion } from 'framer-motion'
-import { Globe2, FolderGit2, Keyboard, Volume2 } from 'lucide-react'
+import { Globe2, FileUser, Keyboard, Volume2 } from 'lucide-react'
 import { Button } from './Button'
 import { useGameStore } from '@/hooks/useGameStore'
 import { APP_CONFIG } from '@/utilities/constants'
@@ -85,7 +85,7 @@ export const WelcomeScreen: React.FC = () => {
           <Button
             variant="secondary"
             size="lg"
-            icon={<FolderGit2 className="w-5 h-5 text-sky-light" />}
+            icon={<FileUser className="w-5 h-5 text-sky-light" />}
             onClick={explorePortfolio}
             className="w-full sm:w-auto min-w-[210px]"
           >

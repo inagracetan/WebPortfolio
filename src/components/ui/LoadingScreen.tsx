@@ -7,12 +7,12 @@ interface LoadingScreenProps {
 }
 
 const BOOT_LOGS = [
-  'BOOTING INA.EXE KERNEL v1.0.0...',
-  'INITIALIZING THREE.JS WEBGL RENDER PIPELINE...',
-  'GENERATING LOW-POLY FLOATING ISLAND GEOMETRY...',
-  'COMPILING NATURAL AMBIENT LIGHT SHADERS...',
-  'SYNCHRONIZING PORTFOLIO KNOWLEDGE REPOSITORY...',
-  'WORLD READY. ENTERING ATMOSPHERE...',
+  'BOOTING INA.EXE KERNEL v1.0.0',
+  'INITIALIZING THREE.JS WEBGL RENDER PIPELINE',
+  'GENERATING LOW-POLY FLOATING ISLAND GEOMETRY',
+  'COMPILING NATURAL AMBIENT LIGHT SHADERS',
+  'SYNCHRONIZING PORTFOLIO KNOWLEDGE REPOSITORY',
+  'WORLD READY: ENTERING ATMOSPHERE',
 ]
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
@@ -136,7 +136,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
         {/* Status Prompt */}
         <div className="font-mono text-[11px] text-warm-ivory-dim/60 tracking-wider">
-          {progress === 100 ? 'INITIALIZATION COMPLETE' : 'CALIBRATING FLOATING ISLANDS...'}
+          {progress === 100 ? 'INITIALIZATION COMPLETE' : 'CALIBRATING FLOATING ISLANDS'}
         </div>
       </div>
     </motion.div>

@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Compass, Eye, Video, EyeOff, RotateCcw, Sparkles } from 'lucide-react'
+import { Compass, Info, Camera, RefreshCcw, Sparkles } from 'lucide-react'
 import { useGameStore, type ActiveModal } from '@/hooks/useGameStore'
 import { characterStore, useCharacterStore } from '@/characters/useCharacterStore'
 
@@ -100,35 +100,34 @@ export const WorldHud: React.FC = () => {
               <button
                 type="button"
                 onClick={handleInspectLocation}
-                className="flex items-center gap-1 px-2.5 py-1 sm:px-3 sm:py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-bold text-[10px] sm:text-xs transition-all cursor-pointer shadow-sm active:scale-95 min-h-[30px]"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 min-h-[38px] min-w-[38px] justify-center"
                 title={`View ${activeLocation.name} portfolio details`}
+                aria-label="View Location Details"
               >
-                <Eye className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span>DETAILS</span>
+                <Info className="w-4 h-4" />
+                <span className="hidden md:inline">DETAILS</span>
               </button>
 
               <button
                 type="button"
                 onClick={toggleCameraMode}
-                className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-sky-blue text-warm-ivory-dim hover:text-warm-ivory rounded-full text-[10px] sm:text-xs transition-colors cursor-pointer active:scale-95 min-h-[30px]"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-sky-blue text-warm-ivory-dim hover:text-warm-ivory rounded-full text-xs transition-colors cursor-pointer active:scale-95 min-h-[38px] min-w-[38px] justify-center"
                 title={cameraMode === 'FOLLOW' ? 'Switch to Free Orbit camera' : 'Switch to Follow camera'}
+                aria-label={cameraMode === 'FOLLOW' ? 'Camera Mode: Follow' : 'Camera Mode: Orbit'}
               >
-                {cameraMode === 'FOLLOW' ? (
-                  <Video className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-electric-blue" />
-                ) : (
-                  <EyeOff className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                )}
-                <span>{cameraMode === 'FOLLOW' ? 'FOLLOW' : 'ORBIT'}</span>
+                <Camera className={`w-4 h-4 ${cameraMode === 'FOLLOW' ? 'text-electric-blue' : 'text-warm-ivory-dim'}`} />
+                <span className="hidden md:inline">{cameraMode === 'FOLLOW' ? 'FOLLOW' : 'ORBIT'}</span>
               </button>
 
               <button
                 type="button"
                 onClick={handleRespawn}
-                className="flex items-center gap-1 px-2 py-1 sm:px-2.5 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full text-[10px] sm:text-xs transition-colors cursor-pointer active:scale-95 min-h-[30px]"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full text-xs transition-colors cursor-pointer active:scale-95 min-h-[38px] min-w-[38px] justify-center"
                 title="Respawn avatar at Main Island spawn point"
+                aria-label="Respawn Character on Main Island"
               >
-                <RotateCcw className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                <span>RESPAWN</span>
+                <RefreshCcw className="w-4 h-4" />
+                <span className="hidden md:inline">RESPAWN</span>
               </button>
             </div>
           </motion.div>

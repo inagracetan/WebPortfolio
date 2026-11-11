@@ -4,16 +4,14 @@ import {
   VolumeX,
   Settings,
   Menu,
-  Home,
-  User,
-  FileText,
-  FolderGit2,
-  Code2,
+  House,
+  UserRound,
+  FileUser,
+  FolderKanban,
+  Brain,
   Mail,
-  RotateCcw,
 } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
-import { characterStore } from '@/characters/useCharacterStore'
 import { Tooltip } from './Tooltip'
 import { APP_CONFIG } from '@/utilities/constants'
 
@@ -24,6 +22,7 @@ export const Navigation: React.FC = () => {
     openModal,
     toggleMenu,
     currentScreen,
+    setScreen,
     isUiModalOpen,
     activeLocation,
     setLocation,
@@ -32,11 +31,6 @@ export const Navigation: React.FC = () => {
   // STRICT REQUIREMENT (Phase 5): Hide completely when ANY modal or popup is open
   if (isUiModalOpen) {
     return null
-  }
-
-  // Quick Respawn handler: Explicitly returns character to the main island spawn point
-  const handleRespawnClick = () => {
-    characterStore.spawnOnMainIsland()
   }
 
   return (
@@ -81,7 +75,7 @@ export const Navigation: React.FC = () => {
               title="Personal Workspace (Creative Studio & Villa Hub)"
               aria-label="Personal Workspace"
             >
-              <Home className="w-3.5 h-3.5 text-electric-blue" />
+              <House className="w-3.5 h-3.5 text-electric-blue" />
               <span><span className="hidden xl:inline">PERSONAL </span>WORKSPACE</span>
             </button>
 
@@ -92,7 +86,7 @@ export const Navigation: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
               title="About Ina Grace Tan"
             >
-              <User className="w-3.5 h-3.5 text-sky-light" />
+              <UserRound className="w-3.5 h-3.5 text-sky-light" />
               <span>ABOUT</span>
             </button>
 
@@ -103,7 +97,7 @@ export const Navigation: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-electric-blue/15 text-electric-blue font-bold border border-electric-blue/30 hover:bg-electric-blue hover:text-deep-navy transition-all cursor-pointer shadow-sm"
               title="View & Download Curriculum Vitae"
             >
-              <FileText className="w-3.5 h-3.5" />
+              <FileUser className="w-3.5 h-3.5" />
               <span>RESUME</span>
             </button>
 
@@ -114,7 +108,7 @@ export const Navigation: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
               title="Featured IT & Software Projects"
             >
-              <FolderGit2 className="w-3.5 h-3.5 text-sky-light" />
+              <FolderKanban className="w-3.5 h-3.5 text-sky-light" />
               <span>PROJECTS</span>
             </button>
 
@@ -125,7 +119,7 @@ export const Navigation: React.FC = () => {
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
               title="Technical Skills Matrix"
             >
-              <Code2 className="w-3.5 h-3.5 text-muted-green-light" />
+              <Brain className="w-3.5 h-3.5 text-muted-green-light" />
               <span>SKILLS</span>
             </button>
 
@@ -142,19 +136,19 @@ export const Navigation: React.FC = () => {
           </nav>
         )}
 
-        {/* Right: Sound, Settings, Respawn & Mobile Drawer Trigger */}
+        {/* Right: Direct Portfolio, Sound, Settings & Mobile Drawer Trigger */}
         <div className="pointer-events-auto flex items-center gap-1.5 sm:gap-2">
-          {/* Quick Respawn Button (desktop only) */}
+          {/* Direct Portfolio Switch (coexisting with 3D exploration) */}
           {currentScreen !== 'WELCOME' && (
-            <Tooltip content="Respawn Avatar on Main Island">
+            <Tooltip content="Direct Portfolio View (All 9 Sections)">
               <button
                 type="button"
-                onClick={handleRespawnClick}
-                className="hidden lg:flex items-center gap-1 px-2.5 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/25 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full text-xs font-mono transition-colors cursor-pointer backdrop-blur-md"
-                aria-label="Respawn Character on Main Island"
+                onClick={() => setScreen('DIRECT_PORTFOLIO')}
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-semibold transition-all backdrop-blur-md cursor-pointer shadow-sm active:scale-95"
+                aria-label="Direct Portfolio View"
               >
-                <RotateCcw className="w-3.5 h-3.5 text-sky-light" />
-                <span className="text-[11px]">SPAWN</span>
+                <FileUser className="w-3.5 h-3.5" />
+                <span className="hidden sm:inline">PORTFOLIO</span>
               </button>
             </Tooltip>
           )}

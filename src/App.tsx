@@ -8,6 +8,7 @@ import { WorldHud } from '@/components/ui/WorldHud'
 import { InteractionPrompt } from '@/components/ui/InteractionPrompt'
 import { Minimap } from '@/components/ui/Minimap'
 import { MobileControls } from '@/components/ui/MobileControls'
+import { DirectPortfolioView } from '@/components/portfolio/DirectPortfolioView'
 import {
   MenuDrawer,
   ProjectsModal,
@@ -50,10 +51,10 @@ export const App: React.FC = () => {
       <div className="absolute inset-0 pointer-events-none bg-gradient-to-t from-deep-navy/80 via-transparent to-deep-navy/50 z-10" />
 
       {/* Persistent Navigation Header HUD */}
-      {currentScreen !== 'LOADING' && <Navigation />}
+      {currentScreen !== 'LOADING' && currentScreen !== 'DIRECT_PORTFOLIO' && <Navigation />}
 
       {/* Top-Right Archipelago Radar / Minimap */}
-      {currentScreen !== 'LOADING' && currentScreen !== 'WELCOME' && <Minimap />}
+      {currentScreen !== 'LOADING' && currentScreen !== 'WELCOME' && currentScreen !== 'DIRECT_PORTFOLIO' && <Minimap />}
 
       {/* Screen Views */}
       <AnimatePresence mode="wait">
@@ -67,16 +68,20 @@ export const App: React.FC = () => {
         {currentScreen === 'WELCOME' && (
           <WelcomeScreen key="welcome" />
         )}
+
+        {currentScreen === 'DIRECT_PORTFOLIO' && (
+          <DirectPortfolioView key="direct-portfolio" />
+        )}
       </AnimatePresence>
 
       {/* Proximity Interaction Prompt [E] */}
-      {currentScreen !== 'LOADING' && currentScreen !== 'WELCOME' && <InteractionPrompt />}
+      {currentScreen !== 'LOADING' && currentScreen !== 'WELCOME' && currentScreen !== 'DIRECT_PORTFOLIO' && <InteractionPrompt />}
 
       {/* Bottom Waypoint & HUD Controls (visible in WORLD / EXPLORE modes) */}
-      <WorldHud />
+      {currentScreen !== 'DIRECT_PORTFOLIO' && <WorldHud />}
 
       {/* Mobile Touch Virtual Joystick & Interact Action */}
-      <MobileControls />
+      {currentScreen !== 'DIRECT_PORTFOLIO' && <MobileControls />}
 
       {/* Interactive Modals & Drawers */}
       <MenuDrawer />

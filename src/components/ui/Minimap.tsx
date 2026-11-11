@@ -1,6 +1,6 @@
 import React, { useState, useRef } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Map, ChevronUp, ChevronDown } from 'lucide-react'
+import { Radar, ChevronUp, ChevronDown } from 'lucide-react'
 import { characterStore, useCharacterStore } from '@/characters/useCharacterStore'
 import { DESTINATION_WAYPOINTS } from '@/characters/spawnConfig'
 import { useGameStore } from '@/hooks/useGameStore'
@@ -75,9 +75,10 @@ export const Minimap: React.FC = () => {
             onClick={() => setIsExpanded(!isExpanded)}
             className="flex items-center gap-1.5 text-left cursor-pointer hover:text-electric-blue transition-colors"
             title="Toggle Radar Display"
+            aria-label="Toggle Radar Display"
           >
-            <Map className="w-3 h-3 text-electric-blue" />
-            <span className="font-bold tracking-wider">RADAR // ARCHIPELAGO</span>
+            <Radar className="w-3 h-3 text-electric-blue" />
+            <span className="font-bold tracking-wider">RADAR<span className="hidden sm:inline"> // ARCHIPELAGO</span></span>
           </button>
           <button
             type="button"

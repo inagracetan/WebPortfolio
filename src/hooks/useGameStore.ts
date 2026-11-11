@@ -4,7 +4,7 @@ import { locationsData } from '@/locations/locationsData'
 import { soundEngine } from '@/utilities/audio'
 import { characterStore } from '@/characters/useCharacterStore'
 
-export type AppScreen = 'LOADING' | 'WELCOME' | 'EXPLORE' | 'WORLD'
+export type AppScreen = 'LOADING' | 'WELCOME' | 'EXPLORE' | 'WORLD' | 'DIRECT_PORTFOLIO'
 export type ActiveModal =
   | 'ABOUT'
   | 'PROJECTS'
@@ -124,13 +124,15 @@ export const gameStore = {
   enterWorld: () => {
     soundEngine.playEnter()
     soundEngine.startAmbientBgm()
-    characterStore.spawnOnMainIsland()
+    if (!state.hasEnteredWorld) {
+      characterStore.spawnOnMainIsland()
+    }
     state = { ...state, currentScreen: 'WORLD', hasEnteredWorld: true, isUiModalOpen: false }
     notify()
   },
   explorePortfolio: () => {
     soundEngine.playClick()
-    state = { ...state, currentScreen: 'WORLD', activeModal: 'PROJECTS', isUiModalOpen: true }
+    state = { ...state, currentScreen: 'DIRECT_PORTFOLIO', activeModal: null, isUiModalOpen: false }
     notify()
   },
   resetToWelcome: () => {

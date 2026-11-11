@@ -2,16 +2,16 @@ import React from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import {
   X,
-  FolderGit2,
-  Code2,
+  FolderKanban,
+  Brain,
   Mail,
-  FileText,
+  FileUser,
   Settings,
   Sparkles,
   Keyboard,
-  User,
-  Home,
-  RotateCcw,
+  UserRound,
+  House,
+  RefreshCcw,
 } from 'lucide-react'
 import { useGameStore, type ActiveModal } from '@/hooks/useGameStore'
 import { characterStore } from '@/characters/useCharacterStore'
@@ -23,6 +23,7 @@ export const MenuDrawer: React.FC = () => {
     openModal,
     enterWorld,
     currentScreen,
+    setScreen,
     setLocation,
   } = useGameStore()
 
@@ -35,6 +36,16 @@ export const MenuDrawer: React.FC = () => {
     isPrimary?: boolean
   }[] = [
     {
+      label: 'Direct Portfolio (All 9 Sections)',
+      action: () => {
+        setScreen('DIRECT_PORTFOLIO')
+        setMenuOpen(false)
+      },
+      icon: <FileUser className="w-4 h-4 text-electric-blue" />,
+      badge: 'COMPLETE PROFILE',
+      isPrimary: true,
+    },
+    {
       label: 'Personal Workspace',
       action: () => {
         if (currentScreen === 'WELCOME') {
@@ -43,9 +54,8 @@ export const MenuDrawer: React.FC = () => {
         setLocation('workspace')
         setMenuOpen(false)
       },
-      icon: <Home className="w-4 h-4 text-electric-blue" />,
+      icon: <House className="w-4 h-4 text-electric-blue" />,
       badge: 'STUDIO VILLA',
-      isPrimary: true,
     },
     {
       label: 'About Me',
@@ -53,7 +63,7 @@ export const MenuDrawer: React.FC = () => {
         openModal('ABOUT')
         setMenuOpen(false)
       },
-      icon: <User className="w-4 h-4 text-sky-light" />,
+      icon: <UserRound className="w-4 h-4 text-sky-light" />,
       badge: 'INA GRACE TAN',
     },
     {
@@ -62,7 +72,7 @@ export const MenuDrawer: React.FC = () => {
         openModal('RESUME')
         setMenuOpen(false)
       },
-      icon: <FileText className="w-4 h-4 text-electric-blue" />,
+      icon: <FileUser className="w-4 h-4 text-electric-blue" />,
       badge: 'PDF / PRINT',
     },
     {
@@ -71,7 +81,7 @@ export const MenuDrawer: React.FC = () => {
         openModal('PROJECTS')
         setMenuOpen(false)
       },
-      icon: <FolderGit2 className="w-4 h-4 text-sky-light" />,
+      icon: <FolderKanban className="w-4 h-4 text-sky-light" />,
       badge: '5 PROJECTS',
     },
     {
@@ -80,7 +90,7 @@ export const MenuDrawer: React.FC = () => {
         openModal('SKILLS')
         setMenuOpen(false)
       },
-      icon: <Code2 className="w-4 h-4 text-muted-green-light" />,
+      icon: <Brain className="w-4 h-4 text-muted-green-light" />,
       badge: '6 DOMAINS',
     },
     {
@@ -191,7 +201,7 @@ export const MenuDrawer: React.FC = () => {
               {/* Respawn / Return to Main Island Action */}
               <div className="p-3 bg-deep-navy/60 border border-sky-blue/15 rounded flex items-center justify-between font-mono text-xs">
                 <div className="flex items-center gap-2 text-warm-ivory">
-                  <RotateCcw className="w-3.5 h-3.5 text-electric-blue" />
+                  <RefreshCcw className="w-3.5 h-3.5 text-electric-blue" />
                   <span>Main Island Spawn Point</span>
                 </div>
                 <button
