@@ -137,3 +137,4 @@ export const CredlyBadge: React.FC<CredlyBadgeProps> = ({
     </div>
   )
 }
+

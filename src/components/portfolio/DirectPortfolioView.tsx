@@ -14,10 +14,6 @@ import {
   Phone,
   MapPin,
   ExternalLink,
-  Menu,
-  X,
-  Volume2,
-  VolumeX,
   CheckCircle2,
   ArrowUp,
   Sparkles,
@@ -34,7 +30,7 @@ import { contactData } from '@/data/contact'
 import { certificationsData, CATEGORY_GRADIENTS } from '@/data/certifications'
 import { CredlyBadge } from './CredlyBadge'
 import { TechLogo } from './TechLogo'
-import { APP_CONFIG } from '@/utilities/constants'
+import { DirectPortfolioNav } from './DirectPortfolioNav'
 
 // Exact 9-section order required
 const SECTIONS = [
@@ -50,9 +46,8 @@ const SECTIONS = [
 ] as const
 
 export const DirectPortfolioView: React.FC = () => {
-  const { enterWorld, isSoundMuted, toggleMute } = useGameStore()
+  const { enterWorld } = useGameStore()
   const [activeSection, setActiveSection] = useState<string>('home')
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
@@ -74,7 +69,6 @@ export const DirectPortfolioView: React.FC = () => {
   }, [])
 
   const scrollToSection = (id: string) => {
-    setMobileMenuOpen(false)
     const el = document.getElementById(id)
     if (el) {
       el.scrollIntoView({ behavior: 'smooth', block: 'start' })
@@ -96,122 +90,11 @@ export const DirectPortfolioView: React.FC = () => {
       <div className="fixed inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-blue/15 via-transparent to-deep-navy" />
       <div className="fixed inset-0 pointer-events-none opacity-20 scanlines" />
 
-      {/* STICKY HEADER */}
-      <header className="sticky top-0 z-50 bg-deep-navy/92 backdrop-blur-xl border-b border-sky-blue/20">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
-          {/* Logo Brand */}
-          <button
-            type="button"
-            onClick={() => scrollToSection('home')}
-            className="flex items-center gap-3 text-left group cursor-pointer"
-          >
-            <div className="w-8 h-8 rounded-full bg-electric-blue/20 border border-electric-blue flex items-center justify-center text-electric-blue font-bold text-xs shadow-[0_0_12px_rgba(0,240,255,0.4)] group-hover:scale-105 transition-transform">
-              IT
-            </div>
-            <div>
-              <div className="font-display font-bold text-sm tracking-wide text-warm-ivory group-hover:text-electric-blue transition-colors">
-                {APP_CONFIG.name}
-              </div>
-              <div className="font-mono text-[10px] text-sky-light/70 hidden sm:block">
-                BSIT &bull; Data Networking
-              </div>
-            </div>
-          </button>
-
-          {/* Desktop Navigation (All 9 Sections) */}
-          <nav
-            aria-label="Direct Portfolio Sections"
-            className="hidden xl:flex items-center gap-1 bg-deep-navy-card/90 border border-sky-blue/20 px-2 py-1 rounded-full text-xs font-mono"
-          >
-            {SECTIONS.map((sec) => {
-              const Icon = sec.icon
-              const isActive = activeSection === sec.id
-              return (
-                <button
-                  key={sec.id}
-                  type="button"
-                  onClick={() => scrollToSection(sec.id)}
-                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer whitespace-nowrap ${
-                    isActive
-                      ? 'bg-electric-blue text-deep-navy font-bold shadow-sm'
-                      : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/5'
-                  }`}
-                  aria-label={sec.label}
-                >
-                  <Icon className="w-3.5 h-3.5" />
-                  <span>{sec.label}</span>
-                </button>
-              )
-            })}
-          </nav>
-
-          {/* Right Action Controls */}
-          <div className="flex items-center gap-2">
-            {/* Audio Toggle */}
-            <button
-              type="button"
-              onClick={toggleMute}
-              className="p-2 rounded-full border border-sky-blue/25 bg-deep-navy-card/90 text-sky-light hover:text-electric-blue hover:border-electric-blue transition-colors cursor-pointer"
-              title={isSoundMuted ? 'Unmute Audio' : 'Mute Audio'}
-              aria-label={isSoundMuted ? 'Unmute Audio' : 'Mute Audio'}
-            >
-              {isSoundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </button>
-
-            {/* Switch to 3D World Button */}
-            <button
-              type="button"
-              onClick={enterWorld}
-              className="flex items-center gap-2 px-3.5 py-1.5 bg-electric-blue text-deep-navy font-mono text-xs font-bold rounded-full shadow-[0_0_15px_rgba(0,240,255,0.4)] hover:bg-white transition-all cursor-pointer active:scale-95"
-              title="Return to Interactive 3D Archipelago"
-              aria-label="Switch to 3D Exploration"
-            >
-              <Globe2 className="w-4 h-4" />
-              <span className="hidden sm:inline">3D WORLD</span>
-            </button>
-
-            {/* Mobile Menu Toggle */}
-            <button
-              type="button"
-              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-              className="xl:hidden p-2 rounded-full border border-sky-blue/25 bg-deep-navy-card/90 text-warm-ivory hover:text-electric-blue transition-colors cursor-pointer"
-              aria-label="Toggle navigation menu"
-            >
-              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-          </div>
-        </div>
-
-        {/* Mobile Navigation Dropdown */}
-        {mobileMenuOpen && (
-          <div className="xl:hidden bg-deep-navy-card/98 border-t border-sky-blue/20 px-4 py-4 space-y-1 font-mono text-xs shadow-2xl">
-            <div className="text-[10px] text-sky-light/60 uppercase tracking-widest px-3 py-1">
-              PORTFOLIO SECTIONS
-            </div>
-            <div className="grid grid-cols-2 gap-1.5">
-              {SECTIONS.map((sec) => {
-                const Icon = sec.icon
-                const isActive = activeSection === sec.id
-                return (
-                  <button
-                    key={sec.id}
-                    type="button"
-                    onClick={() => scrollToSection(sec.id)}
-                    className={`flex items-center gap-2 px-3 py-2.5 rounded-sm border transition-colors text-left cursor-pointer ${
-                      isActive
-                        ? 'bg-electric-blue/20 border-electric-blue text-electric-blue font-bold'
-                        : 'bg-deep-navy/80 border-sky-blue/15 text-warm-ivory hover:text-electric-blue'
-                    }`}
-                  >
-                    <Icon className="w-4 h-4 text-sky-light" />
-                    <span>{sec.label}</span>
-                  </button>
-                )
-              })}
-            </div>
-          </div>
-        )}
-      </header>
+      {/* INA.EXE REDESIGNED NAVIGATION BAR */}
+      <DirectPortfolioNav
+        activeSection={activeSection}
+        onNavigate={scrollToSection}
+      />
 
       {/* MAIN CONTENT CONTAINER */}
       <main className="max-w-6xl mx-auto px-4 sm:px-6 py-10 space-y-20 relative z-10">

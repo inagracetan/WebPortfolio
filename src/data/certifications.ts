@@ -154,3 +154,4 @@ export const CATEGORY_GRADIENTS: Record<CertificationCategory, {
     accent: '#64748b',
   },
 }
+
