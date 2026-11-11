@@ -23,10 +23,12 @@ export interface Project {
 
 export interface SkillItem {
   name: string
-  level: number // 1 - 100 honest representation
+  level?: number
   highlight?: boolean
-  tag: string
-  proficiencyLabel: string // e.g. "Practical Experience", "Academic Coursework", "Foundational"
+  tag?: string
+  proficiencyLabel?: string
+  logo?: string
+  icon?: string
 }
 
 export interface SkillGroup {
@@ -34,6 +36,7 @@ export interface SkillGroup {
   title: string
   description: string
   icon: string
+  gradient?: string
   skills: SkillItem[]
 }
 

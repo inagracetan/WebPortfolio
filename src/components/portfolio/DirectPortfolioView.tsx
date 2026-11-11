@@ -3,10 +3,10 @@ import {
   House,
   UserRound,
   FileUser,
-  FolderKanban,
-  Brain,
   Briefcase,
   GraduationCap,
+  FolderKanban,
+  Brain,
   Award,
   Mail,
   Globe2,
@@ -14,7 +14,6 @@ import {
   Phone,
   MapPin,
   ExternalLink,
-  ChevronRight,
   Menu,
   X,
   Volume2,
@@ -24,24 +23,29 @@ import {
   Sparkles,
   Layers,
   Send,
+  ShieldCheck,
 } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
 import { projectsData } from '@/data/projects'
 import { skillGroupsData } from '@/data/skills'
 import { experienceData } from '@/data/experience'
-import { educationData, seminarsTrainingsData } from '@/data/education'
+import { educationData } from '@/data/education'
 import { contactData } from '@/data/contact'
+import { certificationsData, CATEGORY_GRADIENTS } from '@/data/certifications'
+import { CredlyBadge } from './CredlyBadge'
+import { TechLogo } from './TechLogo'
 import { APP_CONFIG } from '@/utilities/constants'
 
+// Exact 9-section order required
 const SECTIONS = [
   { id: 'home', label: 'Home', icon: House },
   { id: 'about', label: 'About Me', icon: UserRound },
   { id: 'resume', label: 'Resume', icon: FileUser },
-  { id: 'projects', label: 'Projects', icon: FolderKanban },
-  { id: 'skills', label: 'Skills', icon: Brain },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'education', label: 'Education', icon: GraduationCap },
-  { id: 'certifications', label: 'Trainings', icon: Award },
+  { id: 'projects', label: 'Projects', icon: FolderKanban },
+  { id: 'skills', label: 'Technical Skills', icon: Brain },
+  { id: 'certifications', label: 'Certifications & Badges', icon: Award },
   { id: 'contact', label: 'Contact', icon: Mail },
 ] as const
 
@@ -55,7 +59,7 @@ export const DirectPortfolioView: React.FC = () => {
   // Active section scroll spy
   useEffect(() => {
     const handleScroll = () => {
-      const scrollPos = window.scrollY + 200
+      const scrollPos = window.scrollY + 220
       for (let i = SECTIONS.length - 1; i >= 0; i--) {
         const el = document.getElementById(SECTIONS[i].id)
         if (el && el.offsetTop <= scrollPos) {
@@ -93,7 +97,7 @@ export const DirectPortfolioView: React.FC = () => {
       <div className="fixed inset-0 pointer-events-none opacity-20 scanlines" />
 
       {/* STICKY HEADER */}
-      <header className="sticky top-0 z-50 bg-deep-navy/90 backdrop-blur-xl border-b border-sky-blue/20">
+      <header className="sticky top-0 z-50 bg-deep-navy/92 backdrop-blur-xl border-b border-sky-blue/20">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3 flex items-center justify-between">
           {/* Logo Brand */}
           <button
@@ -127,7 +131,7 @@ export const DirectPortfolioView: React.FC = () => {
                   key={sec.id}
                   type="button"
                   onClick={() => scrollToSection(sec.id)}
-                  className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all cursor-pointer ${
+                  className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-full transition-all cursor-pointer whitespace-nowrap ${
                     isActive
                       ? 'bg-electric-blue text-deep-navy font-bold shadow-sm'
                       : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/5'
@@ -215,7 +219,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 1: HOME / INTRODUCTION */}
         {/* ========================================================= */}
         <section id="home" className="pt-6 sm:pt-10 scroll-mt-24">
-          <div className="p-6 sm:p-10 rounded-sm bg-deep-navy-card/80 border border-sky-blue/25 shadow-2xl relative overflow-hidden">
+          <div className="p-6 sm:p-10 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-electric-blue/10 rounded-full blur-3xl pointer-events-none" />
 
             <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-8">
@@ -283,17 +287,17 @@ export const DirectPortfolioView: React.FC = () => {
 
                   <button
                     type="button"
-                    onClick={() => scrollToSection('projects')}
+                    onClick={() => scrollToSection('certifications')}
                     className="flex items-center gap-2 px-4 py-2.5 rounded-full bg-white/5 hover:bg-white/10 text-warm-ivory transition-colors cursor-pointer"
                   >
-                    <span>VIEW PROJECTS</span>
-                    <ChevronRight className="w-4 h-4 text-sky-light" />
+                    <Award className="w-4 h-4 text-electric-blue" />
+                    <span>CREDLY BADGES</span>
                   </button>
                 </div>
               </div>
 
               {/* Quick Stat Card */}
-              <div className="w-full lg:w-80 p-5 rounded-sm bg-deep-navy/90 border border-sky-blue/20 font-mono text-xs space-y-3.5 shadow-xl">
+              <div className="w-full lg:w-80 p-5 rounded-lg bg-deep-navy/90 border border-sky-blue/20 font-mono text-xs space-y-3.5 shadow-xl">
                 <div className="flex items-center justify-between pb-2 border-b border-sky-blue/15 text-sky-light">
                   <span className="font-bold uppercase tracking-wider">CANDIDATE METRICS</span>
                   <span className="text-[10px] text-electric-blue">VERIFIED</span>
@@ -313,8 +317,8 @@ export const DirectPortfolioView: React.FC = () => {
                     <div className="text-electric-blue font-semibold">Major in Data Networking</div>
                   </div>
                   <div>
-                    <div className="text-[10px] text-warm-ivory-dim/70">PORTFOLIO ARCHIVE</div>
-                    <div className="text-warm-ivory">5 Verified Systems & Capstone</div>
+                    <div className="text-[10px] text-warm-ivory-dim/70">OFFICIAL BADGES</div>
+                    <div className="text-emerald-400 font-semibold">3 Cisco Credly Badges Verified</div>
                   </div>
                 </div>
               </div>
@@ -333,13 +337,13 @@ export const DirectPortfolioView: React.FC = () => {
                 ABOUT ME
               </h2>
               <p className="font-mono text-xs text-sky-light/70">
-                Candidate Profile, Background & Professional Objectives
+                Candidate Profile, Background &amp; Professional Objectives
               </p>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <div className="md:col-span-2 space-y-4 p-6 rounded-sm bg-deep-navy-card/60 border border-sky-blue/20">
+            <div className="md:col-span-2 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 shadow-md">
               <h3 className="font-mono text-sm font-bold text-electric-blue uppercase tracking-wider">
                 Professional Profile
               </h3>
@@ -347,37 +351,37 @@ export const DirectPortfolioView: React.FC = () => {
                 Graduated with a Bachelor of Science in Information Technology, specializing in Data Networking from Central Mindanao University (July 2026). Achieved College Scholar recognition throughout academic tenure.
               </p>
               <p className="font-sans text-sm text-warm-ivory-dim leading-relaxed">
-                Demonstrated practical competence in database administration, switching and network segmentation (VLANs, DHCP, IP addressing), directory management fundamentals, and systems development. Experienced through an intensive IT internship at the City Agriculture Office (LGU Malaybalay) and hands-on freelance data entry and information management engagements.
+                Demonstrated practical competence in database administration, network segmentation (VLANs, DHCP, IP addressing), directory management fundamentals, and systems development. Experienced through an intensive IT internship at the City Agriculture Office (LGU Malaybalay) and hands-on freelance data entry and information management engagements.
               </p>
               <p className="font-sans text-sm text-warm-ivory-dim leading-relaxed">
                 Eager to bring disciplined technical skills, high data accuracy, and collaborative problem-solving to technical teams in network engineering, systems administration, database management, and technical support.
               </p>
             </div>
 
-            <div className="space-y-4 p-6 rounded-sm bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs">
+            <div className="space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs shadow-md">
               <h3 className="font-bold text-sky-light uppercase tracking-wider">
                 Core Focus Areas
               </h3>
               <ul className="space-y-2.5 text-warm-ivory-dim">
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-electric-blue flex-shrink-0 mt-0.5" />
-                  <span>Network Configuration, Switching & VLANs</span>
+                  <span>Network Configuration, Switching &amp; VLANs</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-electric-blue flex-shrink-0 mt-0.5" />
-                  <span>Relational & Cloud Databases (MySQL, Firebase)</span>
+                  <span>Relational &amp; Cloud Databases (MySQL, Firebase)</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-electric-blue flex-shrink-0 mt-0.5" />
-                  <span>Administrative Systems & Procurement Tracking</span>
+                  <span>Administrative Systems &amp; Procurement Tracking</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-electric-blue flex-shrink-0 mt-0.5" />
-                  <span>Workstation Troubleshooting & Technical Support</span>
+                  <span>Workstation Troubleshooting &amp; Technical Support</span>
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-electric-blue flex-shrink-0 mt-0.5" />
-                  <span>Item & Event Photography (Lucky Bliss Studio)</span>
+                  <span>Item &amp; Event Photography (Lucky Bliss Studio)</span>
                 </li>
               </ul>
             </div>
@@ -405,7 +409,7 @@ export const DirectPortfolioView: React.FC = () => {
               <a
                 href="/Tan_IG_CV.pdf"
                 download="Tan_IG_CV.pdf"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-all"
+                className="flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-all shadow-sm"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">DOWNLOAD PDF</span>
@@ -422,7 +426,7 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-6 rounded-sm bg-deep-navy-card/80 border border-sky-blue/25 space-y-6">
+          <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-sky-blue/15">
               <div>
                 <h3 className="font-display font-bold text-xl text-warm-ivory">
@@ -449,7 +453,7 @@ export const DirectPortfolioView: React.FC = () => {
                   <li>College Scholar at Central Mindanao University (Graduation: July 2026)</li>
                   <li>Hands-on IT internship with procurement systems and document tracking</li>
                   <li>Verified on-site freelance data entry and sales records maintenance</li>
-                  <li>Cross-platform mobile and web application development (Flutter, Firebase)</li>
+                  <li>Cisco Credly Verified in Cybersecurity, IT Customer Support, and Security Analysis</li>
                 </ul>
               </div>
 
@@ -458,11 +462,11 @@ export const DirectPortfolioView: React.FC = () => {
                   Target IT Roles
                 </h4>
                 <ul className="space-y-1.5 text-warm-ivory-dim list-disc pl-4">
-                  <li>Data Networking & Infrastructure Specialist</li>
+                  <li>Data Networking &amp; Infrastructure Specialist</li>
                   <li>Database Administrator / Data Analyst</li>
                   <li>Junior Software / Mobile App Developer</li>
-                  <li>IT Support Specialist & Workstation Technician</li>
-                  <li>Information Management & Records Specialist</li>
+                  <li>IT Support Specialist &amp; Workstation Technician</li>
+                  <li>Junior Cybersecurity Analyst / SOC Tier 1</li>
                 </ul>
               </div>
             </div>
@@ -470,7 +474,131 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 4: PROJECTS */}
+        {/* SECTION 4: WORK EXPERIENCE */}
+        {/* ========================================================= */}
+        <section id="experience" className="scroll-mt-24 space-y-6">
+          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
+            <Briefcase className="w-6 h-6 text-electric-blue" />
+            <div>
+              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
+                WORK EXPERIENCE
+              </h2>
+              <p className="font-mono text-xs text-sky-light/70">
+                Verified Internship &amp; On-Site Freelance Engagements
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {experienceData.map((exp) => (
+              <div
+                key={exp.id}
+                className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg hover:border-sky-blue/40 transition-colors"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-sky-blue/15">
+                  <div>
+                    <h3 className="font-display font-bold text-lg text-warm-ivory">
+                      {exp.role}
+                    </h3>
+                    <div className="font-mono text-xs text-electric-blue font-semibold">
+                      {exp.organization}
+                    </div>
+                  </div>
+                  <div className="font-mono text-xs text-warm-ivory-dim/80 text-left sm:text-right">
+                    <div>{exp.period}</div>
+                    <div className="text-[11px] text-sky-light">{exp.location}</div>
+                  </div>
+                </div>
+
+                <p className="font-sans text-xs sm:text-sm text-warm-ivory-dim leading-relaxed">
+                  {exp.summary}
+                </p>
+
+                <div className="space-y-2">
+                  <div className="font-mono text-xs font-bold text-sky-light uppercase">
+                    Core Responsibilities &amp; Achievements:
+                  </div>
+                  <ul className="space-y-2 font-mono text-xs text-warm-ivory-dim">
+                    {exp.responsibilities.map((resp, idx) => (
+                      <li key={idx} className="flex items-start gap-2">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-electric-blue flex-shrink-0 mt-0.5" />
+                        <span>{resp}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+
+                <div className="pt-3 flex flex-wrap gap-1.5">
+                  {exp.technologies.map((tech) => (
+                    <span
+                      key={tech}
+                      className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy/80 border border-sky-blue/20 text-sky-light"
+                    >
+                      {tech}
+                    </span>
+                  ))}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* SECTION 5: EDUCATION */}
+        {/* ========================================================= */}
+        <section id="education" className="scroll-mt-24 space-y-6">
+          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
+            <GraduationCap className="w-6 h-6 text-electric-blue" />
+            <div>
+              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
+                EDUCATION
+              </h2>
+              <p className="font-mono text-xs text-sky-light/70">
+                Academic Degrees &amp; Higher Educational Background
+              </p>
+            </div>
+          </div>
+
+          <div className="space-y-6">
+            {educationData.map((edu) => (
+              <div
+                key={edu.id}
+                className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-3 shadow-lg"
+              >
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
+                  <div>
+                    <h3 className="font-display font-bold text-lg text-warm-ivory">
+                      {edu.degree}
+                    </h3>
+                    <div className="font-mono text-xs text-electric-blue">
+                      {edu.institution} &bull; {edu.specialization}
+                    </div>
+                  </div>
+                  <div className="font-mono text-xs text-warm-ivory-dim/80">
+                    <div>{edu.period}</div>
+                    <div className="text-[10px] text-sky-light">{edu.location}</div>
+                  </div>
+                </div>
+
+                <ul className="space-y-1.5 font-mono text-xs text-warm-ivory-dim">
+                  {edu.details.map((det, idx) => (
+                    <li key={idx} className="flex items-start gap-2">
+                      <span className="text-electric-blue font-bold">&bull;</span>
+                      <span>{det}</span>
+                    </li>
+                  ))}
+                </ul>
+
+                <div className="font-mono text-[10px] text-cyber-yellow pt-2">
+                  {edu.clarificationNote}
+                </div>
+              </div>
+            ))}
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* SECTION 6: PROJECTS */}
         {/* ========================================================= */}
         <section id="projects" className="scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
@@ -480,7 +608,7 @@ export const DirectPortfolioView: React.FC = () => {
                 FEATURED PROJECTS
               </h2>
               <p className="font-mono text-xs text-sky-light/70">
-                5 Verified Academic, Capstone & Enterprise Projects
+                5 Verified Academic, Capstone &amp; Enterprise Projects
               </p>
             </div>
           </div>
@@ -489,7 +617,7 @@ export const DirectPortfolioView: React.FC = () => {
             {projectsData.map((project) => (
               <div
                 key={project.id}
-                className="p-6 rounded-sm bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-4 hover:border-electric-blue/50 transition-colors shadow-lg"
+                className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-4 hover:border-electric-blue/50 transition-colors shadow-lg"
               >
                 <div className="space-y-3">
                   <div className="flex items-start justify-between gap-2">
@@ -547,7 +675,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 5: TECHNICAL SKILLS */}
+        {/* SECTION 7: TECHNICAL SKILLS (ENHANCED - NO ARBITRARY RATINGS) */}
         {/* ========================================================= */}
         <section id="skills" className="scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
@@ -557,7 +685,7 @@ export const DirectPortfolioView: React.FC = () => {
                 TECHNICAL SKILLS
               </h2>
               <p className="font-mono text-xs text-sky-light/70">
-                6 Verified Technical Competency Domains
+                Organized Technical Competencies, Toolchains &amp; Recognized Frameworks
               </p>
             </div>
           </div>
@@ -566,157 +694,41 @@ export const DirectPortfolioView: React.FC = () => {
             {skillGroupsData.map((group) => (
               <div
                 key={group.id}
-                className="p-5 rounded-sm bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg"
+                className={`p-6 rounded-lg bg-gradient-to-b ${group.gradient || 'from-deep-navy-card/80 to-deep-navy'} border border-sky-blue/25 space-y-4 shadow-xl hover:border-electric-blue/40 transition-all`}
               >
-                <div>
+                <div className="border-b border-sky-blue/15 pb-3">
                   <h3 className="font-display font-bold text-base text-warm-ivory flex items-center gap-2">
                     <Layers className="w-4 h-4 text-electric-blue" />
                     <span>{group.title}</span>
                   </h3>
-                  <p className="font-mono text-[11px] text-sky-light/70 mt-1">
+                  <p className="font-mono text-[11px] text-sky-light/75 mt-1 leading-snug">
                     {group.description}
                   </p>
                 </div>
 
-                <div className="space-y-2.5">
+                {/* Compact Skill Cards with Logos & Icons */}
+                <div className="grid grid-cols-1 gap-2">
                   {group.skills.map((skill) => (
-                    <div key={skill.name} className="space-y-1">
-                      <div className="flex items-center justify-between font-mono text-xs">
-                        <span className="font-semibold text-warm-ivory">{skill.name}</span>
-                        <span className="text-[10px] text-sky-light">{skill.proficiencyLabel}</span>
-                      </div>
-                      <div className="h-1.5 w-full bg-deep-navy rounded-full overflow-hidden border border-sky-blue/15">
-                        <div
-                          className="h-full bg-gradient-to-r from-sky-blue to-electric-blue rounded-full"
-                          style={{ width: `${skill.level}%` }}
-                        />
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
-
-        {/* ========================================================= */}
-        {/* SECTION 6: WORK EXPERIENCE */}
-        {/* ========================================================= */}
-        <section id="experience" className="scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <Briefcase className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                WORK EXPERIENCE
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Verified Internship & On-Site Freelance Engagements
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            {experienceData.map((exp) => (
-              <div
-                key={exp.id}
-                className="p-6 rounded-sm bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-sky-blue/15">
-                  <div>
-                    <h3 className="font-display font-bold text-lg text-warm-ivory">
-                      {exp.role}
-                    </h3>
-                    <div className="font-mono text-xs text-electric-blue font-semibold">
-                      {exp.organization}
-                    </div>
-                  </div>
-                  <div className="font-mono text-xs text-warm-ivory-dim/80 text-left sm:text-right">
-                    <div>{exp.period}</div>
-                    <div className="text-[11px] text-sky-light">{exp.location}</div>
-                  </div>
-                </div>
-
-                <p className="font-sans text-xs sm:text-sm text-warm-ivory-dim leading-relaxed">
-                  {exp.summary}
-                </p>
-
-                <div className="space-y-2">
-                  <div className="font-mono text-xs font-bold text-sky-light uppercase">
-                    Core Responsibilities & Achievements:
-                  </div>
-                  <ul className="space-y-2 font-mono text-xs text-warm-ivory-dim">
-                    {exp.responsibilities.map((resp, idx) => (
-                      <li key={idx} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-electric-blue flex-shrink-0 mt-0.5" />
-                        <span>{resp}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="pt-3 flex flex-wrap gap-1.5">
-                  {exp.technologies.map((tech) => (
-                    <span
-                      key={tech}
-                      className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy/80 border border-sky-blue/20 text-sky-light"
+                    <div
+                      key={skill.name}
+                      className="flex items-center justify-between p-2.5 rounded-md bg-deep-navy/80 border border-sky-blue/15 hover:border-electric-blue/30 transition-colors group"
                     >
-                      {tech}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-        </section>
+                      <div className="flex items-center gap-2.5 min-w-0">
+                        <div className="p-1 rounded bg-deep-navy flex-shrink-0">
+                          <TechLogo name={skill.logo || skill.name} className="w-4 h-4" />
+                        </div>
+                        <span className="font-mono text-xs font-semibold text-warm-ivory group-hover:text-electric-blue transition-colors truncate">
+                          {skill.name}
+                        </span>
+                      </div>
 
-        {/* ========================================================= */}
-        {/* SECTION 7: EDUCATION */}
-        {/* ========================================================= */}
-        <section id="education" className="scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <GraduationCap className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                EDUCATION
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Academic Degrees & Higher Educational Background
-              </p>
-            </div>
-          </div>
-
-          <div className="space-y-6">
-            {educationData.map((edu) => (
-              <div
-                key={edu.id}
-                className="p-6 rounded-sm bg-deep-navy-card/70 border border-sky-blue/20 space-y-3 shadow-lg"
-              >
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
-                  <div>
-                    <h3 className="font-display font-bold text-lg text-warm-ivory">
-                      {edu.degree}
-                    </h3>
-                    <div className="font-mono text-xs text-electric-blue">
-                      {edu.institution} &bull; {edu.specialization}
+                      {skill.tag && (
+                        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-sky-blue/10 text-sky-light border border-sky-blue/20 flex-shrink-0">
+                          {skill.tag}
+                        </span>
+                      )}
                     </div>
-                  </div>
-                  <div className="font-mono text-xs text-warm-ivory-dim/80">
-                    <div>{edu.period}</div>
-                    <div className="text-[10px] text-sky-light">{edu.location}</div>
-                  </div>
-                </div>
-
-                <ul className="space-y-1.5 font-mono text-xs text-warm-ivory-dim">
-                  {edu.details.map((det, idx) => (
-                    <li key={idx} className="flex items-start gap-2">
-                      <span className="text-electric-blue font-bold">&bull;</span>
-                      <span>{det}</span>
-                    </li>
                   ))}
-                </ul>
-
-                <div className="font-mono text-[10px] text-cyber-yellow pt-2">
-                  {edu.clarificationNote}
                 </div>
               </div>
             ))}
@@ -724,50 +736,136 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 8: TRAININGS AND CERTIFICATIONS */}
+        {/* SECTION 8: CERTIFICATIONS & BADGES (OFFICIAL CREDLY EMBEDS) */}
         {/* ========================================================= */}
         <section id="certifications" className="scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <Award className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                TRAININGS &amp; CERTIFICATIONS
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Academic Cloud Modules, Seminars &amp; Technical Workshops
-              </p>
+          <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
+            <div className="flex items-center gap-3">
+              <Award className="w-6 h-6 text-electric-blue" />
+              <div>
+                <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
+                  CERTIFICATIONS &amp; BADGES
+                </h2>
+                <p className="font-mono text-xs text-sky-light/70">
+                  Official Cisco Credly Verified Credentials &amp; Cloud Modules
+                </p>
+              </div>
+            </div>
+
+            <div className="hidden sm:flex items-center gap-2">
+              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 font-mono text-[11px] text-emerald-400 font-bold">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>OFFICIAL CREDLY VERIFIED</span>
+              </span>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {seminarsTrainingsData.map((sem) => (
-              <div
-                key={sem.id}
-                className="p-5 rounded-sm bg-deep-navy-card/70 border border-sky-blue/20 space-y-2 shadow-lg"
-              >
-                <div className="font-mono text-[10px] text-electric-blue font-bold uppercase">
-                  {sem.date}
-                </div>
-                <h3 className="font-display font-bold text-base text-warm-ivory">
-                  {sem.title}
-                </h3>
-                <div className="font-mono text-xs text-sky-light">
-                  {sem.venue}
-                </div>
-                {sem.details && (
-                  <div className="pt-2 flex flex-wrap gap-1.5">
-                    {sem.details.map((d) => (
-                      <span
-                        key={d}
-                        className="font-mono text-[10px] px-2 py-0.5 rounded bg-deep-navy border border-sky-blue/20 text-warm-ivory-dim"
-                      >
-                        {d}
+          {/* Cards Grid with Category Gradients */}
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {certificationsData.map((cert) => {
+              const gradient = CATEGORY_GRADIENTS[cert.category] || CATEGORY_GRADIENTS['General IT']
+
+              return (
+                <div
+                  key={cert.id}
+                  className={`p-6 rounded-lg bg-gradient-to-b ${gradient.bg} border ${gradient.border} shadow-xl backdrop-blur-md flex flex-col justify-between space-y-5 transition-all hover:scale-[1.01] hover:shadow-2xl`}
+                >
+                  <div className="space-y-4">
+                    {/* Category & Issuer Header */}
+                    <div className="flex items-center justify-between gap-2 pb-2 border-b border-white/10">
+                      <span className={`px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold ${gradient.badgeBg} ${gradient.badgeText} border border-current/30 uppercase`}>
+                        {cert.category}
                       </span>
-                    ))}
+                      <span className="font-mono text-[11px] text-warm-ivory-dim/90 font-medium">
+                        {cert.issuer}
+                      </span>
+                    </div>
+
+                    {/* Centered Authentic Badge Display */}
+                    <div className="flex justify-center py-1">
+                      {cert.type === 'credly' && cert.credlyBadgeId ? (
+                        <CredlyBadge
+                          badgeId={cert.credlyBadgeId}
+                          title={cert.title}
+                          issuer={cert.issuer}
+                          width={cert.width}
+                          height={cert.height}
+                          verificationUrl={cert.verificationUrl}
+                          fallbackImageUrl={cert.badgeImageUrl}
+                        />
+                      ) : (
+                        <div className="flex flex-col items-center justify-center p-4 rounded-md bg-deep-navy/80 border border-sky-blue/20 w-full text-center space-y-3">
+                          {cert.badgeImageUrl && (
+                            <img
+                              src={cert.badgeImageUrl}
+                              alt={cert.title}
+                              width={cert.width}
+                              height={cert.height}
+                              className="w-[110px] h-[110px] object-contain drop-shadow-[0_0_15px_rgba(0,240,255,0.3)] transition-transform hover:scale-105"
+                            />
+                          )}
+                          <div className="font-mono text-xs font-semibold text-warm-ivory">
+                            {cert.title}
+                          </div>
+                          <span className="font-mono text-[10px] text-sky-light/80">
+                            {cert.issueDate}
+                          </span>
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Credential Narrative Details */}
+                    <div className="space-y-2 pt-2">
+                      <h3 className="font-display font-bold text-base text-warm-ivory leading-snug">
+                        {cert.title}
+                      </h3>
+                      <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed">
+                        {cert.description}
+                      </p>
+
+                      {/* Skills Covered Pills */}
+                      {cert.skillsCovered && (
+                        <div className="flex flex-wrap gap-1.5 pt-2">
+                          {cert.skillsCovered.map((sk) => (
+                            <span
+                              key={sk}
+                              className="font-mono text-[9px] px-2 py-0.5 rounded bg-deep-navy/90 border border-sky-blue/20 text-sky-light"
+                            >
+                              {sk}
+                            </span>
+                          ))}
+                        </div>
+                      )}
+                    </div>
                   </div>
-                )}
-              </div>
-            ))}
+
+                  {/* Card Footer: Credential ID & Direct Verify Action */}
+                  <div className="pt-3 border-t border-white/10 font-mono text-[11px] flex flex-col gap-1.5">
+                    {cert.credentialId && (
+                      <div className="text-[10px] text-warm-ivory-dim/60 truncate">
+                        ID: <span className="text-warm-ivory font-mono">{cert.credentialId}</span>
+                      </div>
+                    )}
+
+                    <div className="flex items-center justify-between pt-1">
+                      <span className="text-[10px] text-sky-light/80">
+                        {cert.issueDate}
+                      </span>
+                      <a
+                        href={cert.verificationUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-flex items-center gap-1 text-electric-blue hover:text-white font-bold text-xs transition-colors"
+                        aria-label={`Open Credential for ${cert.title}`}
+                      >
+                        <span>INSPECT</span>
+                        <ExternalLink className="w-3 h-3" />
+                      </a>
+                    </div>
+                  </div>
+                </div>
+              )
+            })}
           </div>
         </section>
 
@@ -789,7 +887,7 @@ export const DirectPortfolioView: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Contact Details Card */}
-            <div className="p-6 rounded-sm bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl">
+            <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl">
               <div className="space-y-2">
                 <h3 className="font-display font-bold text-lg text-warm-ivory">
                   GET IN TOUCH
@@ -802,7 +900,7 @@ export const DirectPortfolioView: React.FC = () => {
               <div className="space-y-4 font-mono text-xs">
                 <a
                   href={`tel:${contactData.phone}`}
-                  className="flex items-center gap-3 p-3 rounded bg-deep-navy/90 border border-sky-blue/20 hover:border-electric-blue transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-deep-navy/90 border border-sky-blue/20 hover:border-electric-blue transition-colors group"
                 >
                   <Phone className="w-4 h-4 text-electric-blue group-hover:scale-110 transition-transform" />
                   <div>
@@ -815,7 +913,7 @@ export const DirectPortfolioView: React.FC = () => {
 
                 <a
                   href={`mailto:${contactData.email}`}
-                  className="flex items-center gap-3 p-3 rounded bg-deep-navy/90 border border-sky-blue/20 hover:border-electric-blue transition-colors group"
+                  className="flex items-center gap-3 p-3 rounded-lg bg-deep-navy/90 border border-sky-blue/20 hover:border-electric-blue transition-colors group"
                 >
                   <Mail className="w-4 h-4 text-electric-blue group-hover:scale-110 transition-transform" />
                   <div>
@@ -826,7 +924,7 @@ export const DirectPortfolioView: React.FC = () => {
                   </div>
                 </a>
 
-                <div className="flex items-center gap-3 p-3 rounded bg-deep-navy/90 border border-sky-blue/20">
+                <div className="flex items-center gap-3 p-3 rounded-lg bg-deep-navy/90 border border-sky-blue/20">
                   <MapPin className="w-4 h-4 text-sky-light" />
                   <div>
                     <div className="text-[10px] text-warm-ivory-dim/70">LOCATION</div>
@@ -858,13 +956,13 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
 
             {/* Quick Interactive Message Form */}
-            <div className="p-6 rounded-sm bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl">
+            <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl">
               <h3 className="font-display font-bold text-lg text-warm-ivory">
                 SEND DIRECT TRANSMISSION
               </h3>
 
               {formSent ? (
-                <div className="p-6 rounded bg-muted-green/20 border border-muted-green text-center space-y-2">
+                <div className="p-6 rounded-lg bg-muted-green/20 border border-muted-green text-center space-y-2">
                   <CheckCircle2 className="w-8 h-8 text-muted-green-light mx-auto" />
                   <div className="font-mono font-bold text-sm text-warm-ivory">
                     TRANSMISSION RECEIVED
@@ -965,4 +1063,3 @@ export const DirectPortfolioView: React.FC = () => {
     </div>
   )
 }
-

@@ -120,33 +120,20 @@ export const SkillsModal: React.FC = () => {
                 </div>
               </div>
 
-              <div className="space-y-2.5 pt-2 border-t border-sky-blue/10">
+              <div className="space-y-2 pt-2 border-t border-sky-blue/10">
                 {group.skills.map((skill) => (
-                  <div key={skill.name} className="space-y-1">
-                    <div className="flex justify-between items-center text-xs font-mono">
-                      <span className="text-warm-ivory flex items-center gap-1.5 font-medium">
-                        {skill.name}
-                        {skill.highlight && (
-                          <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
-                        )}
+                  <div key={skill.name} className="flex justify-between items-center text-xs font-mono py-0.5">
+                    <span className="text-warm-ivory flex items-center gap-1.5 font-medium">
+                      {skill.name}
+                      {skill.highlight && (
+                        <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
+                      )}
+                    </span>
+                    {skill.tag && (
+                      <span className="text-sky-light text-[10px] bg-sky-blue/10 px-2 py-0.5 rounded border border-sky-blue/20">
+                        {skill.tag}
                       </span>
-                      <span className="text-sky-light text-[10px] bg-sky-blue/10 px-1.5 py-0.5 rounded border border-sky-blue/20">
-                        {skill.proficiencyLabel}
-                      </span>
-                    </div>
-
-                    {/* Skill level indicator */}
-                    <div className="flex items-center gap-2">
-                      <div className="h-1.5 flex-1 bg-deep-navy-surface rounded-full overflow-hidden border border-sky-blue/20">
-                        <div
-                          className="h-full bg-gradient-to-r from-sky-blue to-electric-blue rounded-full"
-                          style={{ width: `${skill.level}%` }}
-                        />
-                      </div>
-                      <span className="font-mono text-[10px] text-warm-ivory-dim/70 w-8 text-right">
-                        {skill.level}%
-                      </span>
-                    </div>
+                    )}
                   </div>
                 ))}
               </div>
