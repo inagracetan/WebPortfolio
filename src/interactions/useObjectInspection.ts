@@ -11,6 +11,7 @@ interface ObjectInspectionState {
   activeInspectionModal: InspectionModalType | null
   activeProjectDetail: Project | null
   activeSkillGroupDetail: SkillGroup | null
+  nearestInteractiveId: string | null
 }
 
 let state: ObjectInspectionState = {
@@ -18,6 +19,7 @@ let state: ObjectInspectionState = {
   activeInspectionModal: null,
   activeProjectDetail: null,
   activeSkillGroupDetail: null,
+  nearestInteractiveId: null,
 }
 
 type Listener = (state: ObjectInspectionState) => void
@@ -49,6 +51,7 @@ export const objectInspectionStore = {
     }
 
     state = {
+      ...state,
       inspectedObject: item,
       activeInspectionModal: item.modalType,
       activeProjectDetail: project,
@@ -62,6 +65,7 @@ export const objectInspectionStore = {
       soundEngine.playModalClose()
     }
     state = {
+      ...state,
       inspectedObject: null,
       activeInspectionModal: null,
       activeProjectDetail: null,
@@ -69,6 +73,12 @@ export const objectInspectionStore = {
     }
     gameStore.setUiModalOpen(gameStore.getState().activeModal !== null || gameStore.getState().isMenuOpen)
     notify()
+  },
+  setNearestInteractiveId: (id: string | null) => {
+    if (state.nearestInteractiveId !== id) {
+      state = { ...state, nearestInteractiveId: id }
+      notify()
+    }
   },
 }
 
@@ -89,6 +99,7 @@ export function useObjectInspection() {
     ...currentState,
     openInspection: objectInspectionStore.openInspection,
     closeInspection: objectInspectionStore.closeInspection,
+    setNearestInteractiveId: objectInspectionStore.setNearestInteractiveId,
   }
 }
 

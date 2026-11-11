@@ -13,9 +13,10 @@ export const ExperienceModal: React.FC = () => {
     <Modal
       isOpen={activeModal === 'EXPERIENCE'}
       onClose={closeModal}
-      title="EXPERIENCE & EDUCATION ARCHIVES"
-      subtitle="Verified professional freelance history, internship & academic foundation at Central Mindanao University"
-      badge="TIMELINE"
+      title="UNIVERSITY_BUILDING // ACADEMIA_ARCHIVES.EXE"
+      subtitle="Verified academic record at Central Mindanao University, freelance work history & specialized seminars"
+      badge="CENTRAL MINDANAO UNIV"
+      locationTag="UNIVERSITY BUILDING"
       maxWidth="3xl"
     >
       {/* Tab Switcher */}

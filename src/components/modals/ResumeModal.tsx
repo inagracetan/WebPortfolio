@@ -46,9 +46,10 @@ export const ResumeModal: React.FC = () => {
     <Modal
       isOpen={activeModal === 'RESUME'}
       onClose={closeModal}
-      title="CURRICULUM VITAE // INA GRACE D. TAN"
+      title="RESUME_DOSSIER // TAN_IG_CV.PDF"
       subtitle="Verified professional resume & authoritative candidate dossier"
       badge="AUTHORITATIVE CV"
+      locationTag="CANDIDATE DOSSIER"
       maxWidth="4xl"
     >
       <div className="space-y-5">

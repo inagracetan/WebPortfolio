@@ -1,6 +1,5 @@
 import React, { useMemo } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
-import { Sparkles, ArrowRight } from 'lucide-react'
 import { useCharacterStore } from '@/characters/useCharacterStore'
 import { INTERACTIVE_OBJECTS } from '@/interactions/interactiveObjectsData'
 import { objectInspectionStore, useObjectInspection } from '@/interactions/useObjectInspection'
@@ -11,7 +10,7 @@ import type { InteractiveObjectItem } from '@/interactions/types'
 export const InteractionPrompt: React.FC = () => {
   const { playerPosition } = useCharacterStore()
   const { activeInspectionModal } = useObjectInspection()
-  const { isUiModalOpen } = useGameStore()
+  const { isUiModalOpen, activeLocation } = useGameStore()
   const { playClick, playHover } = useSound()
 
   const nearestObject = useMemo(() => {
@@ -21,6 +20,8 @@ export const InteractionPrompt: React.FC = () => {
     let minDist = Infinity
 
     for (const obj of INTERACTIVE_OBJECTS) {
+      // STRICT REQUIREMENT 1: Only check interactive objects in the character's CURRENT location
+      if (obj.locationId !== activeLocation.id) continue
       const d = Math.hypot(px - obj.position[0], pz - obj.position[2])
       if (d <= obj.radius && d < minDist) {
         minDist = d
@@ -29,7 +30,7 @@ export const InteractionPrompt: React.FC = () => {
     }
 
     return nearest
-  }, [playerPosition])
+  }, [playerPosition, activeLocation.id])
 
   // Don't display prompt if any modal or inspection is currently active
   if (!nearestObject || isUiModalOpen || activeInspectionModal) {
@@ -43,33 +44,29 @@ export const InteractionPrompt: React.FC = () => {
 
   return (
     <AnimatePresence>
-      <div className="fixed bottom-36 md:bottom-28 left-1/2 -translate-x-1/2 z-40 pointer-events-none">
+      <div className="fixed bottom-[215px] landscape:bottom-16 md:bottom-20 left-1/2 -translate-x-1/2 z-35 pointer-events-none select-none">
         <motion.button
-          initial={{ opacity: 0, y: 15, scale: 0.92 }}
+          initial={{ opacity: 0, y: 10, scale: 0.95 }}
           animate={{ opacity: 1, y: 0, scale: 1 }}
-          exit={{ opacity: 0, y: 10, scale: 0.95 }}
-          transition={{ type: 'spring', damping: 22, stiffness: 350 }}
+          exit={{ opacity: 0, y: 8, scale: 0.95 }}
+          transition={{ duration: 0.18 }}
           type="button"
           onClick={handleTrigger}
           onMouseEnter={playHover}
-          className="pointer-events-auto flex items-center gap-3 px-5 py-2.5 bg-deep-navy-card/95 hover:bg-deep-navy border-2 border-electric-blue rounded-sm shadow-[0_0_25px_rgba(0,240,255,0.45)] backdrop-blur-xl text-warm-ivory group cursor-pointer"
+          className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-electric-blue/40 hover:border-electric-blue rounded-full shadow-[0_0_15px_rgba(0,240,255,0.25)] backdrop-blur-md text-xs font-mono text-warm-ivory group cursor-pointer transition-all"
         >
           {/* Key indicator badge */}
-          <span className="px-2 py-0.5 bg-electric-blue text-deep-navy font-mono font-bold text-xs rounded shadow-sm group-hover:scale-105 transition-transform">
+          <span className="px-1.5 py-0.2 bg-electric-blue text-deep-navy font-mono font-bold text-[10px] rounded shadow-sm">
             [E]
           </span>
 
-          <div className="flex flex-col text-left">
-            <span className="font-mono text-xs font-bold tracking-wider text-electric-blue flex items-center gap-1.5 uppercase">
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>{nearestObject.prompt}</span>
-            </span>
-            <span className="text-[11px] font-mono text-warm-ivory-dim/80">
-              {nearestObject.name} &bull; {nearestObject.sublabel}
-            </span>
-          </div>
+          <span className="font-semibold text-electric-blue text-[11px] tracking-wider uppercase">
+            {nearestObject.prompt}
+          </span>
 
-          <ArrowRight className="w-4 h-4 text-sky-light group-hover:translate-x-1 transition-transform ml-1" />
+          <span className="text-[10px] text-warm-ivory-dim/75 hidden sm:inline">
+            &bull; {nearestObject.name}
+          </span>
         </motion.button>
       </div>
     </AnimatePresence>

@@ -52,9 +52,10 @@ export const PersonalProfileModal: React.FC = () => {
     <Modal
       isOpen={activeInspectionModal === 'PROFILE'}
       onClose={closeInspection}
-      title="DEVELOPER NOTEBOOK // PERSONAL PROFILE"
+      title="WORKSPACE // NOTEBOOK_PROFILE.DAT"
       subtitle="Verified facts, technical competencies, daily toolchain & professional focus"
       badge="PROFILE DOSSIER"
+      locationTag="PERSONAL WORKSPACE"
       maxWidth="2xl"
     >
       <div className="space-y-6">

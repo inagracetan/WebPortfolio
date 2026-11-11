@@ -26,9 +26,10 @@ export const CoursesModal: React.FC = () => {
     <Modal
       isOpen={activeInspectionModal === 'COURSES'}
       onClose={closeInspection}
-      title="ACADEMIC TRAINING, COURSEWORK & SEMINARS"
+      title="ACADEMIA // COURSEWORK_RECORDS.DAT"
       subtitle="Institutional IT coursework, cloud foundations, directory services & verified seminars"
       badge="ACADEMIC COURSEWORK"
+      locationTag="UNIVERSITY BUILDING"
       maxWidth="3xl"
     >
       <div className="space-y-5">

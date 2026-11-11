@@ -40,7 +40,7 @@ export const WorldHud: React.FC = () => {
   // Inspect current location's portfolio content
   const handleInspectLocation = () => {
     let targetModal: ActiveModal = 'PROJECTS'
-    if (activeLocation.category === 'WORKSPACE' || activeLocation.id === 'workspace') targetModal = 'RESUME'
+    if (activeLocation.category === 'WORKSPACE' || activeLocation.id === 'workspace') targetModal = 'ABOUT'
     else if (activeLocation.category === 'PROJECTS' || activeLocation.id === 'projects') targetModal = 'PROJECTS'
     else if (activeLocation.category === 'TECH' || activeLocation.id === 'tech') targetModal = 'TECH'
     else if (activeLocation.category === 'UNIVERSITY' || activeLocation.id === 'university') targetModal = 'EXPERIENCE'

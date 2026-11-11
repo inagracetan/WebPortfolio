@@ -24,9 +24,10 @@ export const ProjectsModal: React.FC = () => {
     <Modal
       isOpen={activeModal === 'PROJECTS'}
       onClose={closeModal}
-      title="PROJECT LAB // PORTFOLIO SHOWCASE"
+      title="PROJECT_LAB // SHOWCASE_ARCHIVE.EXE"
       subtitle="Academic capstones, mobile applications, cybersecurity analysis & enterprise systems"
-      badge="PORTFOLIO ARCHIVE"
+      badge="5 PROJECTS"
+      locationTag="PROJECT LAB"
       maxWidth="4xl"
     >
       {/* Category Filter Pills */}

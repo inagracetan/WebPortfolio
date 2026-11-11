@@ -45,9 +45,10 @@ export const SkillsModal: React.FC = () => {
     <Modal
       isOpen={activeModal === 'SKILLS' || activeModal === 'TECH'}
       onClose={closeModal}
-      title="TECH CENTER // TECHNICAL CAPABILITIES MATRIX"
+      title="TECH_CENTER // CAPABILITIES_MATRIX.EXE"
       subtitle="Futuristic glass pavilion housing verified proficiencies across Data Networking, IT Systems, Software & Cloud"
-      badge="LOC_03 // SKILLS"
+      badge="VERIFIED SKILLS"
+      locationTag="TECH CENTER"
       maxWidth="4xl"
     >
       <div className="space-y-4">

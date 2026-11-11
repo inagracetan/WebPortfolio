@@ -29,9 +29,10 @@ export const SkillDetailModal: React.FC = () => {
     <Modal
       isOpen={activeInspectionModal === 'SKILL_DETAIL'}
       onClose={closeInspection}
-      title={activeSkillGroupDetail.title}
+      title={`TECH_CENTER // ${activeSkillGroupDetail.title}.DAT`}
       subtitle={activeSkillGroupDetail.description}
       badge="CAPABILITY DOMAIN"
+      locationTag="TECH CENTER"
       maxWidth="3xl"
     >
       <div className="space-y-6">

@@ -12,9 +12,10 @@ export const ProjectDetailModal: React.FC = () => {
     <Modal
       isOpen={activeInspectionModal === 'PROJECT_DETAIL'}
       onClose={closeInspection}
-      title={activeProjectDetail.title}
+      title={`PROJECT_LAB // ${activeProjectDetail.title}.DAT`}
       subtitle={activeProjectDetail.subtitle}
       badge={activeProjectDetail.category}
+      locationTag="PROJECT LAB"
       maxWidth="3xl"
     >
       <div className="space-y-6">

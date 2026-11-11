@@ -82,9 +82,10 @@ export const ControlsGuideModal: React.FC = () => {
     <Modal
       isOpen={activeModal === 'CONTROLS'}
       onClose={closeModal}
-      title="CONTROLS & NAVIGATION GUIDE"
+      title="CONTROLS // INPUT_MAPPINGS.DAT"
       subtitle="Complete input mappings for desktop keyboard and mobile touch exploration"
-      badge="FIELD GUIDE"
+      badge="FIELD MANUAL"
+      locationTag="NAVIGATION TERMINAL"
       maxWidth="3xl"
     >
       <div className="space-y-6">

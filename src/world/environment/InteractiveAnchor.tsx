@@ -5,7 +5,7 @@ import * as THREE from 'three'
 import type { InteractiveObjectItem } from '@/interactions/types'
 import { characterStore } from '@/characters/useCharacterStore'
 import { useGameStore } from '@/hooks/useGameStore'
-import { objectInspectionStore } from '@/interactions/useObjectInspection'
+import { objectInspectionStore, useObjectInspection } from '@/interactions/useObjectInspection'
 import { useSound } from '@/hooks/useSound'
 
 interface InteractiveAnchorProps {
@@ -18,11 +18,13 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
   const [isHovered, setIsHovered] = useState(false)
   const [isNearby, setIsNearby] = useState(false)
 
-  const { isUiModalOpen } = useGameStore()
+  const { isUiModalOpen, activeLocation } = useGameStore()
+  const { nearestInteractiveId } = useObjectInspection()
   const { playHover, playClick } = useSound()
 
   useFrame((state) => {
-    if (isUiModalOpen) return
+    if (item.locationId !== activeLocation.id || isUiModalOpen) return
+
     const t = state.clock.getElapsedTime()
 
     if (markerRef.current) {
@@ -41,7 +43,9 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
     }
   })
 
-  if (isUiModalOpen) {
+  // STRICT REQUIREMENT 1: Only display anchors and labels for the CURRENT location
+  // STRICT REQUIREMENT 4: Hide completely when any modal or popup is open
+  if (item.locationId !== activeLocation.id || isUiModalOpen) {
     return null
   }
 
@@ -54,11 +58,15 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
 
     // If slightly out of radius, step close to object
     if (currentDist > item.radius) {
-      characterStore.teleportTo([item.position[0], item.position[1] - 0.2, item.position[2] + 0.8])
+      characterStore.teleportTo([item.position[0], item.position[1] + 0.2, item.position[2] + 0.8])
     }
 
     objectInspectionStore.openInspection(item)
   }
+
+  // STRICT REQUIREMENT 2: Prioritize single nearest interactive object; never stack multiple labels
+  const isNearest = nearestInteractiveId === item.id
+  const showPrompt = (isNearest && isNearby) || isHovered
 
   return (
     <group position={[item.position[0], 0, item.position[2]]}>
@@ -66,20 +74,30 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
       <mesh
         ref={markerRef}
         position={[0, item.position[1] + 0.35, 0]}
-        scale={isNearby || isHovered ? 1.2 : 0.8}
+        scale={showPrompt ? 1.2 : 0.8}
+        onClick={handleTrigger}
+        onPointerOver={() => {
+          setIsHovered(true)
+          if (typeof document !== 'undefined') document.body.style.cursor = 'pointer'
+          playHover()
+        }}
+        onPointerOut={() => {
+          setIsHovered(false)
+          if (typeof document !== 'undefined') document.body.style.cursor = 'default'
+        }}
       >
         <octahedronGeometry args={[0.12, 0]} />
         <meshStandardMaterial
           color="#00f0ff"
           emissive="#00f0ff"
-          emissiveIntensity={isNearby || isHovered ? 1.0 : 0.5}
+          emissiveIntensity={showPrompt ? 1.0 : 0.4}
           roughness={0.2}
           metalness={0.8}
         />
       </mesh>
 
-      {/* Orbiting Ring (visible when nearby) */}
-      {isNearby && (
+      {/* Orbiting Ring (visible when nearby or hovered) */}
+      {showPrompt && (
         <mesh
           ref={ringRef}
           position={[0, item.position[1] + 0.35, 0]}
@@ -90,13 +108,13 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
         </mesh>
       )}
 
-      {/* Floating 2.5D Interactive Prompt (Visible when nearby or hovered) */}
-      {(isNearby || isHovered) && (
+      {/* Simplified, Minimalist Floating Prompt (Layering priority z-15; strictly below z-40 navigation) */}
+      {showPrompt && (
         <Html
-          position={[0, item.position[1] + 0.75, 0]}
+          position={[0, item.position[1] + 0.65, 0]}
           center
-          distanceFactor={16}
-          zIndexRange={[100, 0]}
+          distanceFactor={18}
+          zIndexRange={[15, 0]}
         >
           <button
             type="button"
@@ -106,12 +124,12 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
               playHover()
             }}
             onMouseLeave={() => setIsHovered(false)}
-            className="pointer-events-auto flex items-center gap-2 px-2.5 py-1 rounded bg-deep-navy-card/95 hover:bg-deep-navy border border-electric-blue text-warm-ivory shadow-[0_0_15px_rgba(0,240,255,0.4)] backdrop-blur-md text-[10px] font-mono tracking-wider whitespace-nowrap transition-transform hover:scale-105 cursor-pointer select-none"
+            aria-label={item.name}
+            className="pointer-events-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-deep-navy-card/90 hover:bg-deep-navy border border-electric-blue/40 text-warm-ivory shadow-[0_0_12px_rgba(0,240,255,0.25)] backdrop-blur-md text-[11px] font-mono whitespace-nowrap transition-all hover:scale-105 cursor-pointer select-none"
           >
-            <span className="px-1 py-0.2 bg-electric-blue text-deep-navy font-bold rounded">
-              [E]
-            </span>
-            <span className="font-semibold text-electric-blue">{item.prompt}</span>
+            <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
+            <span className="font-bold text-electric-blue">[E]</span>
+            <span className="font-semibold text-warm-ivory">{item.name}</span>
           </button>
         </Html>
       )}

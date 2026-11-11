@@ -34,9 +34,10 @@ export const AboutMeModal: React.FC = () => {
     <Modal
       isOpen={isOpen}
       onClose={handleClose}
-      title="ABOUT ME // INA GRACE TAN"
+      title="PERSONAL_WORKSPACE // INA GRACE TAN.EXE"
       subtitle="BS Information Technology — Data Networking Specialization"
-      badge="PROFILE"
+      badge="STUDIO VILLA"
+      locationTag="PERSONAL WORKSPACE"
       maxWidth="3xl"
     >
       <div className="space-y-6">

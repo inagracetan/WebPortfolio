@@ -35,9 +35,10 @@ export const ContactModal: React.FC = () => {
     <Modal
       isOpen={activeModal === 'CONTACT'}
       onClose={closeModal}
-      title="CONTACT BEACON // TRANSMISSIONS"
-      subtitle="Direct communications, mobile cellular line & collaboration channels"
-      badge="TRANSMISSIONS"
+      title="CONTACT_STATION // TRANSMISSIONS_TERMINAL.EXE"
+      subtitle="Direct cellular telephone line, secure email link & collaboration channels"
+      badge="0955-290-0484"
+      locationTag="CONTACT STATION"
       maxWidth="xl"
     >
       <div className="space-y-4">

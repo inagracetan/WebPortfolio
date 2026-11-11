@@ -47,9 +47,10 @@ export const SettingsModal: React.FC = () => {
     <Modal
       isOpen={activeModal === 'SETTINGS'}
       onClose={closeModal}
-      title="SYSTEM SETTINGS & AUDIO"
+      title="SETTINGS // SYSTEM_CONFIGURATION.DAT"
+      locationTag="SYSTEM CONFIG"
       subtitle="Volume orchestration, procedural audio effects & rendering quality"
-      badge="SETTINGS"
+      badge="CONFIG"
       maxWidth="lg"
     >
       <div className="space-y-5">
