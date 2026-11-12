@@ -2,12 +2,13 @@ export type MultimediaCategory =
   | 'Graphic Design'
   | 'Photo Editing'
   | 'Digital Artwork'
+  | 'Internship / On-the-Job Training'
 
 export interface MultimediaItem {
   id: string
   title: string
   category: MultimediaCategory
-  mediaType: 'image'
+  mediaType: 'image' | 'presentation'
   mediaUrl: string
   thumbnailUrl?: string
   aspectRatio?: 'portrait' | 'square' | 'wide'
@@ -18,6 +19,22 @@ export interface MultimediaItem {
 }
 
 export const multimediaData: MultimediaItem[] = [
+  // ==========================================
+  // INTERNSHIP / ON-THE-JOB TRAINING
+  // ==========================================
+  {
+    id: 'ojt-presentation',
+    title: 'OJT Presentation',
+    category: 'Internship / On-the-Job Training',
+    mediaType: 'presentation',
+    mediaUrl: '/documents/OJT_Presentation_Preview.png',
+    externalUrl: '/documents/Ina_Grace_Tan_OJT_Presentation.pptx',
+    aspectRatio: 'wide',
+    description: 'Internship summary presentation covering operational support, procurement records management, and technical training at the Farmers Training Center, City Agriculture Office (City Government of Malaybalay).',
+    tools: ['Microsoft PowerPoint', 'Canva'],
+    date: 'April 2026',
+  },
+
   // ==========================================
   // DIGITAL ARTWORK
   // ==========================================
@@ -56,7 +73,7 @@ export const multimediaData: MultimediaItem[] = [
   },
 
   // ==========================================
-  // GRAPHIC DESIGN
+  // GRAPHIC DESIGN (CANVA & PRODUCTION ASSETS)
   // ==========================================
   {
     id: 'agriculture-quality-customer-seminar',
@@ -66,8 +83,30 @@ export const multimediaData: MultimediaItem[] = [
     mediaUrl: '/multimedia/agriculture_seminar.jpeg',
     aspectRatio: 'portrait',
     description: 'Official promotional poster and event programme collateral designed for the City Agriculture Office (LGU Malaybalay City) for "Planting the Seeds of Service Excellence: Quality Customer Service for Agricultural Stakeholders" held at the Farmers Training Center, Casisang.',
-    tools: ['Adobe Photoshop', 'Corporate Layout', 'Event Branding & Typography'],
+    tools: ['Canva', 'Corporate Layout', 'Event Branding & Typography'],
     date: 'March 2026',
+  },
+  {
+    id: 'music-competition-poster',
+    title: 'Music Competition Promotional Poster',
+    category: 'Graphic Design',
+    mediaType: 'image',
+    mediaUrl: '/multimedia/Tan_Music_Competition.jpg',
+    aspectRatio: 'portrait',
+    description: 'High-energy musical event poster utilizing bright neon gradients, doodle art illustrations, and bold typography hierarchy for college festival promotion.',
+    tools: ['Canva', 'Graphic Design', 'Promotional Layout'],
+    date: 'September 2024',
+  },
+  {
+    id: 'lucky-bliss-brand-badge',
+    title: 'Lucky Bliss Fruity Drink Mascot Emblem & Badge',
+    category: 'Graphic Design',
+    mediaType: 'image',
+    mediaUrl: '/multimedia/bliss.png',
+    aspectRatio: 'square',
+    description: 'Commercial brand badge and packaging sticker design featuring a playful bunny mascot, retro wave scalloped borders, and custom typography.',
+    tools: ['Canva', 'Brand Identity', 'Packaging Design'],
+    date: 'November 2024',
   },
   {
     id: 'christmas-fest-flyer',
@@ -81,17 +120,6 @@ export const multimediaData: MultimediaItem[] = [
     date: 'September 2024',
   },
   {
-    id: 'music-competition-poster',
-    title: 'Music Competition Promotional Poster',
-    category: 'Graphic Design',
-    mediaType: 'image',
-    mediaUrl: '/multimedia/Tan_Music_Competition.jpg',
-    aspectRatio: 'portrait',
-    description: 'High-energy musical event poster utilizing bright neon gradients, doodle art illustrations, and bold typography hierarchy for college festival promotion.',
-    tools: ['Adobe Photoshop', 'Vector Illustration', 'Graphic Design'],
-    date: 'September 2024',
-  },
-  {
     id: 'cmu-founding-anniversary',
     title: '114th Founding Anniversary & Alumni Homecoming',
     category: 'Graphic Design',
@@ -101,17 +129,6 @@ export const multimediaData: MultimediaItem[] = [
     description: 'Official schedule of activities poster designed for Central Mindanao University celebration featuring university landmarks and festive leaf patterns.',
     tools: ['Adobe Photoshop', 'Editorial Layout', 'Brand Identity'],
     date: 'September 2024',
-  },
-  {
-    id: 'lucky-bliss-brand-badge',
-    title: 'Lucky Bliss Fruity Drink Mascot Emblem & Badge',
-    category: 'Graphic Design',
-    mediaType: 'image',
-    mediaUrl: '/multimedia/bliss.png',
-    aspectRatio: 'square',
-    description: 'Commercial brand badge and packaging sticker design featuring a playful bunny mascot, retro wave scalloped borders, and custom typography.',
-    tools: ['Adobe Illustrator', 'Brand Identity', 'Packaging Design'],
-    date: 'November 2024',
   },
   {
     id: 'uniform-design-concepts',

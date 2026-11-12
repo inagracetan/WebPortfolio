@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react'
-import { motion, useReducedMotion } from 'framer-motion'
 import {
   House,
   UserRound,
@@ -24,7 +23,6 @@ import {
   Palette,
   Maximize2,
   Presentation,
-  Eye,
 } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
 import { projectsData } from '@/data/projects'
@@ -57,59 +55,63 @@ export const DirectPortfolioView: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('home')
   const [multimediaFilter, setMultimediaFilter] = useState<'All Works' | MultimediaCategory>('All Works')
   const [selectedMedia, setSelectedMedia] = useState<MultimediaItem | null>(null)
-  const [viewingOjtPresentation, setViewingOjtPresentation] = useState(false)
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
 
-  const prefersReducedMotion = useReducedMotion()
-
-  // Subtle, smooth scroll-triggered panel & card animations
-  const panelMotion = prefersReducedMotion
-    ? {}
-    : {
-        initial: { opacity: 0, y: 22 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: '-60px' },
-        transition: { duration: 0.5, ease: 'easeOut' as const },
-      }
-
-  const cardStagger = (index: number) =>
-    prefersReducedMotion
-      ? {}
-      : {
-          initial: { opacity: 0, y: 16 },
-          whileInView: { opacity: 1, y: 0 },
-          viewport: { once: true, margin: '-40px' },
-          transition: {
-            duration: 0.45,
-            delay: Math.min(index * 0.06, 0.3),
-            ease: 'easeOut' as const,
-          },
-        }
-
-  // Active section scroll spy
+  // Single lightweight IntersectionObserver for panel entrances (GPU-accelerated, runs once)
   useEffect(() => {
-    const handleScroll = () => {
-      const scrollPos = window.scrollY + 220
-      for (let i = SECTIONS.length - 1; i >= 0; i--) {
-        const el = document.getElementById(SECTIONS[i].id)
-        if (el && el.offsetTop <= scrollPos) {
-          setActiveSection(SECTIONS[i].id)
-          break
-        }
-      }
-    }
+    const panels = document.querySelectorAll('.panel-reveal')
+    if (panels.length === 0) return
 
-    window.addEventListener('scroll', handleScroll, { passive: true })
-    return () => window.removeEventListener('scroll', handleScroll)
+    const observer = new IntersectionObserver(
+      (entries) => {
+        entries.forEach((entry) => {
+          if (entry.isIntersecting) {
+            entry.target.classList.add('is-revealed')
+            observer.unobserve(entry.target) // Unobserve immediately: zero continuous work!
+          }
+        })
+      },
+      {
+        rootMargin: '0px 0px -40px 0px',
+        threshold: 0.05,
+      }
+    )
+
+    panels.forEach((p) => observer.observe(p))
+    return () => observer.disconnect()
   }, [])
 
-  // Close modals on Escape key
+  // IntersectionObserver for scroll-spy activeSection (zero scroll event listeners, zero layout thrashing)
+  useEffect(() => {
+    const sectionElements = SECTIONS.map((s) => document.getElementById(s.id)).filter(
+      Boolean
+    ) as HTMLElement[]
+
+    if (sectionElements.length === 0) return
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const visible = entries.find((e) => e.isIntersecting)
+        if (visible?.target?.id) {
+          setActiveSection(visible.target.id)
+        }
+      },
+      {
+        rootMargin: '-20% 0px -60% 0px',
+        threshold: 0.1,
+      }
+    )
+
+    sectionElements.forEach((el) => observer.observe(el))
+    return () => observer.disconnect()
+  }, [])
+
+  // Close multimedia lightbox on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === 'Escape') {
         setSelectedMedia(null)
-        setViewingOjtPresentation(false)
       }
     }
     window.addEventListener('keydown', handleKeyDown)
@@ -147,7 +149,7 @@ export const DirectPortfolioView: React.FC = () => {
     <div className="fixed inset-0 z-30 overflow-y-auto bg-deep-navy text-warm-ivory font-sans selection:bg-electric-blue selection:text-deep-navy">
       {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-blue/15 via-transparent to-deep-navy" />
-      <div className="fixed inset-0 pointer-events-none opacity-20 scanlines" />
+      <div className="fixed inset-0 pointer-events-none opacity-15 scanlines" />
 
       {/* INA.EXE REDESIGNED NAVIGATION BAR */}
       <DirectPortfolioNav
@@ -160,7 +162,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 1: HOME / INTRODUCTION */}
         {/* ========================================================= */}
-        <motion.section id="home" {...panelMotion} className="pt-6 sm:pt-10 scroll-mt-24">
+        <section id="home" className="panel-reveal pt-6 sm:pt-10 scroll-mt-24">
           <div className="p-6 sm:p-10 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-electric-blue/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -302,12 +304,12 @@ export const DirectPortfolioView: React.FC = () => {
               </div>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
         {/* SECTION 2: ABOUT ME */}
         {/* ========================================================= */}
-        <motion.section id="about" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="about" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <UserRound className="w-6 h-6 text-electric-blue" />
             <div>
@@ -322,10 +324,7 @@ export const DirectPortfolioView: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             {/* Left: Authentic Portrait Card */}
-            <motion.div
-              {...cardStagger(0)}
-              className="md:col-span-4 p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-xl flex flex-col items-center text-center space-y-4"
-            >
+            <div className="md:col-span-4 p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-xl flex flex-col items-center text-center space-y-4">
               <div className="relative w-36 h-36 rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 via-sky-400 to-electric-blue shadow-[0_0_20px_rgba(0,240,255,0.3)]">
                 <div className="w-full h-full rounded-[14px] overflow-hidden bg-deep-navy border border-electric-blue/40">
                   <img
@@ -362,13 +361,10 @@ export const DirectPortfolioView: React.FC = () => {
                   <span className="text-cyber-yellow font-semibold">IT &bull; Multimedia</span>
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Middle: Professional Narrative */}
-            <motion.div
-              {...cardStagger(1)}
-              className="md:col-span-5 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 shadow-md"
-            >
+            <div className="md:col-span-5 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 shadow-md">
               <h3 className="font-mono text-sm font-bold text-electric-blue uppercase tracking-wider">
                 Professional Profile
               </h3>
@@ -381,13 +377,10 @@ export const DirectPortfolioView: React.FC = () => {
               <p className="font-sans text-sm text-warm-ivory-dim leading-relaxed">
                 Eager to bring disciplined technical skills, high data accuracy, and collaborative problem-solving to technical teams in network engineering, systems administration, database management, technical support, and creative multimedia production.
               </p>
-            </motion.div>
+            </div>
 
             {/* Right: Core Focus Areas */}
-            <motion.div
-              {...cardStagger(2)}
-              className="md:col-span-3 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs shadow-md"
-            >
+            <div className="md:col-span-3 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs shadow-md">
               <h3 className="font-bold text-sky-light uppercase tracking-wider">
                 Core Competencies
               </h3>
@@ -410,17 +403,17 @@ export const DirectPortfolioView: React.FC = () => {
                 </li>
                 <li className="flex items-start gap-2">
                   <CheckCircle2 className="w-4 h-4 text-cyber-yellow flex-shrink-0 mt-0.5" />
-                  <span>Graphic Design &amp; Digital Artwork (Photoshop, Illustrator)</span>
+                  <span>Graphic Design &amp; Digital Artwork (Canva, Photoshop)</span>
                 </li>
               </ul>
-            </motion.div>
+            </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
         {/* SECTION 3: RESUME (CV) */}
         {/* ========================================================= */}
-        <motion.section id="resume" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="resume" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
             <div className="flex items-center gap-3">
               <FileUser className="w-6 h-6 text-electric-blue" />
@@ -500,12 +493,12 @@ export const DirectPortfolioView: React.FC = () => {
               </div>
             </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
         {/* SECTION 4: WORK EXPERIENCE */}
         {/* ========================================================= */}
-        <motion.section id="experience" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="experience" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <Briefcase className="w-6 h-6 text-electric-blue" />
             <div>
@@ -519,10 +512,9 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            {experienceData.map((exp, idx) => (
-              <motion.div
+            {experienceData.map((exp) => (
+              <div
                 key={exp.id}
-                {...cardStagger(idx)}
                 className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg hover:border-sky-blue/40 transition-colors"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-sky-blue/15">
@@ -568,120 +560,15 @@ export const DirectPortfolioView: React.FC = () => {
                     </span>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
-
-            {/* OJT Presentation Document Card */}
-            <motion.div
-              {...cardStagger(experienceData.length)}
-              className="p-6 rounded-lg bg-gradient-to-r from-deep-navy-card/90 via-[#0d223a] to-deep-navy-card/90 border border-emerald-500/40 shadow-xl space-y-4 hover:border-emerald-400/70 transition-all"
-            >
-              <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-3 border-b border-emerald-500/20">
-                <div className="flex items-center gap-3">
-                  <div className="p-2.5 rounded-lg bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 flex-shrink-0">
-                    <Presentation className="w-6 h-6" />
-                  </div>
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 uppercase">
-                        Internship / On-the-Job Training
-                      </span>
-                      <span className="font-mono text-[10px] text-sky-light hidden sm:inline">
-                        PowerPoint Document (.pptx)
-                      </span>
-                    </div>
-                    <h3 className="font-display font-bold text-lg text-warm-ivory mt-0.5">
-                      OJT Presentation
-                    </h3>
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    type="button"
-                    onClick={() => setViewingOjtPresentation(true)}
-                    className="flex items-center gap-1.5 px-3.5 py-1.5 rounded-full bg-emerald-500/20 hover:bg-emerald-500 text-emerald-300 hover:text-deep-navy border border-emerald-500/40 font-mono text-xs font-bold transition-all cursor-pointer shadow-sm"
-                  >
-                    <Eye className="w-3.5 h-3.5" />
-                    <span>VIEW PRESENTATION</span>
-                  </button>
-
-                  <a
-                    href="/documents/Ina_Grace_Tan_OJT_Presentation.pptx"
-                    download="Ina_Grace_Tan_OJT_Presentation.pptx"
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-deep-navy/90 hover:bg-deep-navy border border-sky-blue/30 text-warm-ivory hover:text-electric-blue font-mono text-xs transition-colors"
-                    title="Download PowerPoint Presentation (.pptx, 6.3 MB)"
-                  >
-                    <Download className="w-3.5 h-3.5 text-sky-light" />
-                    <span className="hidden md:inline">DOWNLOAD PPTX</span>
-                  </a>
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
-                {/* Presentation Slide Thumbnail Preview */}
-                <div
-                  onClick={() => setViewingOjtPresentation(true)}
-                  className="md:col-span-4 rounded-md overflow-hidden border border-emerald-500/30 bg-black/60 cursor-pointer group relative shadow-md"
-                >
-                  <img
-                    src="/documents/OJT_Presentation_Preview.png"
-                    alt="OJT Presentation - Farmers Training Center City Agriculture Office"
-                    className="w-full h-auto object-cover group-hover:scale-105 transition-transform duration-300"
-                  />
-                  <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-1.5 text-xs font-mono font-bold text-emerald-300 backdrop-blur-xs">
-                    <Maximize2 className="w-4 h-4" />
-                    <span>PREVIEW SLIDES</span>
-                  </div>
-                </div>
-
-                {/* Metadata & Narrative */}
-                <div className="md:col-span-8 space-y-3 font-mono text-xs">
-                  <p className="font-sans text-xs sm:text-sm text-warm-ivory-dim leading-relaxed">
-                    Comprehensive internship summary presentation delivering an in-depth review of on-the-job training, technical accomplishments, and institutional contributions at the Farmers Training Center, City Agriculture Office (City Government of Malaybalay).
-                  </p>
-
-                  {/* Metadata Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-1 text-[11px]">
-                    <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/15">
-                      <div className="text-[10px] text-warm-ivory-dim/60">DOCUMENT TYPE</div>
-                      <div className="text-warm-ivory font-semibold truncate">PowerPoint (.pptx)</div>
-                    </div>
-                    <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/15">
-                      <div className="text-[10px] text-warm-ivory-dim/60">ORGANIZATION</div>
-                      <div className="text-warm-ivory font-semibold truncate">City Agriculture Office</div>
-                    </div>
-                    <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/15">
-                      <div className="text-[10px] text-warm-ivory-dim/60">PRESENTER</div>
-                      <div className="text-emerald-400 font-semibold truncate">Ina Grace Tan</div>
-                    </div>
-                    <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/15">
-                      <div className="text-[10px] text-warm-ivory-dim/60">FILE SIZE</div>
-                      <div className="text-warm-ivory font-semibold truncate">6.3 MB Deck</div>
-                    </div>
-                  </div>
-
-                  {/* Key Focus Highlights */}
-                  <div className="flex flex-wrap gap-1.5 pt-1">
-                    {['Internship Milestones', 'Procurement Management', 'Document Tracking', 'Technical Support', 'Farmers Training Center'].map((badge) => (
-                      <span
-                        key={badge}
-                        className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/25 text-emerald-300"
-                      >
-                        {badge}
-                      </span>
-                    ))}
-                  </div>
-                </div>
-              </div>
-            </motion.div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
         {/* SECTION 5: EDUCATION */}
         {/* ========================================================= */}
-        <motion.section id="education" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="education" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <GraduationCap className="w-6 h-6 text-electric-blue" />
             <div>
@@ -695,10 +582,9 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            {educationData.map((edu, idx) => (
-              <motion.div
+            {educationData.map((edu) => (
+              <div
                 key={edu.id}
-                {...cardStagger(idx)}
                 className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-3 shadow-lg"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
@@ -728,14 +614,11 @@ export const DirectPortfolioView: React.FC = () => {
                 <div className="font-mono text-[10px] text-cyber-yellow pt-2">
                   {edu.clarificationNote}
                 </div>
-              </motion.div>
+              </div>
             ))}
 
             {/* Academic Training & Coursework (AWS Academy / Central Mindanao University) */}
-            <motion.div
-              {...cardStagger(educationData.length)}
-              className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg"
-            >
+            <div className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg">
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
                 <div>
                   <div className="font-mono text-[10px] text-electric-blue uppercase tracking-widest font-bold">
@@ -785,14 +668,14 @@ export const DirectPortfolioView: React.FC = () => {
                   </div>
                 ))}
               </div>
-            </motion.div>
+            </div>
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
         {/* SECTION 6: PROJECTS */}
         {/* ========================================================= */}
-        <motion.section id="projects" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="projects" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <FolderKanban className="w-6 h-6 text-electric-blue" />
             <div>
@@ -806,10 +689,9 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projectsData.map((project, idx) => (
-              <motion.div
+            {projectsData.map((project) => (
+              <div
                 key={project.id}
-                {...cardStagger(idx)}
                 className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-4 hover:border-electric-blue/50 transition-colors shadow-lg"
               >
                 <div className="space-y-3">
@@ -862,15 +744,15 @@ export const DirectPortfolioView: React.FC = () => {
                     <span className="text-warm-ivory-dim/60">{project.metrics}</span>
                   </div>
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
-        {/* SECTION 7: TECHNICAL SKILLS (ENHANCED - NO ARBITRARY RATINGS) */}
+        {/* SECTION 7: TECHNICAL SKILLS */}
         {/* ========================================================= */}
-        <motion.section id="skills" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="skills" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <Brain className="w-6 h-6 text-electric-blue" />
             <div>
@@ -884,10 +766,9 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {skillGroupsData.map((group, idx) => (
-              <motion.div
+            {skillGroupsData.map((group) => (
+              <div
                 key={group.id}
-                {...cardStagger(idx)}
                 className={`p-6 rounded-lg bg-gradient-to-b ${group.gradient || 'from-deep-navy-card/80 to-deep-navy'} border border-sky-blue/25 space-y-4 shadow-xl hover:border-electric-blue/40 transition-all`}
               >
                 <div className="border-b border-sky-blue/15 pb-3">
@@ -924,15 +805,15 @@ export const DirectPortfolioView: React.FC = () => {
                     </div>
                   ))}
                 </div>
-              </motion.div>
+              </div>
             ))}
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
-        {/* SECTION 8: CERTIFICATIONS & BADGES (OFFICIAL CREDLY EMBEDS) */}
+        {/* SECTION 8: CERTIFICATIONS & BADGES */}
         {/* ========================================================= */}
-        <motion.section id="certifications" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="certifications" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
             <div className="flex items-center gap-3">
               <Award className="w-6 h-6 text-electric-blue" />
@@ -956,13 +837,12 @@ export const DirectPortfolioView: React.FC = () => {
 
           {/* Cards Grid with Category Gradients */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {certificationsData.map((cert, idx) => {
+            {certificationsData.map((cert) => {
               const gradient = CATEGORY_GRADIENTS[cert.category] || CATEGORY_GRADIENTS['General IT']
 
               return (
-                <motion.div
+                <div
                   key={cert.id}
-                  {...cardStagger(idx)}
                   className={`p-6 rounded-lg bg-gradient-to-b ${gradient.bg} border ${gradient.border} shadow-xl backdrop-blur-md flex flex-col justify-between space-y-5 transition-all hover:scale-[1.01] hover:shadow-2xl`}
                 >
                   <div className="space-y-4">
@@ -1058,16 +938,16 @@ export const DirectPortfolioView: React.FC = () => {
                       </a>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               )
             })}
           </div>
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
         {/* SECTION 9: MULTIMEDIA & CREATIVE WORKS */}
         {/* ========================================================= */}
-        <motion.section id="multimedia" {...panelMotion} className="scroll-mt-24 space-y-6">
+        <section id="multimedia" className="panel-reveal scroll-mt-24 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-blue/20 pb-3">
             <div className="flex items-center gap-3">
               <Palette className="w-6 h-6 text-cyber-yellow" />
@@ -1111,39 +991,72 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMedia.map((item, idx) => (
-                <motion.div
+              {filteredMedia.map((item) => (
+                <div
                   key={item.id}
-                  {...cardStagger(idx)}
                   className="rounded-lg bg-deep-navy-card/85 border border-sky-blue/25 shadow-xl overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.01] hover:border-cyber-yellow/50 hover:shadow-2xl group"
                 >
                   {/* Media Preview Container */}
                   <div className="relative bg-black/60 overflow-hidden">
-                    <button
-                      type="button"
-                      onClick={() => setSelectedMedia(item)}
-                      className="w-full block relative cursor-pointer group/img overflow-hidden"
-                      title="Click to view full-resolution image"
-                    >
-                      <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden">
-                        <img
-                          src={item.mediaUrl}
-                          alt={item.title}
-                          loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-500 group-hover/img:scale-105"
-                        />
-                      </div>
-                      {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-mono font-bold text-warm-ivory backdrop-blur-xs">
-                        <Maximize2 className="w-4 h-4 text-cyber-yellow" />
-                        <span>EXPAND VIEW</span>
-                      </div>
-                    </button>
+                    {item.mediaType === 'presentation' ? (
+                      <a
+                        href={item.externalUrl || item.mediaUrl}
+                        download="Ina_Grace_Tan_OJT_Presentation.pptx"
+                        className="w-full block relative cursor-pointer group/img overflow-hidden"
+                        title="Download / Open Original PowerPoint Presentation (.pptx)"
+                      >
+                        <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden relative">
+                          <img
+                            src={item.mediaUrl}
+                            alt={item.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+                          />
+                          <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-emerald-500 text-deep-navy font-mono text-[10px] font-bold flex items-center gap-1 shadow-md">
+                            <Presentation className="w-3.5 h-3.5" />
+                            <span>PPTX</span>
+                          </div>
+                        </div>
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-mono font-bold text-emerald-300 backdrop-blur-xs">
+                          <Download className="w-4 h-4" />
+                          <span>OPEN PPT FILE</span>
+                        </div>
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => setSelectedMedia(item)}
+                        className="w-full block relative cursor-pointer group/img overflow-hidden"
+                        title="Click to view full-resolution image"
+                      >
+                        <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden">
+                          <img
+                            src={item.mediaUrl}
+                            alt={item.title}
+                            loading="lazy"
+                            className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+                          />
+                        </div>
+                        {/* Hover Overlay */}
+                        <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-mono font-bold text-warm-ivory backdrop-blur-xs">
+                          <Maximize2 className="w-4 h-4 text-cyber-yellow" />
+                          <span>EXPAND VIEW</span>
+                        </div>
+                      </button>
+                    )}
 
                     {/* Category Pill Over Media */}
                     <div className="absolute top-2.5 left-2.5 pointer-events-none">
-                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full bg-deep-navy/90 border border-cyber-yellow/40 text-cyber-yellow uppercase shadow-md">
-                        {item.category}
+                      <span className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-md flex items-center gap-1 ${
+                        item.category === 'Internship / On-the-Job Training'
+                          ? 'bg-emerald-950/90 border border-emerald-400/50 text-emerald-300'
+                          : 'bg-deep-navy/90 border border-cyber-yellow/40 text-cyber-yellow'
+                      }`}>
+                        {item.category === 'Internship / On-the-Job Training' && (
+                          <Presentation className="w-3 h-3 text-emerald-400" />
+                        )}
+                        <span>{item.category}</span>
                       </span>
                     </div>
 
@@ -1159,9 +1072,14 @@ export const DirectPortfolioView: React.FC = () => {
                   {/* Narrative & Details */}
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
-                      <h3 className="font-display font-bold text-base text-warm-ivory leading-snug group-hover:text-cyber-yellow transition-colors break-words">
-                        {item.title}
-                      </h3>
+                      <div className="flex items-center gap-2">
+                        {item.mediaType === 'presentation' && (
+                          <Presentation className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                        )}
+                        <h3 className="font-display font-bold text-base text-warm-ivory leading-snug group-hover:text-cyber-yellow transition-colors break-words">
+                          {item.title}
+                        </h3>
+                      </div>
                       <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed break-words">
                         {item.description}
                       </p>
@@ -1173,7 +1091,11 @@ export const DirectPortfolioView: React.FC = () => {
                         {item.tools.map((t) => (
                           <span
                             key={t}
-                            className="text-[9px] px-2 py-0.5 rounded bg-deep-navy border border-sky-blue/20 text-sky-light font-mono"
+                            className={`text-[9px] px-2 py-0.5 rounded border font-mono ${
+                              t === 'Canva'
+                                ? 'bg-sky-500/15 border-sky-400/40 text-sky-300 font-bold'
+                                : 'bg-deep-navy border-sky-blue/20 text-sky-light'
+                            }`}
                           >
                             {t}
                           </span>
@@ -1182,38 +1104,39 @@ export const DirectPortfolioView: React.FC = () => {
 
                       {/* Card Action */}
                       <div className="flex items-center justify-between pt-1">
-                        <button
-                          type="button"
-                          onClick={() => setSelectedMedia(item)}
-                          className="inline-flex items-center gap-1.5 text-xs text-cyber-yellow hover:text-white font-bold transition-colors cursor-pointer"
-                        >
-                          <Maximize2 className="w-3.5 h-3.5" />
-                          <span>DETAILS &amp; FULL VIEW</span>
-                        </button>
-                        {item.externalUrl && (
+                        {item.mediaType === 'presentation' ? (
                           <a
-                            href={item.externalUrl}
-                            target="_blank"
-                            rel="noopener noreferrer"
-                            className="text-[11px] text-electric-blue hover:text-white inline-flex items-center gap-1 font-bold"
+                            href={item.externalUrl || item.mediaUrl}
+                            download="Ina_Grace_Tan_OJT_Presentation.pptx"
+                            className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-white font-bold transition-colors cursor-pointer"
                           >
-                            <span>VIEW</span>
-                            <ExternalLink className="w-3 h-3" />
+                            <Presentation className="w-3.5 h-3.5" />
+                            <span>VIEW / OPEN PPT FILE</span>
+                            <ExternalLink className="w-3 h-3 ml-0.5" />
                           </a>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedMedia(item)}
+                            className="inline-flex items-center gap-1.5 text-xs text-cyber-yellow hover:text-white font-bold transition-colors cursor-pointer"
+                          >
+                            <Maximize2 className="w-3.5 h-3.5" />
+                            <span>DETAILS &amp; FULL VIEW</span>
+                          </button>
                         )}
                       </div>
                     </div>
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
-        </motion.section>
+        </section>
 
         {/* ========================================================= */}
         {/* SECTION 10: CONTACT */}
         {/* ========================================================= */}
-        <motion.section id="contact" {...panelMotion} className="scroll-mt-24 space-y-6 pb-12">
+        <section id="contact" className="panel-reveal scroll-mt-24 space-y-6 pb-12">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <Mail className="w-6 h-6 text-electric-blue" />
             <div>
@@ -1228,10 +1151,7 @@ export const DirectPortfolioView: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Contact Details Card */}
-            <motion.div
-              {...cardStagger(0)}
-              className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl"
-            >
+            <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl">
               <div className="space-y-2">
                 <h3 className="font-display font-bold text-lg text-warm-ivory">
                   GET IN TOUCH
@@ -1297,13 +1217,10 @@ export const DirectPortfolioView: React.FC = () => {
                   ))}
                 </div>
               </div>
-            </motion.div>
+            </div>
 
             {/* Quick Interactive Message Form */}
-            <motion.div
-              {...cardStagger(1)}
-              className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl"
-            >
+            <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl">
               <h3 className="font-display font-bold text-lg text-warm-ivory">
                 SEND DIRECT TRANSMISSION
               </h3>
@@ -1374,9 +1291,9 @@ export const DirectPortfolioView: React.FC = () => {
                   </button>
                 </form>
               )}
-            </motion.div>
+            </div>
           </div>
-        </motion.section>
+        </section>
       </main>
 
       {/* ========================================================= */}
@@ -1450,7 +1367,11 @@ export const DirectPortfolioView: React.FC = () => {
                     {selectedMedia.tools.map((t) => (
                       <span
                         key={t}
-                        className="font-mono text-xs px-2.5 py-1 rounded bg-deep-navy border border-sky-blue/25 text-warm-ivory"
+                        className={`font-mono text-xs px-2.5 py-1 rounded border ${
+                          t === 'Canva'
+                            ? 'bg-sky-500/20 border-sky-400/40 text-sky-300 font-bold'
+                            : 'bg-deep-navy border-sky-blue/25 text-warm-ivory'
+                        }`}
                       >
                         {t}
                       </span>
@@ -1458,121 +1379,15 @@ export const DirectPortfolioView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-2 flex justify-end">
+                <div className="pt-2 flex justify-end gap-3">
                   <a
                     href={selectedMedia.mediaUrl}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-electric-blue hover:bg-white text-deep-navy font-mono text-xs font-bold transition-all shadow-md"
                   >
-                    <span>OPEN FULL-SIZE MEDIA</span>
+                    <span>OPEN FULL-SIZE IMAGE</span>
                     <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      )}
-
-      {/* ========================================================= */}
-      {/* OJT PRESENTATION PREVIEW MODAL */}
-      {/* ========================================================= */}
-      {viewingOjtPresentation && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="ojt-ppt-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-deep-navy/90 backdrop-blur-md select-none"
-          onClick={() => setViewingOjtPresentation(false)}
-        >
-          <div
-            className="relative w-full max-w-4xl max-h-[90vh] bg-deep-navy-card/95 border border-emerald-500/40 rounded-lg shadow-2xl overflow-hidden flex flex-col font-sans"
-            onClick={(e) => e.stopPropagation()}
-          >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-[#101b2b] border-b border-emerald-500/25">
-              <div className="flex items-center gap-2 min-w-0 pr-2">
-                <Presentation className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                <span
-                  id="ojt-ppt-dialog-title"
-                  className="font-mono font-bold text-xs sm:text-sm text-warm-ivory uppercase break-words"
-                >
-                  OJT Presentation &bull; City Agriculture Office
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setViewingOjtPresentation(false)}
-                className="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500 border border-rose-500/40 text-rose-300 hover:text-white rounded text-xs font-mono font-bold transition-colors cursor-pointer flex-shrink-0"
-                aria-label="Close presentation dialog"
-              >
-                ✕ CLOSE
-              </button>
-            </div>
-
-            {/* Slide Display Area */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-black/60">
-              <div className="flex justify-center items-center">
-                <img
-                  src="/documents/OJT_Presentation_Preview.png"
-                  alt="OJT Presentation - Farmers Training Center City Agriculture Office - presented by Ina Grace Tan"
-                  className="max-h-[60vh] w-auto max-w-full rounded object-contain shadow-2xl border border-emerald-500/30"
-                />
-              </div>
-
-              {/* Presentation Metadata and Actions */}
-              <div className="space-y-3 pt-3 border-t border-sky-blue/20">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-xs font-bold px-2.5 py-1 rounded bg-emerald-500/15 text-emerald-300 border border-emerald-500/40 uppercase">
-                    Internship / On-the-Job Training
-                  </span>
-                  <span className="font-mono text-xs text-sky-light">
-                    Presenter: Ina Grace Tan
-                  </span>
-                </div>
-
-                <p className="text-xs sm:text-sm text-warm-ivory leading-relaxed">
-                  This presentation covers the on-the-job training experience, key technical accomplishments, and operational support at the Farmers Training Center, City Agriculture Office (City Government of Malaybalay). It highlights administrative workflows, procurement records management, document tracking, and workstation support skills acquired during the internship.
-                </p>
-
-                <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 pt-2 font-mono text-xs">
-                  <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/20">
-                    <span className="text-[10px] text-warm-ivory-dim/70 block">DOCUMENT FORMAT</span>
-                    <span className="font-bold text-warm-ivory">Microsoft PowerPoint (.pptx)</span>
-                  </div>
-                  <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/20">
-                    <span className="text-[10px] text-warm-ivory-dim/70 block">ORGANIZATION</span>
-                    <span className="font-bold text-warm-ivory">City Agriculture Office</span>
-                  </div>
-                  <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/20">
-                    <span className="text-[10px] text-warm-ivory-dim/70 block">VENUE</span>
-                    <span className="font-bold text-warm-ivory">Farmers Training Center</span>
-                  </div>
-                  <div className="p-2 rounded bg-deep-navy/80 border border-sky-blue/20">
-                    <span className="text-[10px] text-warm-ivory-dim/70 block">ATTACHMENT SIZE</span>
-                    <span className="font-bold text-emerald-400">6.3 MB</span>
-                  </div>
-                </div>
-
-                <div className="pt-3 flex flex-wrap items-center justify-end gap-3">
-                  <a
-                    href="/documents/OJT_Presentation_Preview.png"
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded bg-deep-navy-card hover:bg-deep-navy border border-sky-blue/30 text-warm-ivory font-mono text-xs font-bold transition-all"
-                  >
-                    <span>OPEN HIGH-RES TITLE SLIDE</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-sky-light" />
-                  </a>
-
-                  <a
-                    href="/documents/Ina_Grace_Tan_OJT_Presentation.pptx"
-                    download="Ina_Grace_Tan_OJT_Presentation.pptx"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-emerald-500 hover:bg-emerald-400 text-deep-navy font-mono text-xs font-bold transition-all shadow-md"
-                  >
-                    <Download className="w-4 h-4" />
-                    <span>DOWNLOAD POWERPOINT (.PPTX)</span>
                   </a>
                 </div>
               </div>

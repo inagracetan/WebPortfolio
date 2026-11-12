@@ -187,11 +187,11 @@ export const Navigation: React.FC = () => {
             </button>
           </Tooltip>
 
-          {/* Mobile / Recruiter Directory Menu Drawer Button */}
+          {/* Mobile / Recruiter Directory Menu Drawer Button (Hidden on Desktop) */}
           <button
             type="button"
             onClick={toggleMenu}
-            className="flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-all backdrop-blur-md cursor-pointer shadow-sm"
+            className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-all backdrop-blur-md cursor-pointer shadow-sm"
             aria-label="Open Directory Menu"
           >
             <Menu className="w-4 h-4" />
