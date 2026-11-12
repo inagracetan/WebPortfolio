@@ -2,13 +2,12 @@ export type MultimediaCategory =
   | 'Graphic Design'
   | 'Photo Editing'
   | 'Digital Artwork'
-  | 'Internship / On-the-Job Training'
 
 export interface MultimediaItem {
   id: string
   title: string
   category: MultimediaCategory
-  mediaType: 'image' | 'presentation'
+  mediaType: 'image'
   mediaUrl: string
   thumbnailUrl?: string
   aspectRatio?: 'portrait' | 'square' | 'wide'
@@ -20,19 +19,18 @@ export interface MultimediaItem {
 
 export const multimediaData: MultimediaItem[] = [
   // ==========================================
-  // INTERNSHIP / ON-THE-JOB TRAINING
+  // GRAPHIC DESIGN (CANVA & PRODUCTION ASSETS)
   // ==========================================
   {
-    id: 'ojt-presentation',
-    title: 'OJT Presentation',
-    category: 'Internship / On-the-Job Training',
-    mediaType: 'presentation',
+    id: 'ojt-graphic-design',
+    title: 'OJT Graphic Design',
+    category: 'Graphic Design',
+    mediaType: 'image',
     mediaUrl: '/documents/OJT_Presentation_Preview.png',
-    externalUrl: '/documents/Ina_Grace_Tan_OJT_Presentation.pptx',
     aspectRatio: 'wide',
-    description: 'Internship summary presentation covering operational support, procurement records management, and technical training at the Farmers Training Center, City Agriculture Office (City Government of Malaybalay).',
-    tools: ['Microsoft PowerPoint', 'Canva'],
-    date: 'April 2026',
+    description: 'Official corporate visual layout and branding collateral created during on-the-job training for the Farmers Training Center at the City Agriculture Office (City Government of Malaybalay).',
+    tools: ['Canva', 'Graphic Design', 'Corporate Branding'],
+    date: 'March 2026',
   },
 
   // ==========================================

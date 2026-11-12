@@ -58,14 +58,14 @@ export const UniversityBuilding: React.FC = () => {
         </mesh>
       </group>
 
-      {/* Academic Honors Monument (Graduation Cap & Golden Plaque) */}
+      {/* Academic Degree Monument (Graduation Cap & Pedestal) */}
       <group position={[0, 0.25, 1.4]}>
         {/* Stepped Pedestal */}
         <mesh position={[0, 0.2, 0]} castShadow receiveShadow>
           <boxGeometry args={[0.9, 0.4, 0.9]} />
           <meshStandardMaterial color="#0f172a" roughness={0.5} flatShading />
         </mesh>
-        {/* Golden Honors Scroll / Book */}
+        {/* Degree Scroll / Book */}
         <mesh position={[0, 0.46, 0]} rotation={[0.2, 0.4, 0]} castShadow>
           <boxGeometry args={[0.45, 0.08, 0.32]} />
           <meshStandardMaterial color="#fbbf24" metalness={0.7} roughness={0.3} flatShading />

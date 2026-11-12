@@ -10,12 +10,11 @@ export const educationData: EducationItem[] = [
     specialization: 'Major in Data Networking',
     type: 'DEGREE',
     details: [
-      'College Scholar — Central Mindanao University.',
       'Major in Data Networking: network design, switching, IP addressing, DHCP, VLAN configuration, and Active Directory.',
       'Developed City Agriculture Admin Procurement Monitoring System and CMU Faculty Availability and Appointment System (Capstone).',
       'Coursework and practical foundations across Database Management, System Administration, and Technical Support.',
     ],
-    clarificationNote: 'Confirmed academic degree track at Central Mindanao University (July 2026, College Scholar).',
+    clarificationNote: 'Confirmed academic degree track at Central Mindanao University (July 2026).',
   },
   {
     id: 'aws-academy-cloud-foundations',

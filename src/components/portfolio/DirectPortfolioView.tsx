@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useRef } from 'react'
 import {
   House,
   UserRound,
@@ -22,7 +22,8 @@ import {
   ShieldCheck,
   Palette,
   Maximize2,
-  Presentation,
+  Smartphone,
+  Terminal,
 } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
 import { projectsData } from '@/data/projects'
@@ -35,6 +36,17 @@ import { multimediaData, type MultimediaCategory, type MultimediaItem } from '@/
 import { CredlyBadge } from './CredlyBadge'
 import { TechLogo } from './TechLogo'
 import { DirectPortfolioNav } from './DirectPortfolioNav'
+
+// Helper for category-appropriate project simulation icons
+const getProjectDemoIcon = (project: { category: string }) => {
+  if (project.category.includes('Mobile') || project.category.includes('Geolocation')) {
+    return <Smartphone className="w-5 h-5 text-electric-blue" />
+  }
+  if (project.category.includes('Cybersecurity')) {
+    return <ShieldCheck className="w-5 h-5 text-emerald-400" />
+  }
+  return <Terminal className="w-5 h-5 text-sky-light" />
+}
 
 // Exact 10-section portfolio order
 const SECTIONS = [
@@ -57,33 +69,41 @@ export const DirectPortfolioView: React.FC = () => {
   const [selectedMedia, setSelectedMedia] = useState<MultimediaItem | null>(null)
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const scrollContainerRef = useRef<HTMLDivElement>(null)
 
-  // Single lightweight IntersectionObserver for panel entrances (GPU-accelerated, runs once)
+  // Single lightweight IntersectionObserver for panel and card entrance transitions (GPU-accelerated, runs once)
   useEffect(() => {
-    const panels = document.querySelectorAll('.panel-reveal')
-    if (panels.length === 0) return
+    const container = scrollContainerRef.current
+    if (!container) return
+
+    const elements = container.querySelectorAll('.reveal-panel, .reveal-card, .panel-reveal')
+    if (elements.length === 0) return
 
     const observer = new IntersectionObserver(
       (entries) => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-revealed')
-            observer.unobserve(entry.target) // Unobserve immediately: zero continuous work!
+            observer.unobserve(entry.target) // Unobserve immediately: zero continuous overhead!
           }
         })
       },
       {
+        root: container,
         rootMargin: '0px 0px -40px 0px',
-        threshold: 0.05,
+        threshold: 0.08,
       }
     )
 
-    panels.forEach((p) => observer.observe(p))
+    elements.forEach((el) => observer.observe(el))
     return () => observer.disconnect()
   }, [])
 
   // IntersectionObserver for scroll-spy activeSection (zero scroll event listeners, zero layout thrashing)
   useEffect(() => {
+    const container = scrollContainerRef.current
+    if (!container) return
+
     const sectionElements = SECTIONS.map((s) => document.getElementById(s.id)).filter(
       Boolean
     ) as HTMLElement[]
@@ -92,14 +112,17 @@ export const DirectPortfolioView: React.FC = () => {
 
     const observer = new IntersectionObserver(
       (entries) => {
-        const visible = entries.find((e) => e.isIntersecting)
+        const visible = entries
+          .filter((e) => e.isIntersecting)
+          .sort((a, b) => b.intersectionRatio - a.intersectionRatio)[0]
         if (visible?.target?.id) {
           setActiveSection(visible.target.id)
         }
       },
       {
-        rootMargin: '-20% 0px -60% 0px',
-        threshold: 0.1,
+        root: container,
+        rootMargin: '-15% 0px -60% 0px',
+        threshold: [0.1, 0.25, 0.5],
       }
     )
 
@@ -129,11 +152,22 @@ export const DirectPortfolioView: React.FC = () => {
       ? multimediaData
       : multimediaData.filter((m) => m.category === multimediaFilter)
 
+  // Pixel-perfect smooth scroll accounting for the sticky navigation bar
   const scrollToSection = (id: string) => {
+    const container = scrollContainerRef.current
     const el = document.getElementById(id)
-    if (el) {
-      el.scrollIntoView({ behavior: 'smooth', block: 'start' })
-    }
+    if (!container || !el) return
+
+    const containerRect = container.getBoundingClientRect()
+    const elRect = el.getBoundingClientRect()
+    // Sticky header offset (~64px header + 20px padding)
+    const navOffset = 84
+    const targetTop = elRect.top - containerRect.top + container.scrollTop - navOffset
+
+    container.scrollTo({
+      top: Math.max(0, targetTop),
+      behavior: 'smooth',
+    })
   }
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -146,7 +180,7 @@ export const DirectPortfolioView: React.FC = () => {
   }
 
   return (
-    <div className="fixed inset-0 z-30 overflow-y-auto bg-deep-navy text-warm-ivory font-sans selection:bg-electric-blue selection:text-deep-navy">
+    <div ref={scrollContainerRef} className="fixed inset-0 z-30 overflow-y-auto scroll-smooth bg-deep-navy text-warm-ivory font-sans selection:bg-electric-blue selection:text-deep-navy">
       {/* Background Ambience */}
       <div className="fixed inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-blue/15 via-transparent to-deep-navy" />
       <div className="fixed inset-0 pointer-events-none opacity-15 scanlines" />
@@ -162,7 +196,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 1: HOME / INTRODUCTION */}
         {/* ========================================================= */}
-        <section id="home" className="panel-reveal pt-6 sm:pt-10 scroll-mt-24">
+        <section id="home" className="reveal-panel pt-6 sm:pt-10 scroll-mt-24">
           <div className="p-6 sm:p-10 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-2xl relative overflow-hidden">
             <div className="absolute top-0 right-0 w-64 h-64 bg-electric-blue/10 rounded-full blur-3xl pointer-events-none" />
 
@@ -288,8 +322,8 @@ export const DirectPortfolioView: React.FC = () => {
                       <div className="text-warm-ivory font-semibold">Central Mindanao University</div>
                     </div>
                     <div>
-                      <div className="text-[10px] text-warm-ivory-dim/70">ACADEMIC HONORS</div>
-                      <div className="text-cyber-yellow font-semibold">College Scholar</div>
+                      <div className="text-[10px] text-warm-ivory-dim/70">DEGREE CONFERRED</div>
+                      <div className="text-cyber-yellow font-semibold">BS Information Technology</div>
                     </div>
                     <div>
                       <div className="text-[10px] text-warm-ivory-dim/70">TECHNICAL SPECIALIZATION</div>
@@ -309,7 +343,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 2: ABOUT ME */}
         {/* ========================================================= */}
-        <section id="about" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="about" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <UserRound className="w-6 h-6 text-electric-blue" />
             <div>
@@ -324,7 +358,7 @@ export const DirectPortfolioView: React.FC = () => {
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             {/* Left: Authentic Portrait Card */}
-            <div className="md:col-span-4 p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-xl flex flex-col items-center text-center space-y-4">
+            <div className="reveal-card md:col-span-4 p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-xl flex flex-col items-center text-center space-y-4" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
               <div className="relative w-36 h-36 rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 via-sky-400 to-electric-blue shadow-[0_0_20px_rgba(0,240,255,0.3)]">
                 <div className="w-full h-full rounded-[14px] overflow-hidden bg-deep-navy border border-electric-blue/40">
                   <img
@@ -364,12 +398,12 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
 
             {/* Middle: Professional Narrative */}
-            <div className="md:col-span-5 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 shadow-md">
+            <div className="reveal-card md:col-span-5 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 shadow-md" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
               <h3 className="font-mono text-sm font-bold text-electric-blue uppercase tracking-wider">
                 Professional Profile
               </h3>
               <p className="font-sans text-sm text-warm-ivory leading-relaxed">
-                Graduated with a Bachelor of Science in Information Technology, specializing in Data Networking from Central Mindanao University (July 2026). Achieved College Scholar recognition throughout academic tenure.
+                Graduated with a Bachelor of Science in Information Technology, specializing in Data Networking from Central Mindanao University (July 2026).
               </p>
               <p className="font-sans text-sm text-warm-ivory-dim leading-relaxed">
                 Demonstrated practical competence in database administration, network segmentation (VLANs, DHCP, IP addressing), directory management fundamentals, and systems development. Experienced through an intensive IT internship at the City Agriculture Office (LGU Malaybalay) and hands-on freelance data entry and information management engagements.
@@ -380,7 +414,7 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
 
             {/* Right: Core Focus Areas */}
-            <div className="md:col-span-3 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs shadow-md">
+            <div className="reveal-card md:col-span-3 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs shadow-md" style={{ '--stagger-delay': '160ms' } as React.CSSProperties}>
               <h3 className="font-bold text-sky-light uppercase tracking-wider">
                 Core Competencies
               </h3>
@@ -413,7 +447,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 3: RESUME (CV) */}
         {/* ========================================================= */}
-        <section id="resume" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="resume" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
             <div className="flex items-center gap-3">
               <FileUser className="w-6 h-6 text-electric-blue" />
@@ -448,7 +482,7 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
           </div>
 
-          <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl">
+          <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-sky-blue/15">
               <div>
                 <h3 className="font-display font-bold text-xl text-warm-ivory">
@@ -472,7 +506,7 @@ export const DirectPortfolioView: React.FC = () => {
                 </h4>
                 <ul className="space-y-1.5 text-warm-ivory-dim list-disc pl-4">
                   <li>Bachelor of Science in Information Technology (Major in Data Networking)</li>
-                  <li>College Scholar at Central Mindanao University (Graduation: July 2026)</li>
+                  <li>Central Mindanao University Graduate (Graduation: July 2026)</li>
                   <li>Hands-on IT internship with procurement systems and document tracking</li>
                   <li>Verified on-site freelance data entry and sales records maintenance</li>
                   <li>Cisco Credly Verified in Cybersecurity, IT Customer Support, and Security Analysis</li>
@@ -498,7 +532,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 4: WORK EXPERIENCE */}
         {/* ========================================================= */}
-        <section id="experience" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="experience" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <Briefcase className="w-6 h-6 text-electric-blue" />
             <div>
@@ -512,10 +546,11 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            {experienceData.map((exp) => (
+            {experienceData.map((exp, expIdx) => (
               <div
                 key={exp.id}
-                className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg hover:border-sky-blue/40 transition-colors"
+                className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg hover:border-sky-blue/40 transition-colors"
+                style={{ '--stagger-delay': `${expIdx * 80}ms` } as React.CSSProperties}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-sky-blue/15">
                   <div>
@@ -568,7 +603,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 5: EDUCATION */}
         {/* ========================================================= */}
-        <section id="education" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="education" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <GraduationCap className="w-6 h-6 text-electric-blue" />
             <div>
@@ -582,10 +617,11 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="space-y-6">
-            {educationData.map((edu) => (
+            {educationData.map((edu, eduIdx) => (
               <div
                 key={edu.id}
-                className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-3 shadow-lg"
+                className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-3 shadow-lg"
+                style={{ '--stagger-delay': `${eduIdx * 80}ms` } as React.CSSProperties}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
                   <div>
@@ -618,7 +654,7 @@ export const DirectPortfolioView: React.FC = () => {
             ))}
 
             {/* Academic Training & Coursework (AWS Academy / Central Mindanao University) */}
-            <div className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg">
+            <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg" style={{ '--stagger-delay': '120ms' } as React.CSSProperties}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
                 <div>
                   <div className="font-mono text-[10px] text-electric-blue uppercase tracking-widest font-bold">
@@ -637,10 +673,11 @@ export const DirectPortfolioView: React.FC = () => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                {academicTrainingData.map((course) => (
+                {academicTrainingData.map((course, cIdx) => (
                   <div
                     key={course.id}
                     className="p-4 rounded-md bg-deep-navy/80 border border-sky-blue/15 space-y-2.5"
+                    style={{ '--stagger-delay': `${cIdx * 60}ms` } as React.CSSProperties}
                   >
                     <div className="flex items-start justify-between gap-2">
                       <h4 className="font-display font-bold text-sm text-warm-ivory">
@@ -675,7 +712,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 6: PROJECTS */}
         {/* ========================================================= */}
-        <section id="projects" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="projects" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <FolderKanban className="w-6 h-6 text-electric-blue" />
             <div>
@@ -689,12 +726,13 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projectsData.map((project) => (
+            {projectsData.map((project, pIdx) => (
               <div
                 key={project.id}
-                className="p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-4 hover:border-electric-blue/50 transition-colors shadow-lg"
+                className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-5 hover:border-electric-blue/50 transition-colors shadow-lg"
+                style={{ '--stagger-delay': `${pIdx * 70}ms` } as React.CSSProperties}
               >
-                <div className="space-y-3">
+                <div className="space-y-3.5">
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-electric-blue/15 text-electric-blue border border-electric-blue/30 uppercase font-semibold">
                       {project.category}
@@ -712,7 +750,62 @@ export const DirectPortfolioView: React.FC = () => {
                     {project.description}
                   </p>
 
-                  <div className="space-y-1.5 pt-2">
+                  {/* Clean Dark-Themed Project Demo Preview Container */}
+                  <div className="relative rounded-lg overflow-hidden bg-deep-navy-surface/90 border border-sky-blue/20 p-4 flex flex-col items-center justify-center text-center min-h-[145px] group/preview transition-all hover:border-sky-blue/40 shadow-inner">
+                    <div className="absolute inset-0 bg-game-grid opacity-25 pointer-events-none" />
+
+                    <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
+                      <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-deep-navy/90 border border-sky-blue/20 text-sky-light">
+                        <Terminal className="w-3 h-3 text-electric-blue" />
+                        <span>PROTOTYPE ENV</span>
+                      </span>
+                      {project.links?.demo ? (
+                        <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                          <span>LIVE DEMO</span>
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-sky-blue/10 border border-sky-blue/20 text-sky-light/80 font-semibold">
+                          <span className="w-1.5 h-1.5 rounded-full bg-sky-light/60" />
+                          <span>DEMO COMING SOON</span>
+                        </span>
+                      )}
+                    </div>
+
+                    <div className="relative z-10 flex flex-col items-center gap-2 pt-6 pb-2">
+                      <div className="p-3 rounded-xl bg-deep-navy border border-sky-blue/25 shadow-inner group-hover/preview:border-electric-blue transition-colors">
+                        {getProjectDemoIcon(project)}
+                      </div>
+                      <div className="space-y-0.5">
+                        <div className="font-mono text-xs font-semibold text-warm-ivory">
+                          {project.category}
+                        </div>
+                        <div className="font-mono text-[10px] text-warm-ivory-dim/60">
+                          Institutional Software Prototype
+                        </div>
+                      </div>
+                    </div>
+
+                    <div className="relative z-10 w-full pt-2.5 border-t border-sky-blue/10 flex items-center justify-center">
+                      {project.links?.demo ? (
+                        <a
+                          href={project.links.demo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-deep-navy bg-electric-blue hover:bg-white px-3 py-1 rounded transition-colors"
+                        >
+                          <span>LAUNCH INTERACTIVE DEMO</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      ) : (
+                        <div className="inline-flex items-center gap-1.5 font-mono text-[10px] text-warm-ivory-dim/60 cursor-default">
+                          <span>Public Web Simulator Under Staging</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="space-y-1.5 pt-1">
                     <div className="font-mono text-[10px] font-bold text-sky-light uppercase">
                       Key Highlights:
                     </div>
@@ -752,7 +845,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 7: TECHNICAL SKILLS */}
         {/* ========================================================= */}
-        <section id="skills" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="skills" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <Brain className="w-6 h-6 text-electric-blue" />
             <div>
@@ -766,10 +859,11 @@ export const DirectPortfolioView: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {skillGroupsData.map((group) => (
+            {skillGroupsData.map((group, gIdx) => (
               <div
                 key={group.id}
-                className={`p-6 rounded-lg bg-gradient-to-b ${group.gradient || 'from-deep-navy-card/80 to-deep-navy'} border border-sky-blue/25 space-y-4 shadow-xl hover:border-electric-blue/40 transition-all`}
+                className={`reveal-card p-6 rounded-lg bg-gradient-to-b ${group.gradient || 'from-deep-navy-card/80 to-deep-navy'} border border-sky-blue/25 space-y-4 shadow-xl hover:border-electric-blue/40 transition-all`}
+                style={{ '--stagger-delay': `${gIdx * 60}ms` } as React.CSSProperties}
               >
                 <div className="border-b border-sky-blue/15 pb-3">
                   <h3 className="font-display font-bold text-base text-warm-ivory flex items-center gap-2">
@@ -813,7 +907,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 8: CERTIFICATIONS & BADGES */}
         {/* ========================================================= */}
-        <section id="certifications" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="certifications" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
             <div className="flex items-center gap-3">
               <Award className="w-6 h-6 text-electric-blue" />
@@ -837,13 +931,14 @@ export const DirectPortfolioView: React.FC = () => {
 
           {/* Cards Grid with Category Gradients */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {certificationsData.map((cert) => {
+            {certificationsData.map((cert, cIdx) => {
               const gradient = CATEGORY_GRADIENTS[cert.category] || CATEGORY_GRADIENTS['General IT']
 
               return (
                 <div
                   key={cert.id}
-                  className={`p-6 rounded-lg bg-gradient-to-b ${gradient.bg} border ${gradient.border} shadow-xl backdrop-blur-md flex flex-col justify-between space-y-5 transition-all hover:scale-[1.01] hover:shadow-2xl`}
+                  className={`reveal-card p-6 rounded-lg bg-gradient-to-b ${gradient.bg} border ${gradient.border} shadow-xl backdrop-blur-md flex flex-col justify-between space-y-5 transition-all hover:scale-[1.01] hover:shadow-2xl`}
+                  style={{ '--stagger-delay': `${cIdx * 70}ms` } as React.CSSProperties}
                 >
                   <div className="space-y-4">
                     {/* Category & Issuer Header */}
@@ -947,7 +1042,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 9: MULTIMEDIA & CREATIVE WORKS */}
         {/* ========================================================= */}
-        <section id="multimedia" className="panel-reveal scroll-mt-24 space-y-6">
+        <section id="multimedia" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-blue/20 pb-3">
             <div className="flex items-center gap-3">
               <Palette className="w-6 h-6 text-cyber-yellow" />
@@ -991,71 +1086,38 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
           ) : (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMedia.map((item) => (
+              {filteredMedia.map((item, mIdx) => (
                 <div
                   key={item.id}
-                  className="rounded-lg bg-deep-navy-card/85 border border-sky-blue/25 shadow-xl overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.01] hover:border-cyber-yellow/50 hover:shadow-2xl group"
+                  className="reveal-card rounded-lg bg-deep-navy-card/85 border border-sky-blue/25 shadow-xl overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.01] hover:border-cyber-yellow/50 hover:shadow-2xl group"
+                  style={{ '--stagger-delay': `${mIdx * 50}ms` } as React.CSSProperties}
                 >
                   {/* Media Preview Container */}
                   <div className="relative bg-black/60 overflow-hidden">
-                    {item.mediaType === 'presentation' ? (
-                      <a
-                        href={item.externalUrl || item.mediaUrl}
-                        download="Ina_Grace_Tan_OJT_Presentation.pptx"
-                        className="w-full block relative cursor-pointer group/img overflow-hidden"
-                        title="Download / Open Original PowerPoint Presentation (.pptx)"
-                      >
-                        <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden relative">
-                          <img
-                            src={item.mediaUrl}
-                            alt={item.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
-                          />
-                          <div className="absolute top-2.5 right-2.5 px-2 py-0.5 rounded bg-emerald-500 text-deep-navy font-mono text-[10px] font-bold flex items-center gap-1 shadow-md">
-                            <Presentation className="w-3.5 h-3.5" />
-                            <span>PPTX</span>
-                          </div>
-                        </div>
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-mono font-bold text-emerald-300 backdrop-blur-xs">
-                          <Download className="w-4 h-4" />
-                          <span>OPEN PPT FILE</span>
-                        </div>
-                      </a>
-                    ) : (
-                      <button
-                        type="button"
-                        onClick={() => setSelectedMedia(item)}
-                        className="w-full block relative cursor-pointer group/img overflow-hidden"
-                        title="Click to view full-resolution image"
-                      >
-                        <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden">
-                          <img
-                            src={item.mediaUrl}
-                            alt={item.title}
-                            loading="lazy"
-                            className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
-                          />
-                        </div>
-                        {/* Hover Overlay */}
-                        <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-mono font-bold text-warm-ivory backdrop-blur-xs">
-                          <Maximize2 className="w-4 h-4 text-cyber-yellow" />
-                          <span>EXPAND VIEW</span>
-                        </div>
-                      </button>
-                    )}
+                    <button
+                      type="button"
+                      onClick={() => setSelectedMedia(item)}
+                      className="w-full block relative cursor-pointer group/img overflow-hidden"
+                      title="Click to view full-resolution image"
+                    >
+                      <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden">
+                        <img
+                          src={item.mediaUrl}
+                          alt={item.title}
+                          loading="lazy"
+                          className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+                        />
+                      </div>
+                      {/* Hover Overlay */}
+                      <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-mono font-bold text-warm-ivory backdrop-blur-xs">
+                        <Maximize2 className="w-4 h-4 text-cyber-yellow" />
+                        <span>EXPAND VIEW</span>
+                      </div>
+                    </button>
 
                     {/* Category Pill Over Media */}
                     <div className="absolute top-2.5 left-2.5 pointer-events-none">
-                      <span className={`font-mono text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-md flex items-center gap-1 ${
-                        item.category === 'Internship / On-the-Job Training'
-                          ? 'bg-emerald-950/90 border border-emerald-400/50 text-emerald-300'
-                          : 'bg-deep-navy/90 border border-cyber-yellow/40 text-cyber-yellow'
-                      }`}>
-                        {item.category === 'Internship / On-the-Job Training' && (
-                          <Presentation className="w-3 h-3 text-emerald-400" />
-                        )}
+                      <span className="font-mono text-[10px] font-bold px-2 py-0.5 rounded-full uppercase shadow-md flex items-center gap-1 bg-deep-navy/90 border border-cyber-yellow/40 text-cyber-yellow">
                         <span>{item.category}</span>
                       </span>
                     </div>
@@ -1072,14 +1134,9 @@ export const DirectPortfolioView: React.FC = () => {
                   {/* Narrative & Details */}
                   <div className="p-5 flex-1 flex flex-col justify-between space-y-4">
                     <div className="space-y-2">
-                      <div className="flex items-center gap-2">
-                        {item.mediaType === 'presentation' && (
-                          <Presentation className="w-4 h-4 text-emerald-400 flex-shrink-0" />
-                        )}
-                        <h3 className="font-display font-bold text-base text-warm-ivory leading-snug group-hover:text-cyber-yellow transition-colors break-words">
-                          {item.title}
-                        </h3>
-                      </div>
+                      <h3 className="font-display font-bold text-base text-warm-ivory leading-snug group-hover:text-cyber-yellow transition-colors break-words">
+                        {item.title}
+                      </h3>
                       <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed break-words">
                         {item.description}
                       </p>
@@ -1104,26 +1161,14 @@ export const DirectPortfolioView: React.FC = () => {
 
                       {/* Card Action */}
                       <div className="flex items-center justify-between pt-1">
-                        {item.mediaType === 'presentation' ? (
-                          <a
-                            href={item.externalUrl || item.mediaUrl}
-                            download="Ina_Grace_Tan_OJT_Presentation.pptx"
-                            className="inline-flex items-center gap-1.5 text-xs text-emerald-400 hover:text-white font-bold transition-colors cursor-pointer"
-                          >
-                            <Presentation className="w-3.5 h-3.5" />
-                            <span>VIEW / OPEN PPT FILE</span>
-                            <ExternalLink className="w-3 h-3 ml-0.5" />
-                          </a>
-                        ) : (
-                          <button
-                            type="button"
-                            onClick={() => setSelectedMedia(item)}
-                            className="inline-flex items-center gap-1.5 text-xs text-cyber-yellow hover:text-white font-bold transition-colors cursor-pointer"
-                          >
-                            <Maximize2 className="w-3.5 h-3.5" />
-                            <span>DETAILS &amp; FULL VIEW</span>
-                          </button>
-                        )}
+                        <button
+                          type="button"
+                          onClick={() => setSelectedMedia(item)}
+                          className="inline-flex items-center gap-1.5 text-xs text-cyber-yellow hover:text-white font-bold transition-colors cursor-pointer"
+                        >
+                          <Maximize2 className="w-3.5 h-3.5" />
+                          <span>DETAILS &amp; FULL VIEW</span>
+                        </button>
                       </div>
                     </div>
                   </div>
@@ -1136,7 +1181,7 @@ export const DirectPortfolioView: React.FC = () => {
         {/* ========================================================= */}
         {/* SECTION 10: CONTACT */}
         {/* ========================================================= */}
-        <section id="contact" className="panel-reveal scroll-mt-24 space-y-6 pb-12">
+        <section id="contact" className="reveal-panel scroll-mt-24 space-y-6 pb-12">
           <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
             <Mail className="w-6 h-6 text-electric-blue" />
             <div>
@@ -1151,7 +1196,7 @@ export const DirectPortfolioView: React.FC = () => {
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Contact Details Card */}
-            <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl">
+            <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
               <div className="space-y-2">
                 <h3 className="font-display font-bold text-lg text-warm-ivory">
                   GET IN TOUCH
@@ -1220,7 +1265,7 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
 
             {/* Quick Interactive Message Form */}
-            <div className="p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl">
+            <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
               <h3 className="font-display font-bold text-lg text-warm-ivory">
                 SEND DIRECT TRANSMISSION
               </h3>

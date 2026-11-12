@@ -44,7 +44,7 @@ export const locationsData: LocationWaypoint[] = [
     id: 'university',
     name: 'University Building',
     tagline: 'Academy of Computer Science',
-    description: 'A modern academic pavilion honoring Computer Science foundations, research papers, specialized certifications, and honors.',
+    description: 'A modern academic pavilion honoring Computer Science foundations, research papers, and specialized certifications.',
     coordinates: [-10, 1.0, -11],
     cameraOffset: [-6, 7.5, -6],
     cameraTarget: [-10, 1.5, -11],
