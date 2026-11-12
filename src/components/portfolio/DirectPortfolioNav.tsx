@@ -89,17 +89,23 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-2.5 flex items-center justify-between">
         {/* ========================================================= */}
-        {/* LEFT: INA.EXE BRAND IDENTITY */}
+        {/* LEFT: INA.EXE BRAND IDENTITY WITH OFFICIAL IT LOGO */}
         {/* ========================================================= */}
         <button
           type="button"
           onClick={() => handleSelectSection('home')}
-          className="flex items-center gap-2.5 text-left group cursor-pointer"
+          className="flex items-center gap-3 text-left group cursor-pointer"
           aria-label="INA.EXE - Return to Home"
         >
-          {/* Futuristic Terminal Icon */}
-          <div className="w-7 h-7 rounded-sm bg-deep-navy-card/90 border border-electric-blue/50 flex items-center justify-center text-electric-blue font-bold text-xs shadow-[0_0_10px_rgba(0,240,255,0.3)] group-hover:border-electric-blue group-hover:scale-105 transition-all">
-            <span className="text-[11px]">&gt;_</span>
+          {/* Official IT Logo */}
+          <div className="relative h-9 flex items-center justify-center">
+            <img
+              src="/IT_Logo.png"
+              alt="IT Logo"
+              width={54}
+              height={36}
+              className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(0,240,255,0.45)] group-hover:scale-105 transition-transform"
+            />
           </div>
 
           <div>
@@ -390,8 +396,11 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
             className="lg:hidden bg-deep-navy-card/98 border-t border-sky-blue/25 px-4 py-4 space-y-2 text-xs shadow-2xl"
           >
             <div className="px-2 pb-1 text-[10px] text-sky-light/60 uppercase tracking-widest border-b border-sky-blue/15 flex items-center justify-between">
-              <span>PORTFOLIO DIRECTORY</span>
-              <span className="text-electric-blue">INA.EXE</span>
+              <div className="flex items-center gap-2">
+                <img src="/IT_Logo.png" alt="IT Logo" className="h-4 w-auto object-contain" />
+                <span>PORTFOLIO DIRECTORY</span>
+              </div>
+              <span className="text-electric-blue font-bold">INA.EXE</span>
             </div>
 
             {/* Home */}

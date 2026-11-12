@@ -1,5 +1,4 @@
 export type MultimediaCategory =
-  | 'Video Editing'
   | 'Graphic Design'
   | 'Photo Editing'
   | 'Digital Artwork'
@@ -8,10 +7,10 @@ export interface MultimediaItem {
   id: string
   title: string
   category: MultimediaCategory
-  mediaType: 'video' | 'image'
+  mediaType: 'image'
   mediaUrl: string
   thumbnailUrl?: string
-  aspectRatio?: 'video' | 'portrait' | 'square' | 'wide'
+  aspectRatio?: 'portrait' | 'square' | 'wide'
   description: string
   tools: string[]
   date?: string
@@ -19,43 +18,6 @@ export interface MultimediaItem {
 }
 
 export const multimediaData: MultimediaItem[] = [
-  // ==========================================
-  // VIDEO EDITING
-  // ==========================================
-  {
-    id: 'dream-chaser-video',
-    title: 'The Dream Chaser (Narrative A-Roll)',
-    category: 'Video Editing',
-    mediaType: 'video',
-    mediaUrl: '/multimedia/dream_chaser.mp4',
-    aspectRatio: 'video',
-    description: 'Cinematic narrative short film video production featuring story-driven pacing, natural light capture, audio synchronization, and color grading.',
-    tools: ['Adobe Premiere Pro', 'Cinematography', 'Color Grading'],
-    date: 'November 2024',
-  },
-  {
-    id: 'lucky-bliss-broll',
-    title: 'Lucky Bliss Commercial B-Roll Production',
-    category: 'Video Editing',
-    mediaType: 'video',
-    mediaUrl: '/multimedia/lucky_bliss.mp4',
-    aspectRatio: 'video',
-    description: 'Commercial beverage B-roll sequence featuring dynamic macro product shots, liquid pours, motion rhythm, and commercial sound design.',
-    tools: ['Adobe Premiere Pro', 'Commercial Video', 'Motion Editing'],
-    date: 'November 2024',
-  },
-  {
-    id: 'multimedia-info-video',
-    title: 'Multimedia Technology Information Showcase',
-    category: 'Video Editing',
-    mediaType: 'video',
-    mediaUrl: '/multimedia/multimedia_info.mp4',
-    aspectRatio: 'video',
-    description: 'Informational multimedia showcase highlighting digital production workflows, audio editing, and video compilation techniques.',
-    tools: ['Video Editing', 'Motion Graphics', 'Audio Mixing'],
-    date: 'November 2024',
-  },
-
   // ==========================================
   // DIGITAL ARTWORK
   // ==========================================
@@ -96,6 +58,17 @@ export const multimediaData: MultimediaItem[] = [
   // ==========================================
   // GRAPHIC DESIGN
   // ==========================================
+  {
+    id: 'agriculture-quality-customer-seminar',
+    title: 'Quality Customer Service Seminar & Programme Collateral',
+    category: 'Graphic Design',
+    mediaType: 'image',
+    mediaUrl: '/multimedia/agriculture_seminar.jpeg',
+    aspectRatio: 'portrait',
+    description: 'Official promotional poster and event programme collateral designed for the City Agriculture Office (LGU Malaybalay City) for "Planting the Seeds of Service Excellence: Quality Customer Service for Agricultural Stakeholders" held at the Farmers Training Center, Casisang.',
+    tools: ['Adobe Photoshop', 'Corporate Layout', 'Event Branding & Typography'],
+    date: 'March 2026',
+  },
   {
     id: 'christmas-fest-flyer',
     title: 'Christmas Festival Invitation & Promotional Poster',
@@ -139,28 +112,6 @@ export const multimediaData: MultimediaItem[] = [
     description: 'Commercial brand badge and packaging sticker design featuring a playful bunny mascot, retro wave scalloped borders, and custom typography.',
     tools: ['Adobe Illustrator', 'Brand Identity', 'Packaging Design'],
     date: 'November 2024',
-  },
-  {
-    id: 'agriculture-seminar-poster',
-    title: 'Quality Customer Service Seminar Poster',
-    category: 'Graphic Design',
-    mediaType: 'image',
-    mediaUrl: '/multimedia/agriculture_seminar.jpeg',
-    aspectRatio: 'portrait',
-    description: 'Official corporate seminar banner created during IT internship at the City Agriculture Office (LGU Malaybalay City) with emerald and gold geometric accents.',
-    tools: ['Adobe Photoshop', 'Corporate Layout', 'Branding'],
-    date: 'March 2026',
-  },
-  {
-    id: 'agriculture-programme-guide',
-    title: 'Seminar Programme & Event Itinerary',
-    category: 'Graphic Design',
-    mediaType: 'image',
-    mediaUrl: '/multimedia/agriculture_programme.jpeg',
-    aspectRatio: 'portrait',
-    description: 'Executive event itinerary layout for local government agricultural stakeholders, featuring official city seals, schedule milestones, and formal typography.',
-    tools: ['Adobe Photoshop', 'Editorial Design', 'Typography'],
-    date: 'March 2026',
   },
   {
     id: 'uniform-design-concepts',
@@ -211,4 +162,3 @@ export const multimediaData: MultimediaItem[] = [
     date: 'September 2024',
   },
 ]
-

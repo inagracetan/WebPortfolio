@@ -45,7 +45,13 @@ export const Navigation: React.FC = () => {
             aria-label="Ina Grace Tan - Profile Summary"
             title="View Candidate Overview"
           >
-            <div className="w-2.5 h-2.5 rounded-full bg-electric-blue shadow-[0_0_8px_rgba(0,240,255,0.8)] group-hover:scale-110 transition-transform" />
+            <img
+              src="/IT_Logo.png"
+              alt="IT Logo"
+              width={36}
+              height={24}
+              className="h-6 w-auto object-contain drop-shadow-[0_0_8px_rgba(0,240,255,0.6)] group-hover:scale-105 transition-transform"
+            />
             <div className="flex items-baseline gap-1.5">
               <span className="font-display font-bold text-sm tracking-wide text-warm-ivory group-hover:text-white">
                 {APP_CONFIG.name}
