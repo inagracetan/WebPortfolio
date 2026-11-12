@@ -114,7 +114,7 @@ export const ContactModal: React.FC = () => {
                 </span>
                 <a
                   href={`mailto:${contactData.email}`}
-                  className="font-mono text-sm text-warm-ivory hover:text-electric-blue font-semibold tracking-wide transition-colors truncate block"
+                  className="font-mono text-sm text-warm-ivory hover:text-electric-blue font-semibold tracking-wide transition-colors break-all block"
                 >
                   {contactData.email}
                 </a>

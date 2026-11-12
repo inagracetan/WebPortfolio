@@ -114,7 +114,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         {/* Progress Bar Container */}
         <div className="w-full max-w-xs mb-3">
           <div className="flex justify-between items-center text-xs font-mono mb-2 text-sky-light">
-            <span className="truncate pr-2">{BOOT_LOGS[logIndex]}</span>
+            <span className="break-words pr-2">{BOOT_LOGS[logIndex]}</span>
             <span className="font-bold text-electric-blue">{progress}%</span>
           </div>
 

@@ -9,6 +9,7 @@ import {
   FolderKanban,
   Brain,
   Award,
+  Palette,
   Mail,
   Globe2,
   Volume2,
@@ -41,7 +42,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
 
   // Determine active parent state
   const isCareerActive = ['resume', 'experience', 'education'].includes(activeSection)
-  const isPortfolioActive = ['projects', 'skills', 'certifications'].includes(activeSection)
+  const isPortfolioActive = ['projects', 'skills', 'certifications', 'multimedia'].includes(activeSection)
 
   // Close dropdown on click outside
   useEffect(() => {
@@ -300,6 +301,19 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                     <Award className="w-3.5 h-3.5 text-electric-blue flex-shrink-0" />
                     <span>Certifications &amp; Badges</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectSection('multimedia')}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                      activeSection === 'multimedia'
+                        ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
+                        : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
+                    }`}
+                  >
+                    <Palette className="w-3.5 h-3.5 text-cyber-yellow flex-shrink-0" />
+                    <span>Multimedia &amp; Creative Works</span>
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -534,6 +548,19 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                     <Award className="w-3.5 h-3.5" />
                     <span>Certifications &amp; Badges</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectSection('multimedia')}
+                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded text-left ${
+                      activeSection === 'multimedia'
+                        ? 'text-electric-blue font-bold bg-electric-blue/15'
+                        : 'text-warm-ivory-dim hover:text-warm-ivory'
+                    }`}
+                  >
+                    <Palette className="w-3.5 h-3.5" />
+                    <span>Multimedia &amp; Creative Works</span>
+                  </button>
                 </div>
               )}
             </div>
@@ -557,3 +584,4 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
     </header>
   )
 }
+

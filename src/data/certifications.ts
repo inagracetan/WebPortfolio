@@ -12,17 +12,33 @@ export interface CertificationItem {
   issuer: string
   issueDate: string
   category: CertificationCategory
-  credentialId?: string
+  credentialId: string
   verificationUrl: string
-  type: 'credly' | 'image'
-  credlyBadgeId?: string
-  badgeImageUrl?: string
+  type: 'credly'
+  credlyBadgeId: string
+  badgeImageUrl: string
   width: number
   height: number
   description: string
-  skillsCovered?: string[]
+  skillsCovered: string[]
 }
 
+export interface AcademicTrainingItem {
+  id: string
+  title: string
+  provider: string
+  institution: string
+  completionNote: string
+  description: string
+  skillsCovered: string[]
+}
+
+/**
+ * STRICT REQUIREMENT:
+ * Only the three authentic, official Cisco Credly badges are included here.
+ * AWS Academy courses are strictly classified as academic training / coursework,
+ * not professional certifications.
+ */
 export const certificationsData: CertificationItem[] = [
   {
     id: 'cisco-intro-cybersecurity',
@@ -72,35 +88,30 @@ export const certificationsData: CertificationItem[] = [
     description: 'In-depth career pathway credential covering threat intelligence, network monitoring, security operations, endpoint defense, and incident remediation.',
     skillsCovered: ['Security Operations', 'Threat Intelligence', 'Incident Response', 'Packet Analysis'],
   },
+]
+
+/**
+ * Completed Academic Training & University Coursework
+ * (Taught in partnership with AWS Academy at Central Mindanao University)
+ */
+export const academicTrainingData: AcademicTrainingItem[] = [
   {
     id: 'aws-cloud-foundations',
     title: 'AWS Academy Cloud Foundations',
-    issuer: 'AWS Academy / Central Mindanao University',
-    issueDate: 'Academic Coursework',
-    category: 'Cloud Computing',
-    credentialId: 'AWS-ACADEMY-CF-CMU',
-    verificationUrl: 'https://aws.amazon.com/training/awsacademy/',
-    type: 'image',
-    badgeImageUrl: 'https://images.credly.com/images/b055375c-dd75-470a-a53c-15a0c3a8868a/AWS-Academy-Graduate-AWS-Academy-Cloud-Foundations.png',
-    width: 150,
-    height: 150,
-    description: 'Comprehensive academic coursework completed covering AWS compute (EC2), storage (S3), virtual networking (VPC), cloud economics, and architecture.',
-    skillsCovered: ['Cloud Computing', 'Amazon EC2', 'Amazon S3', 'Amazon VPC'],
+    provider: 'AWS Academy',
+    institution: 'Central Mindanao University',
+    completionNote: 'Completed Academic Coursework',
+    description: 'Comprehensive academic coursework covering AWS core compute (Amazon EC2), storage solutions (Amazon S3), virtual private cloud networking (Amazon VPC), cloud economics, and infrastructure architecture.',
+    skillsCovered: ['Cloud Computing', 'Amazon EC2', 'Amazon S3', 'Amazon VPC', 'Cloud Architecture'],
   },
   {
     id: 'aws-cloud-security',
     title: 'AWS Academy Cloud Security',
-    issuer: 'AWS Academy / Central Mindanao University',
-    issueDate: 'Academic Coursework',
-    category: 'Cloud Computing',
-    credentialId: 'AWS-ACADEMY-CS-CMU',
-    verificationUrl: 'https://aws.amazon.com/training/awsacademy/',
-    type: 'image',
-    badgeImageUrl: 'https://images.credly.com/images/56434455-8025-4c07-9759-869fc485c292/AWS-Academy-Graduate-AWS-Academy-Cloud-Security-Foundations.png',
-    width: 150,
-    height: 150,
-    description: 'Practical training on the AWS Shared Responsibility Model, Identity and Access Management (IAM), data encryption at rest and in transit, and CloudTrail auditing.',
-    skillsCovered: ['Cloud Security', 'AWS IAM', 'Data Encryption', 'Compliance'],
+    provider: 'AWS Academy',
+    institution: 'Central Mindanao University',
+    completionNote: 'Completed Academic Coursework',
+    description: 'Practical training on the AWS Shared Responsibility Model, Identity and Access Management (IAM), data encryption at rest and in transit, and security compliance auditing.',
+    skillsCovered: ['Cloud Security', 'AWS IAM', 'Data Encryption', 'Compliance Auditing', 'Access Governance'],
   },
 ]
 
@@ -154,4 +165,3 @@ export const CATEGORY_GRADIENTS: Record<CertificationCategory, {
     accent: '#64748b',
   },
 }
-

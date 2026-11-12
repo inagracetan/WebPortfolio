@@ -99,7 +99,7 @@ export const Modal: React.FC<ModalProps> = ({
                 </div>
                 <h2
                   id="modal-title"
-                  className="font-mono font-bold text-xs sm:text-sm text-warm-ivory tracking-wider truncate uppercase"
+                  className="font-mono font-bold text-xs sm:text-sm text-warm-ivory tracking-wider break-words uppercase"
                 >
                   {cleanTitle}
                 </h2>
@@ -110,7 +110,7 @@ export const Modal: React.FC<ModalProps> = ({
                 )}
               </div>
 
-              {/* Retro 3-Button Window Controls */}
+              {/* Functional Window Close Control */}
               <div className="flex items-center gap-1.5 font-mono flex-shrink-0">
                 <span className="hidden md:inline-block px-1.5 py-0.2 text-[9px] text-sky-light/60 bg-white/5 border border-white/10 rounded-xs mr-1">
                   ESC
@@ -118,37 +118,21 @@ export const Modal: React.FC<ModalProps> = ({
                 <button
                   type="button"
                   onClick={onClose}
-                  className="w-5 h-5 flex items-center justify-center bg-white/5 hover:bg-white/15 border border-white/20 text-warm-ivory-dim hover:text-warm-ivory text-[10px] rounded-xs transition-colors cursor-pointer"
-                  title="Minimize Window"
-                  aria-label="Minimize Window"
-                >
-                  _
-                </button>
-                <button
-                  type="button"
-                  className="w-5 h-5 flex items-center justify-center bg-white/5 hover:bg-white/15 border border-white/20 text-warm-ivory-dim hover:text-warm-ivory text-[10px] rounded-xs transition-colors cursor-pointer"
-                  title="Standard View"
-                  aria-label="Standard View"
-                >
-                  □
-                </button>
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="w-5 h-5 flex items-center justify-center bg-rose-500/20 hover:bg-rose-500 border border-rose-500/40 text-rose-300 hover:text-white text-xs font-bold rounded-xs transition-colors cursor-pointer"
+                  className="px-2 py-0.5 flex items-center gap-1 bg-rose-500/20 hover:bg-rose-500 border border-rose-500/40 text-rose-300 hover:text-white text-xs font-bold rounded-xs transition-colors cursor-pointer"
                   title="Close Window (ESC)"
                   aria-label="Close Window"
                 >
-                  ✕
+                  <span>CLOSE</span>
+                  <span>✕</span>
                 </button>
               </div>
             </div>
 
             {/* B. Retro Terminal Command / Context Sub-Bar */}
             <div className="px-3 sm:px-4 py-1.5 bg-[#0e141f] border-b border-sky-blue/15 flex items-center justify-between text-[10px] font-mono text-sky-light/75 flex-shrink-0 z-10">
-              <div className="flex items-center gap-2 truncate">
-                <span className="text-electric-blue font-bold">C:\INA_TAN\ARCHIPELAGO&gt;</span>
-                <span className="truncate text-warm-ivory-dim">
+              <div className="flex items-center gap-2 break-all pr-2">
+                <span className="text-electric-blue font-bold flex-shrink-0">C:\INA_TAN\ARCHIPELAGO&gt;</span>
+                <span className="text-warm-ivory-dim break-all">
                   {subtitle || `cat ${resolvedLocation.toLowerCase().replace(/[^a-z0-9]/g, '_')}_spec.dat`}
                 </span>
               </div>

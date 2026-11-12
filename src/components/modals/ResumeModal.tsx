@@ -306,7 +306,7 @@ export const ResumeModal: React.FC = () => {
                     key={p.id}
                     className="p-3 bg-deep-navy/40 border border-sky-blue/15 rounded space-y-1 font-mono"
                   >
-                    <span className="font-bold text-warm-ivory block truncate">{p.title}</span>
+                    <span className="font-bold text-warm-ivory block break-words">{p.title}</span>
                     <span className="text-[11px] text-electric-blue block">{p.role}</span>
                     <span className="text-[10px] text-sky-light/80 block">{p.techStack.join(', ')}</span>
                   </div>

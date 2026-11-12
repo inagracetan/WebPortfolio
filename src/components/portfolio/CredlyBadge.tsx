@@ -77,7 +77,7 @@ export const CredlyBadge: React.FC<CredlyBadgeProps> = ({
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-2 bg-deep-navy/90 z-10">
             <Loader2 className="w-6 h-6 text-electric-blue animate-spin" />
             <span className="font-mono text-[10px] text-sky-light/80 tracking-wider">
-              VERIFYING BADGE...
+              VERIFYING BADGE
             </span>
           </div>
         )}

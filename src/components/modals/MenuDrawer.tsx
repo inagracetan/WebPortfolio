@@ -11,10 +11,8 @@ import {
   Keyboard,
   UserRound,
   House,
-  RefreshCcw,
 } from 'lucide-react'
 import { useGameStore, type ActiveModal } from '@/hooks/useGameStore'
-import { characterStore } from '@/characters/useCharacterStore'
 
 export const MenuDrawer: React.FC = () => {
   const {
@@ -120,11 +118,6 @@ export const MenuDrawer: React.FC = () => {
     },
   ]
 
-  const handleReturnToSpawn = () => {
-    characterStore.spawnOnMainIsland()
-    setMenuOpen(false)
-  }
-
   return (
     <AnimatePresence>
       {isMenuOpen && (
@@ -196,21 +189,6 @@ export const MenuDrawer: React.FC = () => {
                     )}
                   </button>
                 ))}
-              </div>
-
-              {/* Respawn / Return to Main Island Action */}
-              <div className="p-3 bg-deep-navy/60 border border-sky-blue/15 rounded flex items-center justify-between font-mono text-xs">
-                <div className="flex items-center gap-2 text-warm-ivory">
-                  <RefreshCcw className="w-3.5 h-3.5 text-electric-blue" />
-                  <span>Main Island Spawn Point</span>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleReturnToSpawn}
-                  className="px-2.5 py-1 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy rounded text-[11px] font-bold border border-electric-blue/30 transition-colors cursor-pointer"
-                >
-                  RESPAWN
-                </button>
               </div>
             </div>
 

@@ -88,9 +88,9 @@ export const WorldHud: React.FC = () => {
             className="pointer-events-auto flex items-center justify-between gap-1.5 sm:gap-3 px-3 py-1.5 sm:px-4 sm:py-2 bg-deep-navy-card/95 border border-sky-blue/30 rounded-full shadow-2xl backdrop-blur-xl text-xs font-mono text-warm-ivory select-none"
           >
             {/* Current Active Location Indicator */}
-            <div className="flex items-center gap-1.5 sm:gap-2 min-w-0 pr-1.5 sm:pr-2 border-r border-sky-blue/15">
+            <div className="flex items-center gap-1.5 sm:gap-2 pr-2 border-r border-sky-blue/15 flex-shrink-0">
               <Compass className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-electric-blue flex-shrink-0 animate-pulse" />
-              <span className="font-semibold text-warm-ivory truncate text-[11px] sm:text-xs max-w-[105px] xs:max-w-[150px] sm:max-w-[200px]">
+              <span className="font-semibold text-warm-ivory text-[11px] sm:text-xs whitespace-nowrap">
                 {activeLocation.name}
               </span>
             </div>

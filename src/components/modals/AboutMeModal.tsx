@@ -41,9 +41,21 @@ export const AboutMeModal: React.FC = () => {
       maxWidth="3xl"
     >
       <div className="space-y-6">
-        {/* Intro Banner */}
-        <div className="p-5 bg-deep-navy/80 border border-sky-blue/25 rounded-sm flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div>
+        {/* Intro Banner with Authentic Photograph */}
+        <div className="p-5 bg-deep-navy/80 border border-sky-blue/25 rounded-sm flex flex-col sm:flex-row items-center gap-5">
+          <div className="relative w-24 h-24 sm:w-28 sm:h-28 rounded-2xl p-0.5 bg-gradient-to-tr from-electric-blue via-sky-blue/40 to-cyan-300 shadow-[0_0_15px_rgba(0,240,255,0.3)] flex-shrink-0">
+            <div className="w-full h-full rounded-[14px] overflow-hidden bg-deep-navy">
+              <img
+                src="/profile.jpg"
+                alt="Ina Grace Tan"
+                width={112}
+                height={112}
+                className="w-full h-full object-cover object-top"
+              />
+            </div>
+          </div>
+
+          <div className="flex-1 text-center sm:text-left">
             <span className="text-xs font-mono text-electric-blue tracking-wider uppercase block mb-1">
               Terminal Log // Verified Candidate Profile
             </span>
@@ -55,7 +67,7 @@ export const AboutMeModal: React.FC = () => {
             </p>
           </div>
 
-          <div className="flex flex-col gap-1.5 text-xs font-mono">
+          <div className="flex flex-col gap-1.5 text-xs font-mono flex-shrink-0">
             <div className="flex items-center gap-2 px-3 py-1.5 bg-sky-blue/10 border border-sky-blue/30 rounded text-electric-blue">
               <Phone className="w-3.5 h-3.5 text-sky-light flex-shrink-0" />
               <a href={`tel:${contactData.phone}`} className="hover:underline">

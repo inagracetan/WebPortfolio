@@ -74,15 +74,15 @@ export const ProjectsModal: React.FC = () => {
                     </span>
                   )}
                 </div>
-                <p className="text-xs text-warm-ivory-dim/80 line-clamp-2 font-sans mb-2">
+                <p className="text-xs text-warm-ivory-dim/80 font-sans mb-2 leading-relaxed break-words">
                   {proj.subtitle}
                 </p>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="text-[10px] font-mono text-sky-light bg-sky-blue/10 px-2 py-0.5 rounded">
                     {proj.category}
                   </span>
                   {proj.metrics && (
-                    <span className="text-[10px] font-mono text-muted-green-light truncate">
+                    <span className="text-[10px] font-mono text-muted-green-light break-words">
                       {proj.metrics}
                     </span>
                   )}
