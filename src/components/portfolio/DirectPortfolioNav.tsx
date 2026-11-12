@@ -180,11 +180,11 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
             <AnimatePresence>
               {openDropdown === 'career' && (
                 <motion.div
-                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="absolute top-full left-0 mt-2 w-52 bg-deep-navy-card/95 border border-sky-blue/30 rounded-md shadow-[0_12px_32px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 space-y-1 z-50"
+                  exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-full left-0 mt-2 w-52 bg-deep-navy-card/95 border border-sky-blue/30 rounded-md shadow-[0_16px_36px_rgba(0,0,0,0.85),0_0_15px_rgba(0,240,255,0.1)] backdrop-blur-xl p-1.5 space-y-1 z-50"
                 >
                   <div className="px-2.5 py-1 text-[9px] uppercase tracking-widest text-sky-light/60 border-b border-sky-blue/15 mb-1">
                     Career Profile
@@ -193,7 +193,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectSection('resume')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
                       activeSection === 'resume'
                         ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
                         : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
@@ -206,7 +206,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectSection('experience')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
                       activeSection === 'experience'
                         ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
                         : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
@@ -219,7 +219,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectSection('education')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
                       activeSection === 'education'
                         ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
                         : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
@@ -259,11 +259,11 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
             <AnimatePresence>
               {openDropdown === 'portfolio' && (
                 <motion.div
-                  initial={{ opacity: 0, y: -6, scale: 0.98 }}
+                  initial={{ opacity: 0, y: -8, scale: 0.96 }}
                   animate={{ opacity: 1, y: 0, scale: 1 }}
-                  exit={{ opacity: 0, y: -4, scale: 0.98 }}
-                  transition={{ duration: 0.15, ease: 'easeOut' }}
-                  className="absolute top-full left-0 mt-2 w-60 bg-deep-navy-card/95 border border-sky-blue/30 rounded-md shadow-[0_12px_32px_rgba(0,0,0,0.8)] backdrop-blur-xl p-1.5 space-y-1 z-50"
+                  exit={{ opacity: 0, y: -4, scale: 0.97 }}
+                  transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+                  className="absolute top-full left-0 mt-2 w-60 bg-deep-navy-card/95 border border-sky-blue/30 rounded-md shadow-[0_16px_36px_rgba(0,0,0,0.85),0_0_15px_rgba(0,240,255,0.1)] backdrop-blur-xl p-1.5 space-y-1 z-50"
                 >
                   <div className="px-2.5 py-1 text-[9px] uppercase tracking-widest text-sky-light/60 border-b border-sky-blue/15 mb-1">
                     Technical Showcase
@@ -272,7 +272,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectSection('projects')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
                       activeSection === 'projects'
                         ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
                         : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
@@ -285,7 +285,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectSection('skills')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
                       activeSection === 'skills'
                         ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
                         : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
@@ -298,7 +298,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectSection('certifications')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
                       activeSection === 'certifications'
                         ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
                         : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
@@ -311,7 +311,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   <button
                     type="button"
                     onClick={() => handleSelectSection('multimedia')}
-                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-colors cursor-pointer text-xs ${
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
                       activeSection === 'multimedia'
                         ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
                         : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
@@ -392,8 +392,8 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
             initial={{ opacity: 0, height: 0 }}
             animate={{ opacity: 1, height: 'auto' }}
             exit={{ opacity: 0, height: 0 }}
-            transition={{ duration: 0.2 }}
-            className="lg:hidden bg-deep-navy-card/98 border-t border-sky-blue/25 px-4 py-4 space-y-2 text-xs shadow-2xl"
+            transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+            className="lg:hidden bg-deep-navy-card/98 border-t border-sky-blue/25 px-4 py-4 space-y-2 text-xs shadow-2xl backdrop-blur-2xl"
           >
             <div className="px-2 pb-1 text-[10px] text-sky-light/60 uppercase tracking-widest border-b border-sky-blue/15 flex items-center justify-between">
               <div className="flex items-center gap-2">

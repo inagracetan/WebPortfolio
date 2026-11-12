@@ -101,41 +101,118 @@ body {
   pointer-events: none;
 }
 
-/* Lightweight hardware-accelerated scroll reveal transitions (IntersectionObserver driven) */
+/* ==========================================================================
+   Apple-Inspired Motion Design System for INA.EXE
+   Restrained, fluid, GPU-accelerated transforms (transforms & opacity only)
+   ========================================================================== */
+
+:root {
+  --ease-apple: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-apple-smooth: cubic-bezier(0.25, 1, 0.5, 1);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .reveal-panel,
   .reveal-card,
-  .panel-reveal {
+  .panel-reveal,
+  .apple-card-hover,
+  .story-header,
+  .section-spotlight {
     opacity: 1 !important;
     transform: none !important;
     transition: none !important;
+    animation: none !important;
   }
 }
 
 @media (prefers-reduced-motion: no-preference) {
+  /* Major Section Reveal: Depth Scale + Vertical Glide */
   .reveal-panel,
   .panel-reveal {
     opacity: 0;
-    transform: translateY(22px);
-    transition: opacity 0.6s cubic-bezier(0.16, 1, 0.3, 1), transform 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translate3d(0, 32px, 0) scale3d(0.985, 0.985, 1);
+    transition: opacity 0.75s var(--ease-apple),
+                transform 0.75s var(--ease-apple);
     will-change: opacity, transform;
+    backface-visibility: hidden;
   }
+
   .reveal-panel.is-revealed,
   .panel-reveal.is-revealed {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
   }
 
+  /* Card Grid Reveals: Delicate Staggered Cascade */
   .reveal-card {
     opacity: 0;
-    transform: translateY(18px);
-    transition: opacity 0.5s cubic-bezier(0.16, 1, 0.3, 1), transform 0.5s cubic-bezier(0.16, 1, 0.3, 1);
+    transform: translate3d(0, 24px, 0) scale3d(0.98, 0.98, 1);
+    transition: opacity 0.65s var(--ease-apple),
+                transform 0.65s var(--ease-apple);
     transition-delay: var(--stagger-delay, 0ms);
     will-change: opacity, transform;
+    backface-visibility: hidden;
   }
+
   .reveal-card.is-revealed {
     opacity: 1;
-    transform: translateY(0);
+    transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+  }
+
+  /* Memory Optimization: Release GPU layer allocations once animations settle */
+  .reveal-panel.is-revealed,
+  .panel-reveal.is-revealed,
+  .reveal-card.is-revealed {
+    will-change: auto;
+  }
+
+  /* Apple Card Interactive Hover: Subtle Physical Elevation & Depth */
+  @media (hover: hover) and (pointer: fine) {
+    .apple-card-hover {
+      transition: transform 0.35s var(--ease-apple),
+                  border-color 0.35s var(--ease-apple),
+                  box-shadow 0.35s var(--ease-apple),
+                  background-color 0.35s var(--ease-apple);
+      backface-visibility: hidden;
+      transform: translate3d(0, 0, 0);
+    }
+
+    .apple-card-hover:hover {
+      transform: translate3d(0, -4px, 0) scale3d(1.01, 1.01, 1);
+      border-color: rgba(0, 240, 255, 0.42);
+      box-shadow: 0 16px 36px -8px rgba(0, 0, 0, 0.75),
+                  0 0 24px -4px rgba(0, 240, 255, 0.18);
+    }
+  }
+
+  /* Sticky Storytelling Chapter Header */
+  .story-header {
+    position: sticky;
+    top: 57px;
+    z-index: 20;
+    background: rgba(11, 17, 32, 0.88);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    transition: border-color 0.4s var(--ease-apple),
+                box-shadow 0.4s var(--ease-apple),
+                background-color 0.4s var(--ease-apple);
+  }
+
+  /* Navigation Destination Subtle Pulse */
+  @keyframes spotlight-pulse {
+    0% {
+      box-shadow: 0 0 0 0 rgba(0, 240, 255, 0.4);
+    }
+    50% {
+      box-shadow: 0 0 28px 4px rgba(0, 240, 255, 0.25);
+    }
+    100% {
+      box-shadow: 0 0 0 0 rgba(0, 240, 255, 0);
+    }
+  }
+
+  .section-spotlight {
+    animation: spotlight-pulse 1.2s var(--ease-apple) forwards;
   }
 }
 

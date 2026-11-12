@@ -1,4 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import {
   House,
   UserRound,
@@ -48,6 +49,28 @@ const getProjectDemoIcon = (project: { category: string }) => {
   return <Terminal className="w-5 h-5 text-sky-light" />
 }
 
+// Apple-inspired ambient illumination profiles per section
+const getSectionAmbientGlow = (section: string) => {
+  switch (section) {
+    case 'certifications':
+      return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_25%,_rgba(16,185,129,0.15),_transparent_70%)]'
+    case 'multimedia':
+      return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_35%,_rgba(255,215,0,0.12),_transparent_70%)]'
+    case 'skills':
+      return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_30%,_rgba(139,92,246,0.14),_transparent_70%)]'
+    case 'projects':
+      return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_30%,_rgba(0,240,255,0.16),_transparent_70%)]'
+    case 'resume':
+    case 'experience':
+    case 'education':
+      return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_25%,_rgba(56,189,248,0.13),_transparent_70%)]'
+    case 'contact':
+      return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,_rgba(0,240,255,0.14),_transparent_70%)]'
+    default:
+      return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_15%,_rgba(56,189,248,0.15),_transparent_70%)]'
+  }
+}
+
 // Exact 10-section portfolio order
 const SECTIONS = [
   { id: 'home', label: 'Home', icon: House },
@@ -70,6 +93,8 @@ export const DirectPortfolioView: React.FC = () => {
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const scrollContainerRef = useRef<HTMLDivElement>(null)
+  const parallaxGlowRef = useRef<HTMLDivElement>(null)
+  const parallaxGridRef = useRef<HTMLDivElement>(null)
 
   // Single lightweight IntersectionObserver for panel and card entrance transitions (GPU-accelerated, runs once)
   useEffect(() => {
@@ -99,7 +124,7 @@ export const DirectPortfolioView: React.FC = () => {
     return () => observer.disconnect()
   }, [])
 
-  // IntersectionObserver for scroll-spy activeSection (zero scroll event listeners, zero layout thrashing)
+  // IntersectionObserver for scroll-spy activeSection (zero layout thrashing)
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
@@ -130,6 +155,45 @@ export const DirectPortfolioView: React.FC = () => {
     return () => observer.disconnect()
   }, [])
 
+  // Apple-Inspired Subtle Parallax Background (RAF-throttled, GPU compositor only)
+  useEffect(() => {
+    const container = scrollContainerRef.current
+    const glowEl = parallaxGlowRef.current
+    const gridEl = parallaxGridRef.current
+    if (!container || !glowEl || !gridEl) return
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      return
+    }
+
+    let rafId: number
+    let lastScroll = -1
+
+    const updateParallax = () => {
+      const top = container.scrollTop
+      if (top !== lastScroll) {
+        lastScroll = top
+        const glowY = -(top * 0.05)
+        const gridY = -(top * 0.02)
+        glowEl.style.transform = `translate3d(0, ${glowY.toFixed(1)}px, 0)`
+        gridEl.style.transform = `translate3d(0, ${gridY.toFixed(1)}px, 0)`
+      }
+      rafId = 0
+    }
+
+    const handleScroll = () => {
+      if (!rafId) {
+        rafId = requestAnimationFrame(updateParallax)
+      }
+    }
+
+    container.addEventListener('scroll', handleScroll, { passive: true })
+    return () => {
+      container.removeEventListener('scroll', handleScroll)
+      if (rafId) cancelAnimationFrame(rafId)
+    }
+  }, [])
+
   // Close multimedia lightbox on Escape key
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -152,7 +216,7 @@ export const DirectPortfolioView: React.FC = () => {
       ? multimediaData
       : multimediaData.filter((m) => m.category === multimediaFilter)
 
-  // Pixel-perfect smooth scroll accounting for the sticky navigation bar
+  // Apple-inspired smooth scroll with quintic ease-out physics and sticky offset
   const scrollToSection = (id: string) => {
     const container = scrollContainerRef.current
     const el = document.getElementById(id)
@@ -160,14 +224,54 @@ export const DirectPortfolioView: React.FC = () => {
 
     const containerRect = container.getBoundingClientRect()
     const elRect = el.getBoundingClientRect()
-    // Sticky header offset (~64px header + 20px padding)
-    const navOffset = 84
-    const targetTop = elRect.top - containerRect.top + container.scrollTop - navOffset
+    // Sticky navigation bar offset (~58px nav + 18px comfortable storytelling margin = 76px)
+    const navOffset = 76
+    const targetTop = Math.max(0, elRect.top - containerRect.top + container.scrollTop - navOffset)
 
-    container.scrollTo({
-      top: Math.max(0, targetTop),
-      behavior: 'smooth',
-    })
+    // Trigger subtle destination spotlight feedback
+    el.classList.remove('section-spotlight')
+    void el.offsetWidth // force DOM reflow for animation restart
+    el.classList.add('section-spotlight')
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      container.scrollTop = targetTop
+      return
+    }
+
+    const startTop = container.scrollTop
+    const distance = targetTop - startTop
+    if (Math.abs(distance) < 2) return
+
+    // Dynamic duration based on travel distance: short glides (~450ms), long traversals (~750ms)
+    const duration = Math.min(750, Math.max(450, Math.abs(distance) * 0.35))
+    const startTime = performance.now()
+
+    // Apple quintic ease-out: brisk initial movement, prolonged silky deceleration
+    const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5)
+
+    let animId: number
+    const animateScroll = (currentTime: number) => {
+      const elapsed = currentTime - startTime
+      const progress = Math.min(elapsed / duration, 1)
+      const eased = easeOutQuint(progress)
+
+      container.scrollTop = startTop + distance * eased
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(animateScroll)
+      }
+    }
+
+    animId = requestAnimationFrame(animateScroll)
+
+    // Cancel animation gracefully if user intervenes with mousewheel or touch
+    const cancelScroll = () => {
+      cancelAnimationFrame(animId)
+      container.removeEventListener('wheel', cancelScroll)
+      container.removeEventListener('touchstart', cancelScroll)
+    }
+    container.addEventListener('wheel', cancelScroll, { passive: true, once: true })
+    container.addEventListener('touchstart', cancelScroll, { passive: true, once: true })
   }
 
   const handleFormSubmit = (e: React.FormEvent) => {
@@ -181,9 +285,27 @@ export const DirectPortfolioView: React.FC = () => {
 
   return (
     <div ref={scrollContainerRef} className="fixed inset-0 z-30 overflow-y-auto scroll-smooth bg-deep-navy text-warm-ivory font-sans selection:bg-electric-blue selection:text-deep-navy">
-      {/* Background Ambience */}
-      <div className="fixed inset-0 pointer-events-none opacity-40 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-sky-blue/15 via-transparent to-deep-navy" />
-      <div className="fixed inset-0 pointer-events-none opacity-15 scanlines" />
+      {/* ========================================================= */}
+      {/* APPLE-INSPIRED MULTI-LAYER PARALLAX & AMBIENT SYSTEM     */}
+      {/* ========================================================= */}
+      <div className="fixed inset-0 pointer-events-none overflow-hidden z-0">
+        {/* Layer 1: Dynamic Ambient Glow Spheres (Section-Adaptive Crossfade) */}
+        <div
+          ref={parallaxGlowRef}
+          className={`absolute -inset-10 transition-all duration-1000 ease-out will-change-transform ${getSectionAmbientGlow(
+            activeSection
+          )}`}
+        />
+
+        {/* Layer 2: Subtle Cyber Grid with Parallax Depth Offset */}
+        <div
+          ref={parallaxGridRef}
+          className="absolute -inset-20 bg-game-grid opacity-15 pointer-events-none will-change-transform"
+        />
+
+        {/* Layer 3: Film-Grain CRT Scanlines */}
+        <div className="absolute inset-0 opacity-[0.08] scanlines pointer-events-none" />
+      </div>
 
       {/* INA.EXE REDESIGNED NAVIGATION BAR */}
       <DirectPortfolioNav
@@ -307,7 +429,7 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
 
                 {/* Candidate Metrics Card */}
-                <div className="w-full p-5 rounded-lg bg-deep-navy/90 border border-sky-blue/20 font-mono text-xs space-y-3 shadow-xl">
+                <div className="w-full p-5 rounded-lg bg-deep-navy/90 border border-sky-blue/20 font-mono text-xs space-y-3 shadow-xl apple-card-hover">
                   <div className="flex items-center justify-between pb-2 border-b border-sky-blue/15 text-sky-light">
                     <span className="font-bold uppercase tracking-wider">CANDIDATE METRICS</span>
                     <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
@@ -344,21 +466,31 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 2: ABOUT ME */}
         {/* ========================================================= */}
         <section id="about" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <UserRound className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                ABOUT ME
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Candidate Profile, Background &amp; Professional Objectives
-              </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <UserRound className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>ABOUT ME</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Candidate Profile, Background &amp; Professional Objectives
+                  </p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 02
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-12 gap-6 items-start">
             {/* Left: Authentic Portrait Card */}
-            <div className="reveal-card md:col-span-4 p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-xl flex flex-col items-center text-center space-y-4" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
+            <div className="reveal-card apple-card-hover md:col-span-4 p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 shadow-xl flex flex-col items-center text-center space-y-4" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
               <div className="relative w-36 h-36 rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 via-sky-400 to-electric-blue shadow-[0_0_20px_rgba(0,240,255,0.3)]">
                 <div className="w-full h-full rounded-[14px] overflow-hidden bg-deep-navy border border-electric-blue/40">
                   <img
@@ -398,7 +530,7 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
 
             {/* Middle: Professional Narrative */}
-            <div className="reveal-card md:col-span-5 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 shadow-md" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
+            <div className="reveal-card apple-card-hover md:col-span-5 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 shadow-md" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
               <h3 className="font-mono text-sm font-bold text-electric-blue uppercase tracking-wider">
                 Professional Profile
               </h3>
@@ -414,7 +546,7 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
 
             {/* Right: Core Focus Areas */}
-            <div className="reveal-card md:col-span-3 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs shadow-md" style={{ '--stagger-delay': '160ms' } as React.CSSProperties}>
+            <div className="reveal-card apple-card-hover md:col-span-3 space-y-4 p-6 rounded-lg bg-deep-navy-card/60 border border-sky-blue/20 font-mono text-xs shadow-md" style={{ '--stagger-delay': '160ms' } as React.CSSProperties}>
               <h3 className="font-bold text-sky-light uppercase tracking-wider">
                 Core Competencies
               </h3>
@@ -448,41 +580,46 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 3: RESUME (CV) */}
         {/* ========================================================= */}
         <section id="resume" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
-            <div className="flex items-center gap-3">
-              <FileUser className="w-6 h-6 text-electric-blue" />
-              <div>
-                <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                  CURRICULUM VITAE (CV)
-                </h2>
-                <p className="font-mono text-xs text-sky-light/70">
-                  Authoritative Candidate Dossier &bull; Tan_IG_CV.pdf
-                </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <FileUser className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>CURRICULUM VITAE (CV)</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Authoritative Candidate Dossier &bull; Tan_IG_CV.pdf
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="flex items-center gap-2">
-              <a
-                href="/Tan_IG_CV.pdf"
-                download="Tan_IG_CV.pdf"
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-all shadow-sm"
-              >
-                <Download className="w-3.5 h-3.5" />
-                <span className="hidden sm:inline">DOWNLOAD PDF</span>
-              </a>
+              <div className="flex items-center gap-2">
+                <a
+                  href="/Tan_IG_CV.pdf"
+                  download="Tan_IG_CV.pdf"
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-all shadow-sm active:scale-95"
+                >
+                  <Download className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">DOWNLOAD PDF</span>
+                </a>
 
-              <button
-                type="button"
-                onClick={() => window.open('/Tan_IG_CV.pdf', '_blank')}
-                className="flex items-center gap-1.5 px-3 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/25 text-warm-ivory rounded-full font-mono text-xs transition-colors cursor-pointer"
-              >
-                <ExternalLink className="w-3.5 h-3.5 text-sky-light" />
-                <span className="hidden sm:inline">VIEW FULLSCREEN</span>
-              </button>
+                <button
+                  type="button"
+                  onClick={() => window.open('/Tan_IG_CV.pdf', '_blank')}
+                  className="flex items-center gap-1.5 px-3.5 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/25 text-warm-ivory rounded-full font-mono text-xs transition-colors cursor-pointer active:scale-95"
+                >
+                  <ExternalLink className="w-3.5 h-3.5 text-sky-light" />
+                  <span className="hidden sm:inline">VIEW FULLSCREEN</span>
+                </button>
+              </div>
             </div>
           </div>
 
-          <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
+          <div className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 pb-4 border-b border-sky-blue/15">
               <div>
                 <h3 className="font-display font-bold text-xl text-warm-ivory">
@@ -533,15 +670,25 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 4: WORK EXPERIENCE */}
         {/* ========================================================= */}
         <section id="experience" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <Briefcase className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                WORK EXPERIENCE
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Verified Internship &amp; On-Site Freelance Engagements
-              </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <Briefcase className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>WORK EXPERIENCE</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Verified Internship &amp; On-Site Freelance Engagements
+                  </p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 04
+              </span>
             </div>
           </div>
 
@@ -549,7 +696,7 @@ export const DirectPortfolioView: React.FC = () => {
             {experienceData.map((exp, expIdx) => (
               <div
                 key={exp.id}
-                className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg hover:border-sky-blue/40 transition-colors"
+                className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg hover:border-sky-blue/40 transition-colors"
                 style={{ '--stagger-delay': `${expIdx * 80}ms` } as React.CSSProperties}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-3 border-b border-sky-blue/15">
@@ -604,15 +751,25 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 5: EDUCATION */}
         {/* ========================================================= */}
         <section id="education" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <GraduationCap className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                EDUCATION
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Academic Degrees &amp; Higher Educational Background
-              </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <GraduationCap className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>EDUCATION</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Academic Degrees &amp; Higher Educational Background
+                  </p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 05
+              </span>
             </div>
           </div>
 
@@ -620,7 +777,7 @@ export const DirectPortfolioView: React.FC = () => {
             {educationData.map((edu, eduIdx) => (
               <div
                 key={edu.id}
-                className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-3 shadow-lg"
+                className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-3 shadow-lg"
                 style={{ '--stagger-delay': `${eduIdx * 80}ms` } as React.CSSProperties}
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
@@ -654,7 +811,7 @@ export const DirectPortfolioView: React.FC = () => {
             ))}
 
             {/* Academic Training & Coursework (AWS Academy / Central Mindanao University) */}
-            <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg" style={{ '--stagger-delay': '120ms' } as React.CSSProperties}>
+            <div className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 space-y-4 shadow-lg" style={{ '--stagger-delay': '120ms' } as React.CSSProperties}>
               <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 pb-2 border-b border-sky-blue/15">
                 <div>
                   <div className="font-mono text-[10px] text-electric-blue uppercase tracking-widest font-bold">
@@ -713,15 +870,25 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 6: PROJECTS */}
         {/* ========================================================= */}
         <section id="projects" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <FolderKanban className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                FEATURED PROJECTS
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                5 Verified Academic, Capstone &amp; Enterprise Projects
-              </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <FolderKanban className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>FEATURED PROJECTS</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    5 Verified Academic, Capstone &amp; Enterprise Projects
+                  </p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 06
+              </span>
             </div>
           </div>
 
@@ -729,7 +896,7 @@ export const DirectPortfolioView: React.FC = () => {
             {projectsData.map((project, pIdx) => (
               <div
                 key={project.id}
-                className="reveal-card p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-5 hover:border-electric-blue/50 transition-colors shadow-lg"
+                className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-5 hover:border-electric-blue/50 transition-colors shadow-lg"
                 style={{ '--stagger-delay': `${pIdx * 70}ms` } as React.CSSProperties}
               >
                 <div className="space-y-3.5">
@@ -792,7 +959,7 @@ export const DirectPortfolioView: React.FC = () => {
                           href={project.links.demo}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-deep-navy bg-electric-blue hover:bg-white px-3 py-1 rounded transition-colors"
+                          className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-deep-navy bg-electric-blue hover:bg-white px-3 py-1 rounded transition-colors active:scale-95"
                         >
                           <span>LAUNCH INTERACTIVE DEMO</span>
                           <ExternalLink className="w-3 h-3" />
@@ -846,15 +1013,25 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 7: TECHNICAL SKILLS */}
         {/* ========================================================= */}
         <section id="skills" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <Brain className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                TECHNICAL SKILLS
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Organized Technical Competencies, Toolchains &amp; Recognized Frameworks
-              </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <Brain className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>TECHNICAL SKILLS</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Organized Technical Competencies, Toolchains &amp; Recognized Frameworks
+                  </p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 07
+              </span>
             </div>
           </div>
 
@@ -862,7 +1039,7 @@ export const DirectPortfolioView: React.FC = () => {
             {skillGroupsData.map((group, gIdx) => (
               <div
                 key={group.id}
-                className={`reveal-card p-6 rounded-lg bg-gradient-to-b ${group.gradient || 'from-deep-navy-card/80 to-deep-navy'} border border-sky-blue/25 space-y-4 shadow-xl hover:border-electric-blue/40 transition-all`}
+                className={`reveal-card apple-card-hover p-6 rounded-lg bg-gradient-to-b ${group.gradient || 'from-deep-navy-card/80 to-deep-navy'} border border-sky-blue/25 space-y-4 shadow-xl hover:border-electric-blue/40 transition-all`}
                 style={{ '--stagger-delay': `${gIdx * 60}ms` } as React.CSSProperties}
               >
                 <div className="border-b border-sky-blue/15 pb-3">
@@ -880,7 +1057,7 @@ export const DirectPortfolioView: React.FC = () => {
                   {group.skills.map((skill) => (
                     <div
                       key={skill.name}
-                      className="flex items-center justify-between p-2.5 rounded-md bg-deep-navy/80 border border-sky-blue/15 hover:border-electric-blue/30 transition-colors group"
+                      className="flex items-center justify-between p-2.5 rounded-md bg-deep-navy/80 border border-sky-blue/15 hover:border-electric-blue/30 transition-all duration-200 hover:translate-x-1 group"
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="p-1 rounded bg-deep-navy flex-shrink-0">
@@ -908,24 +1085,32 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 8: CERTIFICATIONS & BADGES */}
         {/* ========================================================= */}
         <section id="certifications" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
-            <div className="flex items-center gap-3">
-              <Award className="w-6 h-6 text-electric-blue" />
-              <div>
-                <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                  CERTIFICATIONS &amp; BADGES
-                </h2>
-                <p className="font-mono text-xs text-sky-light/70">
-                  Official Cisco Credly Verified Digital Badges
-                </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>CERTIFICATIONS &amp; BADGES</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Official Cisco Credly Verified Digital Badges
+                  </p>
+                </div>
               </div>
-            </div>
 
-            <div className="hidden sm:flex items-center gap-2">
-              <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 font-mono text-[11px] text-emerald-400 font-bold">
-                <ShieldCheck className="w-3.5 h-3.5" />
-                <span>OFFICIAL CREDLY VERIFIED</span>
-              </span>
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-emerald-500/15 border border-emerald-500/30 font-mono text-[11px] text-emerald-400 font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">OFFICIAL CREDLY VERIFIED</span>
+                </span>
+                <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden md:inline-block">
+                  CHAPTER // 08
+                </span>
+              </div>
             </div>
           </div>
 
@@ -937,7 +1122,7 @@ export const DirectPortfolioView: React.FC = () => {
               return (
                 <div
                   key={cert.id}
-                  className={`reveal-card p-6 rounded-lg bg-gradient-to-b ${gradient.bg} border ${gradient.border} shadow-xl backdrop-blur-md flex flex-col justify-between space-y-5 transition-all hover:scale-[1.01] hover:shadow-2xl`}
+                  className={`reveal-card apple-card-hover p-6 rounded-lg bg-gradient-to-b ${gradient.bg} border ${gradient.border} shadow-xl backdrop-blur-md flex flex-col justify-between space-y-5 transition-all`}
                   style={{ '--stagger-delay': `${cIdx * 70}ms` } as React.CSSProperties}
                 >
                   <div className="space-y-4">
@@ -1043,35 +1228,40 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 9: MULTIMEDIA & CREATIVE WORKS */}
         {/* ========================================================= */}
         <section id="multimedia" className="reveal-panel scroll-mt-24 space-y-6">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-sky-blue/20 pb-3">
-            <div className="flex items-center gap-3">
-              <Palette className="w-6 h-6 text-cyber-yellow" />
-              <div>
-                <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                  MULTIMEDIA &amp; CREATIVE WORKS
-                </h2>
-                <p className="font-mono text-xs text-sky-light/70">
-                  Graphic Design, Photo Manipulation &amp; Digital Artwork
-                </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-cyber-yellow/15 border border-cyber-yellow/30 text-cyber-yellow flex-shrink-0">
+                  <Palette className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>MULTIMEDIA &amp; CREATIVE WORKS</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-cyber-yellow animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Graphic Design, Photo Manipulation &amp; Digital Artwork
+                  </p>
+                </div>
               </div>
-            </div>
 
-            {/* Category Filter Pills (Only categories with actual uploaded works) */}
-            <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs">
-              {availableCategories.map((cat) => (
-                <button
-                  key={cat}
-                  type="button"
-                  onClick={() => setMultimediaFilter(cat)}
-                  className={`px-3 py-1.5 rounded-full transition-all cursor-pointer ${
-                    multimediaFilter === cat
-                      ? 'bg-cyber-yellow text-deep-navy font-bold shadow-[0_0_12px_rgba(255,215,0,0.4)]'
-                      : 'bg-deep-navy/80 border border-sky-blue/20 text-warm-ivory-dim hover:text-warm-ivory hover:border-sky-blue'
-                  }`}
-                >
-                  {cat}
-                </button>
-              ))}
+              {/* Category Filter Pills (Only categories with actual uploaded works) */}
+              <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs">
+                {availableCategories.map((cat) => (
+                  <button
+                    key={cat}
+                    type="button"
+                    onClick={() => setMultimediaFilter(cat)}
+                    className={`px-3 py-1.5 rounded-full transition-all cursor-pointer active:scale-95 ${
+                      multimediaFilter === cat
+                        ? 'bg-cyber-yellow text-deep-navy font-bold shadow-[0_0_12px_rgba(255,215,0,0.4)]'
+                        : 'bg-deep-navy/80 border border-sky-blue/20 text-warm-ivory-dim hover:text-warm-ivory hover:border-sky-blue'
+                    }`}
+                  >
+                    {cat}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
@@ -1089,7 +1279,7 @@ export const DirectPortfolioView: React.FC = () => {
               {filteredMedia.map((item, mIdx) => (
                 <div
                   key={item.id}
-                  className="reveal-card rounded-lg bg-deep-navy-card/85 border border-sky-blue/25 shadow-xl overflow-hidden flex flex-col justify-between transition-all hover:scale-[1.01] hover:border-cyber-yellow/50 hover:shadow-2xl group"
+                  className="reveal-card apple-card-hover rounded-lg bg-deep-navy-card/85 border border-sky-blue/25 shadow-xl overflow-hidden flex flex-col justify-between transition-all group"
                   style={{ '--stagger-delay': `${mIdx * 50}ms` } as React.CSSProperties}
                 >
                   {/* Media Preview Container */}
@@ -1105,11 +1295,11 @@ export const DirectPortfolioView: React.FC = () => {
                           src={item.mediaUrl}
                           alt={item.title}
                           loading="lazy"
-                          className="w-full h-full object-cover transition-transform duration-300 group-hover/img:scale-105"
+                          className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img:scale-105"
                         />
                       </div>
                       {/* Hover Overlay */}
-                      <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity flex items-center justify-center gap-2 text-xs font-mono font-bold text-warm-ivory backdrop-blur-xs">
+                      <div className="absolute inset-0 bg-deep-navy/40 opacity-0 group-hover/img:opacity-100 transition-opacity duration-300 flex items-center justify-center gap-2 text-xs font-mono font-bold text-warm-ivory backdrop-blur-xs">
                         <Maximize2 className="w-4 h-4 text-cyber-yellow" />
                         <span>EXPAND VIEW</span>
                       </div>
@@ -1164,7 +1354,7 @@ export const DirectPortfolioView: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => setSelectedMedia(item)}
-                          className="inline-flex items-center gap-1.5 text-xs text-cyber-yellow hover:text-white font-bold transition-colors cursor-pointer"
+                          className="inline-flex items-center gap-1.5 text-xs text-cyber-yellow hover:text-white font-bold transition-colors cursor-pointer active:scale-95"
                         >
                           <Maximize2 className="w-3.5 h-3.5" />
                           <span>DETAILS &amp; FULL VIEW</span>
@@ -1182,21 +1372,31 @@ export const DirectPortfolioView: React.FC = () => {
         {/* SECTION 10: CONTACT */}
         {/* ========================================================= */}
         <section id="contact" className="reveal-panel scroll-mt-24 space-y-6 pb-12">
-          <div className="flex items-center gap-3 border-b border-sky-blue/20 pb-3">
-            <Mail className="w-6 h-6 text-electric-blue" />
-            <div>
-              <h2 className="font-display font-bold text-2xl text-warm-ivory tracking-wide">
-                CONTACT INFORMATION
-              </h2>
-              <p className="font-mono text-xs text-sky-light/70">
-                Direct Cellular Line, Email Transmission &amp; Message Portal
-              </p>
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <Mail className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>CONTACT INFORMATION</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Direct Cellular Line, Email Transmission &amp; Message Portal
+                  </p>
+                </div>
+              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 10
+              </span>
             </div>
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
             {/* Contact Details Card */}
-            <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
+            <div className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-6 shadow-xl" style={{ '--stagger-delay': '0ms' } as React.CSSProperties}>
               <div className="space-y-2">
                 <h3 className="font-display font-bold text-lg text-warm-ivory">
                   GET IN TOUCH
@@ -1254,7 +1454,7 @@ export const DirectPortfolioView: React.FC = () => {
                       href={link.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="px-3 py-1.5 rounded-full bg-deep-navy/80 hover:bg-sky-blue/15 border border-sky-blue/25 hover:border-electric-blue text-xs font-mono text-warm-ivory hover:text-electric-blue transition-colors flex items-center gap-1.5"
+                      className="px-3 py-1.5 rounded-full bg-deep-navy/80 hover:bg-sky-blue/15 border border-sky-blue/25 hover:border-electric-blue text-xs font-mono text-warm-ivory hover:text-electric-blue transition-colors flex items-center gap-1.5 active:scale-95"
                     >
                       <span>{link.platform}</span>
                       <ExternalLink className="w-3 h-3 text-sky-light" />
@@ -1265,7 +1465,7 @@ export const DirectPortfolioView: React.FC = () => {
             </div>
 
             {/* Quick Interactive Message Form */}
-            <div className="reveal-card p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
+            <div className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
               <h3 className="font-display font-bold text-lg text-warm-ivory">
                 SEND DIRECT TRANSMISSION
               </h3>
@@ -1293,7 +1493,7 @@ export const DirectPortfolioView: React.FC = () => {
                       value={formData.name}
                       onChange={(e) => setFormData({ ...formData, name: e.target.value })}
                       placeholder="e.g. Jane Doe"
-                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none"
+                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors"
                     />
                   </div>
 
@@ -1308,7 +1508,7 @@ export const DirectPortfolioView: React.FC = () => {
                       value={formData.email}
                       onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                       placeholder="e.g. recruiter@company.com"
-                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none"
+                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors"
                     />
                   </div>
 
@@ -1323,7 +1523,7 @@ export const DirectPortfolioView: React.FC = () => {
                       value={formData.message}
                       onChange={(e) => setFormData({ ...formData, message: e.target.value })}
                       placeholder="Detail your inquiry or interview invitation here"
-                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none resize-none"
+                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none resize-none transition-colors"
                     />
                   </div>
 
@@ -1342,104 +1542,114 @@ export const DirectPortfolioView: React.FC = () => {
       </main>
 
       {/* ========================================================= */}
-      {/* MULTIMEDIA INSPECTION LIGHTBOX MODAL */}
+      {/* MULTIMEDIA INSPECTION LIGHTBOX MODAL (APPLE QUICK LOOK)   */}
       {/* ========================================================= */}
-      {selectedMedia && (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-labelledby="multimedia-dialog-title"
-          className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-deep-navy/90 backdrop-blur-md select-none"
-          onClick={() => setSelectedMedia(null)}
-        >
-          <div
-            className="relative w-full max-w-4xl max-h-[90vh] bg-deep-navy-card/95 border border-sky-blue/40 rounded-lg shadow-2xl overflow-hidden flex flex-col font-sans"
-            onClick={(e) => e.stopPropagation()}
+      <AnimatePresence>
+        {selectedMedia && (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="multimedia-dialog-title"
+            className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-deep-navy/90 backdrop-blur-xl select-none"
+            onClick={() => setSelectedMedia(null)}
           >
-            {/* Modal Header */}
-            <div className="flex items-center justify-between px-4 py-3 bg-[#121926] border-b border-sky-blue/25">
-              <div className="flex items-center gap-2 min-w-0 pr-2">
-                <Palette className="w-4 h-4 text-cyber-yellow flex-shrink-0" />
-                <span
-                  id="multimedia-dialog-title"
-                  className="font-mono font-bold text-xs sm:text-sm text-warm-ivory uppercase break-words"
-                >
-                  {selectedMedia.title}
-                </span>
-              </div>
-              <button
-                type="button"
-                onClick={() => setSelectedMedia(null)}
-                className="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500 border border-rose-500/40 text-rose-300 hover:text-white rounded text-xs font-mono font-bold transition-colors cursor-pointer flex-shrink-0"
-                aria-label="Close dialog"
-              >
-                ✕ CLOSE
-              </button>
-            </div>
-
-            {/* Media Display Area */}
-            <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-black/50">
-              <div className="flex justify-center items-center">
-                <img
-                  src={selectedMedia.mediaUrl}
-                  alt={selectedMedia.title}
-                  className="max-h-[65vh] w-auto max-w-full rounded object-contain shadow-2xl border border-sky-blue/20"
-                />
-              </div>
-
-              {/* Narrative & Details */}
-              <div className="space-y-3 pt-3 border-t border-sky-blue/20">
-                <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span className="font-mono text-xs font-bold px-2.5 py-1 rounded bg-cyber-yellow/15 text-cyber-yellow border border-cyber-yellow/40 uppercase">
-                    {selectedMedia.category}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.94, y: 18 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.96, y: 10 }}
+              transition={{ duration: 0.28, ease: [0.16, 1, 0.3, 1] }}
+              className="relative w-full max-w-4xl max-h-[90vh] bg-deep-navy-card/95 border border-sky-blue/40 rounded-xl shadow-[0_24px_64px_rgba(0,0,0,0.9),0_0_30px_rgba(0,240,255,0.15)] overflow-hidden flex flex-col font-sans"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {/* Modal Header */}
+              <div className="flex items-center justify-between px-4 py-3 bg-[#121926] border-b border-sky-blue/25">
+                <div className="flex items-center gap-2 min-w-0 pr-2">
+                  <Palette className="w-4 h-4 text-cyber-yellow flex-shrink-0" />
+                  <span
+                    id="multimedia-dialog-title"
+                    className="font-mono font-bold text-xs sm:text-sm text-warm-ivory uppercase break-words"
+                  >
+                    {selectedMedia.title}
                   </span>
-                  {selectedMedia.date && (
-                    <span className="font-mono text-xs text-sky-light">
-                      Date: {selectedMedia.date}
-                    </span>
-                  )}
+                </div>
+                <button
+                  type="button"
+                  onClick={() => setSelectedMedia(null)}
+                  className="px-2.5 py-1 bg-rose-500/20 hover:bg-rose-500 border border-rose-500/40 text-rose-300 hover:text-white rounded text-xs font-mono font-bold transition-colors cursor-pointer flex-shrink-0 active:scale-95"
+                  aria-label="Close dialog"
+                >
+                  ✕ CLOSE
+                </button>
+              </div>
+
+              {/* Media Display Area */}
+              <div className="flex-1 overflow-y-auto p-4 sm:p-6 space-y-4 bg-black/50">
+                <div className="flex justify-center items-center">
+                  <img
+                    src={selectedMedia.mediaUrl}
+                    alt={selectedMedia.title}
+                    className="max-h-[65vh] w-auto max-w-full rounded object-contain shadow-2xl border border-sky-blue/20"
+                  />
                 </div>
 
-                <p className="text-sm text-warm-ivory leading-relaxed break-words">
-                  {selectedMedia.description}
-                </p>
-
-                <div className="pt-2">
-                  <span className="font-mono text-xs text-sky-light/80 block mb-1.5 uppercase">
-                    Tools &amp; Software Used:
-                  </span>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedMedia.tools.map((t) => (
-                      <span
-                        key={t}
-                        className={`font-mono text-xs px-2.5 py-1 rounded border ${
-                          t === 'Canva'
-                            ? 'bg-sky-500/20 border-sky-400/40 text-sky-300 font-bold'
-                            : 'bg-deep-navy border-sky-blue/25 text-warm-ivory'
-                        }`}
-                      >
-                        {t}
+                {/* Narrative & Details */}
+                <div className="space-y-3 pt-3 border-t border-sky-blue/20">
+                  <div className="flex flex-wrap items-center justify-between gap-2">
+                    <span className="font-mono text-xs font-bold px-2.5 py-1 rounded bg-cyber-yellow/15 text-cyber-yellow border border-cyber-yellow/40 uppercase">
+                      {selectedMedia.category}
+                    </span>
+                    {selectedMedia.date && (
+                      <span className="font-mono text-xs text-sky-light">
+                        Date: {selectedMedia.date}
                       </span>
-                    ))}
+                    )}
+                  </div>
+
+                  <p className="text-sm text-warm-ivory leading-relaxed break-words">
+                    {selectedMedia.description}
+                  </p>
+
+                  <div className="pt-2">
+                    <span className="font-mono text-xs text-sky-light/80 block mb-1.5 uppercase">
+                      Tools &amp; Software Used:
+                    </span>
+                    <div className="flex flex-wrap gap-2">
+                      {selectedMedia.tools.map((t) => (
+                        <span
+                          key={t}
+                          className={`font-mono text-xs px-2.5 py-1 rounded border ${
+                            t === 'Canva'
+                              ? 'bg-sky-500/20 border-sky-400/40 text-sky-300 font-bold'
+                              : 'bg-deep-navy border-sky-blue/25 text-warm-ivory'
+                          }`}
+                        >
+                          {t}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="pt-2 flex justify-end gap-3">
+                    <a
+                      href={selectedMedia.mediaUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-electric-blue hover:bg-white text-deep-navy font-mono text-xs font-bold transition-all shadow-md active:scale-95"
+                    >
+                      <span>OPEN FULL-SIZE IMAGE</span>
+                      <ExternalLink className="w-3.5 h-3.5" />
+                    </a>
                   </div>
                 </div>
-
-                <div className="pt-2 flex justify-end gap-3">
-                  <a
-                    href={selectedMedia.mediaUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded bg-electric-blue hover:bg-white text-deep-navy font-mono text-xs font-bold transition-all shadow-md"
-                  >
-                    <span>OPEN FULL-SIZE IMAGE</span>
-                    <ExternalLink className="w-3.5 h-3.5" />
-                  </a>
-                </div>
               </div>
-            </div>
-          </div>
-        </div>
-      )}
+            </motion.div>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* FOOTER */}
       <footer className="border-t border-sky-blue/20 bg-deep-navy-card/90 py-8 text-center font-mono text-xs text-warm-ivory-dim/70 space-y-3">
