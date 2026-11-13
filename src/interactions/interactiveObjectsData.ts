@@ -302,18 +302,6 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     cameraTarget: [-10, 1.4, -9.6],
   },
   {
-    id: 'uni-study-table',
-    name: 'Academic Coursework Desk',
-    sublabel: 'AWS Academy Cloud & Security, Active Directory',
-    prompt: 'VIEW COURSEWORK & TRAINING',
-    locationId: 'university',
-    position: [-11.8, 1.25, -10.2],
-    radius: 2.4,
-    iconName: 'BookOpen',
-    modalType: 'COURSES',
-    cameraTarget: [-11.8, 1.25, -10.2],
-  },
-  {
     id: 'uni-library-entrance',
     name: 'Central Mindanao University Archive',
     sublabel: 'Academic Background & Freelance Experience Timeline',

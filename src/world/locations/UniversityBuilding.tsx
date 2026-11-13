@@ -77,23 +77,6 @@ export const UniversityBuilding: React.FC = () => {
         </mesh>
       </group>
 
-      {/* Outdoor Study Table & Wooden Bench */}
-      <group position={[-1.8, 0.25, 0.8]}>
-        <mesh position={[0, 0.35, 0]} castShadow receiveShadow>
-          <boxGeometry args={[0.9, 0.06, 0.5]} />
-          <meshStandardMaterial color="#b45309" roughness={0.6} flatShading />
-        </mesh>
-        <mesh position={[0, 0.17, 0]} castShadow>
-          <boxGeometry args={[0.7, 0.3, 0.3]} />
-          <meshStandardMaterial color="#475569" flatShading />
-        </mesh>
-        {/* Books on the study table */}
-        <mesh position={[0, 0.41, 0]} castShadow>
-          <boxGeometry args={[0.22, 0.06, 0.16]} />
-          <meshStandardMaterial color="#38bdf8" />
-        </mesh>
-      </group>
-
       {/* Surrounding Scholarly Foliage & Boulder */}
       <ForestTree position={[-2.8, 0.2, -1.8]} scale={1.2} tint="lush" />
       <ForestTree position={[2.6, 0.2, -1.6]} scale={1.1} tint="sage" />
