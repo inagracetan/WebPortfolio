@@ -4,6 +4,8 @@ import cpaleLogo from '@/assets/cpale.png'
 import musuantrackLogo from '@/assets/musuantrack.png'
 import cmufasLogo from '@/assets/cmufas.png'
 import cityagriLogo from '@/assets/cityagri.png'
+import cpalePreview from '@/assets/cpale-preview.jpg'
+import musuantrackPreview from '@/assets/musuantrack-preview.jpg'
 
 export const projectsData: Project[] = [
   // ── 1. CPALE Tracker ────────────────────────────────────────────────────────
@@ -24,6 +26,7 @@ export const projectsData: Project[] = [
     metrics: 'Personal Project',
     role: 'Developer',
     logo: cpaleLogo,
+    previewScreenshot: cpalePreview,
     techStack: ['TypeScript', 'React', 'Expo', 'Supabase', 'Vercel'],
     techStackGrouped: [
       { category: 'Languages', items: ['TypeScript', 'JavaScript'] },
@@ -65,6 +68,7 @@ export const projectsData: Project[] = [
     metrics: 'Main Developer // Group Project',
     role: 'Main Developer (Group Project)',
     logo: musuantrackLogo,
+    previewScreenshot: musuantrackPreview,
     techStack: ['Java', 'Android SDK', 'Google Maps', 'GPS / Location', 'Gradle'],
     links: {
       github: 'https://github.com/inagracetan/MusuanTrack',

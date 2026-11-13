@@ -923,11 +923,12 @@ export const DirectPortfolioView: React.FC = () => {
               >
                 <div className="space-y-3.5">
 
-                  {/* ── Live website preview (demo projects only) ─────── */}
-                  {project.links?.demo && (
+                  {/* ── Live website preview (projects with screenshot) ── */}
+                  {project.links?.demo && project.previewScreenshot && (
                     <ProjectLivePreview
                       url={project.links.demo}
                       title={project.title}
+                      screenshot={project.previewScreenshot}
                       logo={project.logo}
                     />
                   )}

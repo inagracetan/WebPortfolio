@@ -22,6 +22,7 @@ export interface Project {
   featured: boolean
   locationId: string
   previewImage?: string
+  previewScreenshot?: string
   logo?: string
   statusBadge?: string
   isCapstone?: boolean
