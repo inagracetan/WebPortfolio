@@ -1,6 +1,6 @@
-import React, { useEffect, useState, useRef } from 'react'
+import React, { useEffect, useState, useRef, useCallback } from 'react'
 import { motion } from 'framer-motion'
-import { useGameStore, gameStore } from '@/hooks/useGameStore'
+import { useGameStore } from '@/hooks/useGameStore'
 
 interface LoadingScreenProps {
   onComplete: () => void
@@ -20,6 +20,18 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
   const [displayProgress, setDisplayProgress] = useState(15)
   const hasCompleted = useRef(false)
 
+  // Keep a stable ref to onComplete so effects don't re-run when the parent
+  // passes a new function reference (e.g. on every store notify in App).
+  const onCompleteRef = useRef(onComplete)
+  useEffect(() => { onCompleteRef.current = onComplete }, [onComplete])
+
+  // Central completion — called from any path; fires exactly once.
+  const complete = useCallback(() => {
+    if (hasCompleted.current) return
+    hasCompleted.current = true
+    onCompleteRef.current()
+  }, [])
+
   // Smoothly lerp displayed progress toward real store progress
   useEffect(() => {
     const target = isEssentialReady ? 100 : loadingProgress
@@ -35,29 +47,23 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
     return () => clearInterval(interval)
   }, [loadingProgress, isEssentialReady])
 
-  // Complete and enter as soon as essential world is ready
+  // Complete as soon as essential world is ready
   useEffect(() => {
-    if ((isEssentialReady || displayProgress >= 100) && !hasCompleted.current) {
-      hasCompleted.current = true
-      const timer = setTimeout(() => {
-        onComplete()
-      }, 200)
+    if (isEssentialReady || displayProgress >= 100) {
+      const timer = setTimeout(() => complete(), 200)
       return () => clearTimeout(timer)
     }
-  }, [isEssentialReady, displayProgress, onComplete])
+  }, [isEssentialReady, displayProgress, complete])
 
-  // Failsafe watchdog timer: ensure loading never stalls indefinitely on low-tier or restricted hardware
+  // Failsafe watchdog: fires once after 4 s regardless of store state.
+  // Uses a ref-based callback so it is NEVER reset by re-renders or prop changes.
+  // This is the safety net for production environments where WebGL may be
+  // blocked, slow, or unavailable (server-side rendering, bots, restricted GPUs).
   useEffect(() => {
-    const failsafe = setTimeout(() => {
-      if (!hasCompleted.current) {
-        hasCompleted.current = true
-        gameStore.setEssentialReady(true)
-        onComplete()
-      }
-    }, 2200)
-
+    const failsafe = setTimeout(() => complete(), 4000)
     return () => clearTimeout(failsafe)
-  }, [onComplete])
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []) // intentionally empty — must only run once on mount
 
   const logIndex = Math.min(
     Math.floor((displayProgress / 100) * BOOT_LOGS.length),

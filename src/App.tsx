@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { AnimatePresence } from 'framer-motion'
 import { WorldCanvas } from '@/world/WorldCanvas'
 import { LoadingScreen } from '@/components/ui/LoadingScreen'
@@ -31,6 +31,13 @@ import { useProximityInteractions } from '@/interactions/useProximityInteraction
 export const App: React.FC = () => {
   const { currentScreen, setScreen } = useGameStore()
 
+  // Stable reference — must not change between renders or the LoadingScreen
+  // failsafe timer (which depends on onComplete) resets on every store notify,
+  // preventing it from ever firing in production when WebGL is slow/unavailable.
+  const handleLoadingComplete = useCallback(() => {
+    setScreen('WELCOME')
+  }, [setScreen])
+
   // Activate keyboard shortcuts (Escape, M, H, V, 1-5)
   useKeyboardShortcuts()
 
@@ -61,7 +68,7 @@ export const App: React.FC = () => {
         {currentScreen === 'LOADING' && (
           <LoadingScreen
             key="loading"
-            onComplete={() => setScreen('WELCOME')}
+            onComplete={handleLoadingComplete}
           />
         )}
 
