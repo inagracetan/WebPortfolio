@@ -1,7 +1,7 @@
 import React from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
-import { ExternalLink, GitBranch, Sparkles, CheckCircle2, FolderGit2, Info, Image as ImageIcon } from 'lucide-react'
+import { ExternalLink, GitBranch, Sparkles, CheckCircle2, FolderGit2, Info } from 'lucide-react'
 
 export const ProjectDetailModal: React.FC = () => {
   const { activeInspectionModal, activeProjectDetail, closeInspection } = useObjectInspection()
@@ -38,17 +38,64 @@ export const ProjectDetailModal: React.FC = () => {
           )}
         </div>
 
-        {/* Visual Screenshot / Architecture Placeholder Frame */}
-        <div className="relative w-full h-40 bg-deep-navy/90 border border-dashed border-sky-blue/30 rounded-sm flex flex-col items-center justify-center p-4 text-center overflow-hidden group">
-          <div className="p-3 rounded-full bg-sky-blue/10 border border-sky-blue/20 text-electric-blue mb-2">
-            <ImageIcon className="w-6 h-6" />
-          </div>
-          <span className="font-mono text-xs text-warm-ivory font-bold tracking-wider uppercase block">
-            {activeProjectDetail.title}
-          </span>
-          <span className="font-mono text-[11px] text-sky-light/80 mt-0.5">
-            [System Architecture Diagram &amp; Screenshots Stored in Academic Archive]
-          </span>
+        {/* Visual Screenshot / Logo Preview */}
+        <div className="relative w-full h-44 bg-deep-navy/90 border border-sky-blue/20 rounded-sm overflow-hidden group">
+          {activeProjectDetail.previewScreenshot ? (
+            /* Actual website screenshot */
+            <>
+              <img
+                src={activeProjectDetail.previewScreenshot}
+                alt={`${activeProjectDetail.title} preview`}
+                className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                draggable={false}
+              />
+              {/* Fade overlay at bottom */}
+              <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-deep-navy/80 to-transparent pointer-events-none" />
+              {/* Logo badge over screenshot */}
+              {activeProjectDetail.logo && (
+                <div className="absolute bottom-2 left-3 p-1.5 bg-deep-navy/80 rounded border border-sky-blue/20 backdrop-blur-sm">
+                  <img
+                    src={activeProjectDetail.logo}
+                    alt={`${activeProjectDetail.title} logo`}
+                    className="h-6 w-auto object-contain"
+                    draggable={false}
+                  />
+                </div>
+              )}
+            </>
+          ) : activeProjectDetail.logo ? (
+            /* Logo-only display (no screenshot) */
+            <div className="w-full h-full flex items-center justify-center bg-deep-navy-surface/60">
+              <div className="absolute inset-0 bg-game-grid opacity-15 pointer-events-none" />
+              <img
+                src={activeProjectDetail.logo}
+                alt={`${activeProjectDetail.title} logo`}
+                className="max-h-20 max-w-[180px] object-contain drop-shadow-lg"
+                draggable={false}
+              />
+            </div>
+          ) : (
+            /* Fallback — no assets available */
+            <div className="w-full h-full flex flex-col items-center justify-center gap-2 text-center px-4">
+              <div className="absolute inset-0 bg-game-grid opacity-15 pointer-events-none" />
+              <span className="font-mono text-xs text-warm-ivory font-bold tracking-wider uppercase">
+                {activeProjectDetail.title}
+              </span>
+              <span className="font-mono text-[10px] text-sky-light/60">
+                {activeProjectDetail.category}
+              </span>
+            </div>
+          )}
+
+          {/* Live Demo badge overlay (top-right) */}
+          {activeProjectDetail.links?.demo && (
+            <div className="absolute top-2 right-2">
+              <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-mono text-[9px] font-bold">
+                <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                LIVE DEMO
+              </span>
+            </div>
+          )}
         </div>
 
         {/* Narrative Description */}

@@ -2,7 +2,9 @@ import React from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
 import { educationData, seminarsTrainingsData } from '@/data/education'
-import { BookOpen, CheckCircle2, Info, Cloud, Shield, Server, Award, Calendar, MapPin } from 'lucide-react'
+import { certificationsData } from '@/data/certifications'
+import { CredlyBadge } from '@/components/portfolio/CredlyBadge'
+import { BookOpen, CheckCircle2, Info, Cloud, Shield, Server, Award, Calendar, MapPin, ExternalLink } from 'lucide-react'
 
 export const CoursesModal: React.FC = () => {
   const { activeInspectionModal, closeInspection } = useObjectInspection()
@@ -45,6 +47,40 @@ export const CoursesModal: React.FC = () => {
               modules, and industry seminars attended under the Information Technology curriculum at
               Central Mindanao University and cooperating agencies.
             </p>
+          </div>
+        </div>
+
+        {/* Official Credly Verified Badges */}
+        <div className="space-y-3">
+          <h3 className="font-mono text-xs text-electric-blue font-bold tracking-wider uppercase flex items-center gap-1.5">
+            <Award className="w-3.5 h-3.5" />
+            Official Cisco Credly Verified Badges
+          </h3>
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {certificationsData.map((cert) => (
+              <div key={cert.id} className="space-y-2">
+                <CredlyBadge
+                  badgeId={cert.credlyBadgeId}
+                  title={cert.title}
+                  issuer={cert.issuer}
+                  verificationUrl={cert.verificationUrl}
+                  fallbackImageUrl={cert.badgeImageUrl}
+                />
+                <div className="text-center space-y-0.5">
+                  <p className="font-mono text-[10px] text-warm-ivory font-semibold leading-snug">{cert.title}</p>
+                  <p className="font-mono text-[9px] text-sky-light/60">{cert.category}</p>
+                  <a
+                    href={cert.verificationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center gap-1 text-[9px] font-mono text-electric-blue hover:text-sky-light transition-colors"
+                  >
+                    <ExternalLink className="w-2.5 h-2.5" />
+                    Verify on Credly
+                  </a>
+                </div>
+              </div>
+            ))}
           </div>
         </div>
 

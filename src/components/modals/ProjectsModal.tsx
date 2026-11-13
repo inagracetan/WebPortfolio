@@ -130,6 +130,41 @@ export const ProjectsModal: React.FC = () => {
                     </span>
                   )}
                 </div>
+
+                {/* Screenshot / logo preview */}
+                {(activeProject.previewScreenshot || activeProject.logo) && (
+                  <div className="relative mt-2 mb-1 w-full h-36 rounded-sm overflow-hidden border border-sky-blue/20 group">
+                    {activeProject.previewScreenshot ? (
+                      <>
+                        <img
+                          src={activeProject.previewScreenshot}
+                          alt={`${activeProject.title} preview`}
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-[1.03]"
+                          draggable={false}
+                        />
+                        <div className="absolute bottom-0 left-0 right-0 h-8 bg-gradient-to-t from-deep-navy/80 to-transparent pointer-events-none" />
+                        {activeProject.logo && (
+                          <div className="absolute bottom-1.5 left-2.5 p-1 bg-deep-navy/80 rounded border border-sky-blue/20">
+                            <img src={activeProject.logo} alt="" className="h-5 w-auto object-contain" draggable={false} />
+                          </div>
+                        )}
+                      </>
+                    ) : (
+                      <div className="w-full h-full flex items-center justify-center bg-deep-navy-surface/60">
+                        <img src={activeProject.logo!} alt={`${activeProject.title} logo`} className="max-h-16 max-w-[160px] object-contain drop-shadow-lg" draggable={false} />
+                      </div>
+                    )}
+                    {activeProject.links?.demo && (
+                      <div className="absolute top-1.5 right-1.5">
+                        <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-emerald-500/20 border border-emerald-500/40 text-emerald-400 font-mono text-[8px] font-bold">
+                          <span className="w-1 h-1 rounded-full bg-emerald-400 animate-pulse" />
+                          LIVE
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )}
+
                 <h3 className="font-display font-extrabold text-2xl text-warm-ivory mt-1">
                   {activeProject.title}
                 </h3>
