@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import { ExternalLink, GitBranch, Sparkles, CheckCircle2, Info, FolderGit2 } from 'lucide-react'
+import { Sparkles, CheckCircle2, Info, FolderGit2, Globe, Code2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { projectsData } from '@/data/projects'
 import type { Project } from '@/data/types'
@@ -25,8 +25,8 @@ export const ProjectsModal: React.FC = () => {
       isOpen={activeModal === 'PROJECTS'}
       onClose={closeModal}
       title="PROJECT_LAB // SHOWCASE_ARCHIVE.EXE"
-      subtitle="Academic capstones, mobile applications, cybersecurity analysis & enterprise systems"
-      badge="5 PROJECTS"
+      subtitle="Personal projects, academic capstones, mobile applications, cybersecurity analysis & enterprise systems"
+      badge="6 PROJECTS"
       locationTag="PROJECT LAB"
       maxWidth="4xl"
     >
@@ -68,7 +68,11 @@ export const ProjectsModal: React.FC = () => {
                   <span className="font-display font-bold text-sm text-warm-ivory">
                     {proj.title}
                   </span>
-                  {proj.statusBadge && (
+                  {proj.isPersonalProject ? (
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-sky-blue/15 text-sky-light border border-sky-blue/30 whitespace-nowrap">
+                      PERSONAL
+                    </span>
+                  ) : proj.statusBadge && (
                     <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-electric-blue/15 text-electric-blue border border-electric-blue/30 whitespace-nowrap">
                       {proj.statusBadge.split(' // ')[0]}
                     </span>
@@ -99,7 +103,11 @@ export const ProjectsModal: React.FC = () => {
               <span className="text-xs font-mono text-electric-blue tracking-wider">
                 {activeProject.category} &bull; {activeProject.role}
               </span>
-              {activeProject.statusBadge && (
+              {activeProject.isPersonalProject ? (
+                <span className="text-xs font-mono px-2 py-0.5 rounded bg-sky-blue/15 text-sky-light border border-sky-blue/30 font-semibold">
+                  PERSONAL PROJECT
+                </span>
+              ) : activeProject.statusBadge && (
                 <span className="text-xs font-mono text-muted-green-light font-semibold">
                   {activeProject.statusBadge}
                 </span>
@@ -133,24 +141,46 @@ export const ProjectsModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Tech Stack Badges */}
+          {/* Tech Stack — grouped if available, flat otherwise */}
           <div>
             <h4 className="font-mono text-xs text-warm-ivory font-semibold tracking-wider mb-2 uppercase">
               Technologies &amp; Methodologies
             </h4>
-            <div className="flex flex-wrap gap-1.5">
-              {activeProject.techStack.map((tech) => (
-                <span
-                  key={tech}
-                  className="px-2 py-0.5 text-xs font-mono bg-deep-navy-surface text-sky-light border border-sky-blue/25 rounded"
-                >
-                  {tech}
-                </span>
-              ))}
-            </div>
+            {activeProject.techStackGrouped ? (
+              <div className="space-y-2">
+                {activeProject.techStackGrouped.map((group) => (
+                  <div key={group.category}>
+                    <div className="font-mono text-[10px] text-sky-light/70 uppercase tracking-wider mb-1">
+                      {group.category}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {group.items.map((tech) => (
+                        <span
+                          key={tech}
+                          className="px-2 py-0.5 text-xs font-mono bg-deep-navy-surface text-sky-light border border-sky-blue/25 rounded"
+                        >
+                          {tech}
+                        </span>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className="flex flex-wrap gap-1.5">
+                {activeProject.techStack.map((tech) => (
+                  <span
+                    key={tech}
+                    className="px-2 py-0.5 text-xs font-mono bg-deep-navy-surface text-sky-light border border-sky-blue/25 rounded"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            )}
           </div>
 
-          {/* Documentation & Screenshot Placeholder Notice */}
+          {/* Documentation / Notes */}
           <div className="p-3 bg-deep-navy/90 border border-sky-blue/15 rounded flex items-start gap-2 text-xs text-warm-ivory-dim">
             <Info className="w-4 h-4 text-sky-light flex-shrink-0 mt-0.5" />
             <div className="space-y-0.5">
@@ -164,16 +194,16 @@ export const ProjectsModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Links / Placeholders */}
+          {/* Action Links */}
           <div className="pt-2 flex flex-wrap items-center gap-3">
             {activeProject.links.github ? (
               <a
                 href={activeProject.links.github}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-deep-navy hover:bg-deep-navy-surface border border-sky-blue/30 text-warm-ivory hover:text-electric-blue text-xs font-mono rounded tracking-wider transition-colors"
               >
-                <GitBranch className="w-3.5 h-3.5" />
+                <Code2 className="w-3.5 h-3.5" />
                 <span>REPOSITORY</span>
               </a>
             ) : (
@@ -187,11 +217,11 @@ export const ProjectsModal: React.FC = () => {
               <a
                 href={activeProject.links.demo}
                 target="_blank"
-                rel="noreferrer"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-4 py-2 bg-electric-blue hover:bg-sky-light text-deep-navy text-xs font-mono font-bold rounded tracking-wider transition-colors shadow-[0_0_15px_rgba(0,240,255,0.4)]"
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>LAUNCH DEMO</span>
+                <Globe className="w-3.5 h-3.5" />
+                <span>LIVE DEMO</span>
               </a>
             )}
           </div>
@@ -200,3 +230,4 @@ export const ProjectsModal: React.FC = () => {
     </Modal>
   )
 }
+

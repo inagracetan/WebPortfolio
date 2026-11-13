@@ -25,6 +25,7 @@ import {
   Maximize2,
   Smartphone,
   Terminal,
+  Code2,
 } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
 import { projectsData } from '@/data/projects'
@@ -36,6 +37,8 @@ import { certificationsData, academicTrainingData, CATEGORY_GRADIENTS } from '@/
 import { multimediaData, type MultimediaCategory, type MultimediaItem } from '@/data/multimedia'
 import { CredlyBadge } from './CredlyBadge'
 import { TechLogo } from './TechLogo'
+import { TechTag } from './TechTag'
+import { ProjectLivePreview } from './ProjectLivePreview'
 import { DirectPortfolioNav } from './DirectPortfolioNav'
 
 // Helper for category-appropriate project simulation icons
@@ -45,6 +48,9 @@ const getProjectDemoIcon = (project: { category: string }) => {
   }
   if (project.category.includes('Cybersecurity')) {
     return <ShieldCheck className="w-5 h-5 text-emerald-400" />
+  }
+  if (project.category.includes('Web')) {
+    return <Globe2 className="w-5 h-5 text-electric-blue" />
   }
   return <Terminal className="w-5 h-5 text-sky-light" />
 }
@@ -882,7 +888,7 @@ export const DirectPortfolioView: React.FC = () => {
                     <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
                   </h2>
                   <p className="font-mono text-[11px] text-sky-light/70">
-                    5 Verified Academic, Capstone &amp; Enterprise Projects
+                    6 Projects — Personal, Academic, Capstone &amp; Enterprise
                   </p>
                 </div>
               </div>
@@ -896,82 +902,108 @@ export const DirectPortfolioView: React.FC = () => {
             {projectsData.map((project, pIdx) => (
               <div
                 key={project.id}
-                className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-5 hover:border-electric-blue/50 transition-colors shadow-lg"
+                className={[
+                  'reveal-card apple-card-hover p-6 rounded-lg flex flex-col justify-between space-y-5 shadow-lg transition-colors',
+                  project.links?.demo
+                    ? 'bg-deep-navy-card/80 border border-electric-blue/30 hover:border-electric-blue/60'
+                    : 'bg-deep-navy-card/70 border border-sky-blue/20 hover:border-electric-blue/50',
+                ].join(' ')}
                 style={{ '--stagger-delay': `${pIdx * 70}ms` } as React.CSSProperties}
               >
                 <div className="space-y-3.5">
+
+                  {/* ── Live website preview (demo projects only) ─────── */}
+                  {project.links?.demo && (
+                    <ProjectLivePreview
+                      url={project.links.demo}
+                      title={project.title}
+                      logo={project.logo}
+                    />
+                  )}
+
+                  {/* ── Category + badges row ─────────────────────────── */}
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-electric-blue/15 text-electric-blue border border-electric-blue/30 uppercase font-semibold">
                       {project.category}
                     </span>
-                    <span className="font-mono text-[10px] text-warm-ivory-dim/70">
-                      {project.role}
-                    </span>
+                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
+                      {project.isPersonalProject && (
+                        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-sky-blue/15 text-sky-light border border-sky-blue/30 font-semibold">
+                          Personal Project
+                        </span>
+                      )}
+                      {project.isDocumentationOnly && (
+                        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-warm-ivory/10 text-warm-ivory-dim/60 border border-warm-ivory/15 font-semibold">
+                          Case Study
+                        </span>
+                      )}
+                      <span className="font-mono text-[10px] text-warm-ivory-dim/70">
+                        {project.role}
+                      </span>
+                    </div>
                   </div>
 
-                  <h3 className="font-display font-bold text-lg text-warm-ivory leading-snug">
-                    {project.title}
-                  </h3>
+                  {/* ── Title row: logo + title ───────────────────────── */}
+                  <div className="flex items-center gap-3">
+                    {project.logo && (
+                      <img
+                        src={project.logo}
+                        alt={`${project.title} logo`}
+                        className="w-9 h-9 object-contain flex-shrink-0 rounded-md"
+                        draggable={false}
+                      />
+                    )}
+                    <h3 className="font-display font-bold text-lg text-warm-ivory leading-snug">
+                      {project.title}
+                    </h3>
+                  </div>
 
                   <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed">
                     {project.description}
                   </p>
 
-                  {/* Clean Dark-Themed Project Demo Preview Container */}
-                  <div className="relative rounded-lg overflow-hidden bg-deep-navy-surface/90 border border-sky-blue/20 p-4 flex flex-col items-center justify-center text-center min-h-[145px] group/preview transition-all hover:border-sky-blue/40 shadow-inner">
-                    <div className="absolute inset-0 bg-game-grid opacity-25 pointer-events-none" />
+                  {/* ── Static preview card (non-demo projects only) ──── */}
+                  {!project.links?.demo && (
+                    <div className="relative rounded-lg overflow-hidden bg-deep-navy-surface/90 border border-sky-blue/20 flex flex-col items-center justify-center text-center min-h-[120px] group/preview transition-all hover:border-sky-blue/40 shadow-inner">
+                      <div className="absolute inset-0 bg-game-grid opacity-20 pointer-events-none" />
 
-                    <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
-                      <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-deep-navy/90 border border-sky-blue/20 text-sky-light">
-                        <Terminal className="w-3 h-3 text-electric-blue" />
-                        <span>PROTOTYPE ENV</span>
-                      </span>
-                      {project.links?.demo ? (
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>LIVE DEMO</span>
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-sky-blue/10 border border-sky-blue/20 text-sky-light/80 font-semibold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-sky-light/60" />
-                          <span>DEMO COMING SOON</span>
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="relative z-10 flex flex-col items-center gap-2 pt-6 pb-2">
-                      <div className="p-3 rounded-xl bg-deep-navy border border-sky-blue/25 shadow-inner group-hover/preview:border-electric-blue transition-colors">
-                        {getProjectDemoIcon(project)}
+                      {/* Status badge */}
+                      <div className="absolute top-2.5 right-2.5 text-[10px] font-mono pointer-events-none z-10">
+                        {project.isDocumentationOnly ? (
+                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warm-ivory/10 border border-warm-ivory/20 text-warm-ivory-dim/70 font-semibold">
+                            CASE STUDY
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-sky-blue/10 border border-sky-blue/20 text-sky-light/80 font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-light/60" />
+                            IN REVIEW
+                          </span>
+                        )}
                       </div>
-                      <div className="space-y-0.5">
-                        <div className="font-mono text-xs font-semibold text-warm-ivory">
-                          {project.category}
-                        </div>
-                        <div className="font-mono text-[10px] text-warm-ivory-dim/60">
-                          Institutional Software Prototype
-                        </div>
+
+                      <div className="relative z-10 flex flex-col items-center gap-2 py-5 px-4 w-full">
+                        {project.logo ? (
+                          <img
+                            src={project.logo}
+                            alt={`${project.title} logo`}
+                            className="max-h-14 max-w-[140px] w-auto object-contain drop-shadow-lg transition-transform duration-300 group-hover/preview:scale-105"
+                            draggable={false}
+                          />
+                        ) : (
+                          <div className="p-3 rounded-xl bg-deep-navy border border-sky-blue/25 shadow-inner group-hover/preview:border-electric-blue transition-colors">
+                            {getProjectDemoIcon(project)}
+                          </div>
+                        )}
+                        {project.isDocumentationOnly && (
+                          <span className="font-mono text-[9px] px-2 py-0.5 rounded border border-warm-ivory/15 text-warm-ivory-dim/50 tracking-wider uppercase">
+                            Documentation Only
+                          </span>
+                        )}
                       </div>
                     </div>
+                  )}
 
-                    <div className="relative z-10 w-full pt-2.5 border-t border-sky-blue/10 flex items-center justify-center">
-                      {project.links?.demo ? (
-                        <a
-                          href={project.links.demo}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-deep-navy bg-electric-blue hover:bg-white px-3 py-1 rounded transition-colors active:scale-95"
-                        >
-                          <span>LAUNCH INTERACTIVE DEMO</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      ) : (
-                        <div className="inline-flex items-center gap-1.5 font-mono text-[10px] text-warm-ivory-dim/60 cursor-default">
-                          <span>Public Web Simulator Under Staging</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
+                  {/* ── Key highlights ────────────────────────────────── */}
                   <div className="space-y-1.5 pt-1">
                     <div className="font-mono text-[10px] font-bold text-sky-light uppercase">
                       Key Highlights:
@@ -988,20 +1020,42 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
 
                 <div className="pt-4 border-t border-sky-blue/15 space-y-2.5">
+                  {/* Tech Stack: logo + name tags — consistent across all project cards */}
                   <div className="flex flex-wrap gap-1.5">
                     {project.techStack.map((tech) => (
-                      <span
-                        key={tech}
-                        className="font-mono text-[10px] px-2 py-0.5 rounded bg-deep-navy/80 border border-sky-blue/20 text-sky-light"
-                      >
-                        {tech}
-                      </span>
+                      <TechTag key={tech} name={tech} />
                     ))}
                   </div>
 
-                  <div className="font-mono text-[10px] text-electric-blue flex items-center justify-between">
-                    <span>{project.statusBadge}</span>
-                    <span className="text-warm-ivory-dim/60">{project.metrics}</span>
+                  {/* Footer row: links + status */}
+                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
+                    <div className="flex items-center gap-2">
+                      {project.links?.github && (
+                        <a
+                          href={project.links.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1 rounded bg-deep-navy border border-sky-blue/25 text-warm-ivory hover:text-electric-blue hover:border-electric-blue/40 transition-colors"
+                        >
+                          <Code2 className="w-3 h-3" />
+                          <span>GitHub</span>
+                        </a>
+                      )}
+                      {project.links?.demo && (
+                        <a
+                          href={project.links.demo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1 rounded bg-electric-blue/15 border border-electric-blue/30 text-electric-blue hover:bg-electric-blue hover:text-deep-navy font-bold transition-colors"
+                        >
+                          <Globe2 className="w-3 h-3" />
+                          <span>Live Demo</span>
+                        </a>
+                      )}
+                    </div>
+                    <div className="font-mono text-[10px] text-electric-blue text-right">
+                      <span>{project.statusBadge}</span>
+                    </div>
                   </div>
                 </div>
               </div>
