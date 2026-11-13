@@ -1,4 +1,5 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 import {
   Volume2,
   VolumeX,
@@ -14,6 +15,7 @@ import {
 import { useGameStore } from '@/hooks/useGameStore'
 import { Tooltip } from './Tooltip'
 import { APP_CONFIG } from '@/utilities/constants'
+import { APPLE_SPRINGS } from '@/styles/motion'
 
 export const Navigation: React.FC = () => {
   const {
@@ -38,10 +40,13 @@ export const Navigation: React.FC = () => {
       <div className="max-w-7xl mx-auto flex items-center justify-between">
         {/* Left: Brand Identity Logo */}
         <div className="pointer-events-auto flex items-center gap-2">
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.96 }}
+            transition={APPLE_SPRINGS.snappy}
             onClick={() => openModal('ABOUT')}
-            className="group flex items-center gap-2.5 px-3 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/30 hover:border-electric-blue rounded-full backdrop-blur-md transition-all shadow-md cursor-pointer"
+            className="group flex items-center gap-2.5 px-3 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/30 hover:border-electric-blue rounded-full backdrop-blur-md transition-colors shadow-md cursor-pointer"
             aria-label="Ina Grace Tan - Profile Summary"
             title="View Candidate Overview"
           >
@@ -60,7 +65,7 @@ export const Navigation: React.FC = () => {
                 Data Networking &bull; IT
               </span>
             </div>
-          </button>
+          </motion.button>
         </div>
 
         {/* Center: Simplified, Professional 6-Section Navigation (Desktop / Tablet) */}
@@ -70,8 +75,10 @@ export const Navigation: React.FC = () => {
             className="pointer-events-auto hidden md:flex items-center gap-1 px-2.5 py-1 bg-deep-navy-card/90 border border-sky-blue/25 rounded-full shadow-lg backdrop-blur-md text-xs font-mono"
           >
             {/* 1. Personal Workspace (First and most prominent location option - no reset/respawn) */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => setLocation('workspace')}
               className={`flex items-center gap-1.5 px-3 py-1.5 rounded-full transition-all cursor-pointer ${
                 activeLocation.id === 'workspace'
@@ -83,62 +90,72 @@ export const Navigation: React.FC = () => {
             >
               <House className="w-3.5 h-3.5 text-electric-blue" />
               <span><span className="hidden xl:inline">PERSONAL </span>WORKSPACE</span>
-            </button>
+            </motion.button>
 
             {/* 2. About (Opens About Me modal without teleporting) */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => openModal('ABOUT')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
               title="About Ina Grace Tan"
             >
               <UserRound className="w-3.5 h-3.5 text-sky-light" />
               <span>ABOUT</span>
-            </button>
+            </motion.button>
 
             {/* 3. Resume (Opens authentic PDF CV without teleporting) */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => openModal('RESUME')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-electric-blue/15 text-electric-blue font-bold border border-electric-blue/30 hover:bg-electric-blue hover:text-deep-navy transition-all cursor-pointer shadow-sm"
               title="View & Download Curriculum Vitae"
             >
               <FileUser className="w-3.5 h-3.5" />
               <span>RESUME</span>
-            </button>
+            </motion.button>
 
             {/* 4. Projects (Opens Project Showcase without teleporting) */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => openModal('PROJECTS')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
               title="Featured IT & Software Projects"
             >
               <FolderKanban className="w-3.5 h-3.5 text-sky-light" />
               <span>PROJECTS</span>
-            </button>
+            </motion.button>
 
             {/* 5. Skills (Opens Skills Matrix without teleporting) */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => openModal('SKILLS')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
               title="Technical Skills Matrix"
             >
               <Brain className="w-3.5 h-3.5 text-muted-green-light" />
               <span>SKILLS</span>
-            </button>
+            </motion.button>
 
             {/* 6. Contact (Opens Contact Beacon without teleporting) */}
-            <button
+            <motion.button
               type="button"
+              whileTap={{ scale: 0.95 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => openModal('CONTACT')}
               className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/10 transition-colors cursor-pointer"
               title="Contact Info & Direct Cellular Phone"
             >
               <Mail className="w-3.5 h-3.5 text-electric-blue" />
               <span>CONTACT</span>
-            </button>
+            </motion.button>
           </nav>
         )}
 
@@ -147,24 +164,30 @@ export const Navigation: React.FC = () => {
           {/* Direct Portfolio Switch (coexisting with 3D exploration) */}
           {currentScreen !== 'WELCOME' && (
             <Tooltip content="Direct Portfolio View (All 9 Sections)">
-              <button
+              <motion.button
                 type="button"
+                whileHover={{ scale: 1.04 }}
+                whileTap={{ scale: 0.94 }}
+                transition={APPLE_SPRINGS.snappy}
                 onClick={() => setScreen('DIRECT_PORTFOLIO')}
-                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-semibold transition-all backdrop-blur-md cursor-pointer shadow-sm active:scale-95"
+                className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-semibold transition-colors backdrop-blur-md cursor-pointer shadow-sm"
                 aria-label="Direct Portfolio View"
               >
                 <FileUser className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">PORTFOLIO</span>
-              </button>
+              </motion.button>
             </Tooltip>
           )}
 
           {/* Sound Toggle */}
           <Tooltip content={isSoundMuted ? 'Unmute Audio' : 'Mute Audio'}>
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={toggleMute}
-              className={`p-2 rounded-full border text-xs font-mono flex items-center justify-center transition-all backdrop-blur-md cursor-pointer ${
+              className={`p-2 rounded-full border text-xs font-mono flex items-center justify-center transition-colors backdrop-blur-md cursor-pointer ${
                 isSoundMuted
                   ? 'bg-deep-navy/80 border-warm-ivory/20 text-warm-ivory-dim hover:text-warm-ivory'
                   : 'bg-deep-navy-card/90 border-sky-blue/30 text-electric-blue hover:border-electric-blue'
@@ -172,31 +195,37 @@ export const Navigation: React.FC = () => {
               aria-label={isSoundMuted ? 'Unmute Sound' : 'Mute Sound'}
             >
               {isSoundMuted ? <VolumeX className="w-4 h-4" /> : <Volume2 className="w-4 h-4" />}
-            </button>
+            </motion.button>
           </Tooltip>
 
           {/* Settings */}
           <Tooltip content="Settings & Quality">
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.08 }}
+              whileTap={{ scale: 0.92 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => openModal('SETTINGS')}
-              className="p-2 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/30 hover:border-electric-blue text-warm-ivory hover:text-electric-blue rounded-full text-xs font-mono flex items-center justify-center transition-all backdrop-blur-md cursor-pointer"
+              className="p-2 bg-deep-navy-card/90 hover:bg-deep-navy border border-sky-blue/30 hover:border-electric-blue text-warm-ivory hover:text-electric-blue rounded-full text-xs font-mono flex items-center justify-center transition-colors backdrop-blur-md cursor-pointer"
               aria-label="Settings"
             >
               <Settings className="w-4 h-4" />
-            </button>
+            </motion.button>
           </Tooltip>
 
           {/* Mobile / Recruiter Directory Menu Drawer Button (Hidden on Desktop) */}
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.94 }}
+            transition={APPLE_SPRINGS.snappy}
             onClick={toggleMenu}
-            className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-all backdrop-blur-md cursor-pointer shadow-sm"
+            className="md:hidden flex items-center gap-1.5 px-3 py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-mono text-xs font-bold transition-colors backdrop-blur-md cursor-pointer shadow-sm"
             aria-label="Open Directory Menu"
           >
             <Menu className="w-4 h-4" />
             <span className="hidden sm:inline">MENU</span>
-          </button>
+          </motion.button>
         </div>
       </div>
     </header>

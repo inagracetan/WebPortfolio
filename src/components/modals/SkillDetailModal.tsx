@@ -1,7 +1,9 @@
 import React from 'react'
+import { motion } from 'framer-motion'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
 import { Code2, Database, Network, ShieldCheck, FileSpreadsheet, Layers, CheckCircle2 } from 'lucide-react'
+import { APPLE_EASE } from '@/styles/motion'
 
 export const SkillDetailModal: React.FC = () => {
   const { activeInspectionModal, activeSkillGroupDetail, closeInspection } = useObjectInspection()
@@ -82,9 +84,11 @@ export const SkillDetailModal: React.FC = () => {
 
                 {/* Progress bar */}
                 <div className="h-2 w-full bg-deep-navy-surface rounded-full overflow-hidden border border-sky-blue/20">
-                  <div
+                  <motion.div
                     className="h-full bg-gradient-to-r from-sky-blue via-electric-blue to-sky-light rounded-full"
-                    style={{ width: `${skill.level}%` }}
+                    initial={{ width: 0 }}
+                    animate={{ width: `${skill.level}%` }}
+                    transition={{ duration: 0.6, ease: APPLE_EASE }}
                   />
                 </div>
 

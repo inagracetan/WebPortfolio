@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { motion } from 'framer-motion'
 import { Modal } from '@/components/ui/Modal'
 import { useGameStore } from '@/hooks/useGameStore'
 import { useSound } from '@/hooks/useSound'
 import { soundEngine } from '@/utilities/audio'
 import { Volume2, VolumeX, Keyboard, Monitor, Cpu, Music } from 'lucide-react'
+import { APPLE_SPRINGS } from '@/styles/motion'
 
 export const SettingsModal: React.FC = () => {
   const {
@@ -71,8 +73,11 @@ export const SettingsModal: React.FC = () => {
               </div>
             </div>
 
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.04 }}
+              whileTap={{ scale: 0.94 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={toggleMute}
               className={`px-3 py-1.5 text-xs font-mono rounded border transition-colors cursor-pointer ${
                 isSoundMuted
@@ -81,7 +86,7 @@ export const SettingsModal: React.FC = () => {
               }`}
             >
               {isSoundMuted ? 'UNMUTE AUDIO' : 'MUTED'}
-            </button>
+            </motion.button>
           </div>
 
           {/* Volume Sliders */}
@@ -185,8 +190,11 @@ export const SettingsModal: React.FC = () => {
           </div>
 
           <div className="grid grid-cols-3 gap-2 pt-1">
-            <button
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => setGraphicsQuality('high')}
               className={`p-2 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
                 graphicsQuality === 'high'
@@ -195,9 +203,12 @@ export const SettingsModal: React.FC = () => {
               }`}
             >
               HIGH FIDELITY
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => setGraphicsQuality('medium')}
               className={`p-2 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
                 graphicsQuality === 'medium'
@@ -206,9 +217,12 @@ export const SettingsModal: React.FC = () => {
               }`}
             >
               BALANCED
-            </button>
-            <button
+            </motion.button>
+            <motion.button
               type="button"
+              whileHover={{ scale: 1.03 }}
+              whileTap={{ scale: 0.96 }}
+              transition={APPLE_SPRINGS.snappy}
               onClick={() => setGraphicsQuality('low')}
               className={`p-2 rounded text-xs font-mono border text-center transition-colors cursor-pointer ${
                 graphicsQuality === 'low'
@@ -217,7 +231,7 @@ export const SettingsModal: React.FC = () => {
               }`}
             >
               ECO / BATTERY
-            </button>
+            </motion.button>
           </div>
         </div>
 
@@ -227,13 +241,16 @@ export const SettingsModal: React.FC = () => {
             <Keyboard className="w-4 h-4 text-electric-blue" />
             <span className="text-xs font-mono text-warm-ivory">Looking for input keybindings?</span>
           </div>
-          <button
+          <motion.button
             type="button"
+            whileHover={{ scale: 1.04 }}
+            whileTap={{ scale: 0.95 }}
+            transition={APPLE_SPRINGS.snappy}
             onClick={() => openModal('CONTROLS')}
-            className="px-3 py-1 bg-sky-blue/15 hover:bg-sky-blue/25 border border-sky-blue/30 text-electric-blue text-xs font-mono rounded cursor-pointer"
+            className="px-3 py-1 bg-sky-blue/15 hover:bg-sky-blue/25 border border-sky-blue/30 text-electric-blue text-xs font-mono rounded cursor-pointer transition-colors"
           >
             VIEW CONTROLS GUIDE
-          </button>
+          </motion.button>
         </div>
 
         {/* System Build Info */}

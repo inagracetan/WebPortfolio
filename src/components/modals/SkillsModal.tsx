@@ -1,7 +1,9 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Modal } from '@/components/ui/Modal'
 import { skillGroupsData } from '@/data/skills'
 import { useGameStore } from '@/hooks/useGameStore'
+import { APPLE_SPRINGS, APPLE_EASE } from '@/styles/motion'
 import {
   Code2,
   Database,
@@ -74,20 +76,31 @@ export const SkillsModal: React.FC = () => {
 
         {/* Domain Filter Pills */}
         <div className="flex flex-wrap items-center gap-1.5 pb-2.5 border-b border-sky-blue/15">
-          {domains.map((domain) => (
-            <button
-              key={domain}
-              type="button"
-              onClick={() => setSelectedDomain(domain)}
-              className={`px-3 py-1 text-xs font-mono rounded transition-all cursor-pointer ${
-                selectedDomain === domain
-                  ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_12px_rgba(0,240,255,0.4)]'
-                  : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
-              }`}
-            >
-              {domain}
-            </button>
-          ))}
+          {domains.map((domain) => {
+            const isSelected = selectedDomain === domain
+            return (
+              <motion.button
+                key={domain}
+                type="button"
+                whileTap={{ scale: 0.95 }}
+                onClick={() => setSelectedDomain(domain)}
+                className={`relative px-3 py-1 text-xs font-mono rounded transition-colors cursor-pointer z-10 ${
+                  isSelected
+                    ? 'text-deep-navy font-bold'
+                    : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
+                }`}
+              >
+                {isSelected && (
+                  <motion.div
+                    layoutId="skills-domain-active-pill"
+                    className="absolute inset-0 bg-electric-blue rounded -z-10 shadow-[0_0_12px_rgba(0,240,255,0.4)]"
+                    transition={APPLE_SPRINGS.pill}
+                  />
+                )}
+                <span>{domain}</span>
+              </motion.button>
+            )
+          })}
         </div>
 
         {/* Verification Note */}
@@ -100,46 +113,55 @@ export const SkillsModal: React.FC = () => {
         </div>
 
         {/* Skill Groups Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {filteredGroups.map((group) => (
-            <div
-              key={group.id}
-              className="p-4 bg-deep-navy/70 border border-sky-blue/20 rounded-sm space-y-3 hover:border-sky-blue/40 transition-colors"
-            >
-              <div className="flex items-center gap-3">
-                <div className="p-2 bg-sky-blue/10 border border-sky-blue/30 rounded">
-                  {getIcon(group.icon)}
-                </div>
-                <div>
-                  <h4 className="font-display font-bold text-base text-warm-ivory flex items-center gap-1.5">
-                    <span>{group.title}</span>
-                  </h4>
-                  <p className="text-xs text-warm-ivory-dim/75 font-sans">
-                    {group.description}
-                  </p>
-                </div>
-              </div>
-
-              <div className="space-y-2 pt-2 border-t border-sky-blue/10">
-                {group.skills.map((skill) => (
-                  <div key={skill.name} className="flex justify-between items-center text-xs font-mono py-0.5">
-                    <span className="text-warm-ivory flex items-center gap-1.5 font-medium">
-                      {skill.name}
-                      {skill.highlight && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
-                      )}
-                    </span>
-                    {skill.tag && (
-                      <span className="text-sky-light text-[10px] bg-sky-blue/10 px-2 py-0.5 rounded border border-sky-blue/20">
-                        {skill.tag}
-                      </span>
-                    )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={selectedDomain}
+            initial={{ opacity: 0, y: 8 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -6 }}
+            transition={{ duration: 0.22, ease: APPLE_EASE }}
+            className="grid grid-cols-1 md:grid-cols-2 gap-4"
+          >
+            {filteredGroups.map((group) => (
+              <div
+                key={group.id}
+                className="p-4 bg-deep-navy/70 border border-sky-blue/20 rounded-sm space-y-3 hover:border-sky-blue/40 transition-all duration-200 hover:-translate-y-0.5 hover:shadow-lg"
+              >
+                <div className="flex items-center gap-3">
+                  <div className="p-2 bg-sky-blue/10 border border-sky-blue/30 rounded">
+                    {getIcon(group.icon)}
                   </div>
-                ))}
+                  <div>
+                    <h4 className="font-display font-bold text-base text-warm-ivory flex items-center gap-1.5">
+                      <span>{group.title}</span>
+                    </h4>
+                    <p className="text-xs text-warm-ivory-dim/75 font-sans">
+                      {group.description}
+                    </p>
+                  </div>
+                </div>
+
+                <div className="space-y-2 pt-2 border-t border-sky-blue/10">
+                  {group.skills.map((skill) => (
+                    <div key={skill.name} className="flex justify-between items-center text-xs font-mono py-0.5">
+                      <span className="text-warm-ivory flex items-center gap-1.5 font-medium">
+                        {skill.name}
+                        {skill.highlight && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
+                        )}
+                      </span>
+                      {skill.tag && (
+                        <span className="text-sky-light text-[10px] bg-sky-blue/10 px-2 py-0.5 rounded border border-sky-blue/20">
+                          {skill.tag}
+                        </span>
+                      )}
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
+            ))}
+          </motion.div>
+        </AnimatePresence>
       </div>
     </Modal>
   )

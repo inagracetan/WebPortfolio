@@ -1,4 +1,5 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Modal } from '@/components/ui/Modal'
 import { useGameStore } from '@/hooks/useGameStore'
 import { contactData } from '@/data/contact'
@@ -6,6 +7,7 @@ import { experienceData } from '@/data/experience'
 import { educationData, seminarsTrainingsData } from '@/data/education'
 import { skillGroupsData } from '@/data/skills'
 import { projectsData } from '@/data/projects'
+import { APPLE_SPRINGS, APPLE_EASE } from '@/styles/motion'
 import {
   Printer,
   Download,
@@ -109,69 +111,100 @@ export const ResumeModal: React.FC = () => {
 
         {/* View Mode Tabs: PDF View vs Interactive Dossier */}
         <div className="flex items-center gap-2 border-b border-sky-blue/20 pb-2">
-          <button
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.95 }}
             onClick={() => setActiveTab('PDF')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-mono rounded transition-all cursor-pointer ${
+            className={`relative flex items-center gap-2 px-4 py-2 text-xs font-mono rounded transition-colors cursor-pointer z-10 ${
               activeTab === 'PDF'
-                ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
+                ? 'text-deep-navy font-bold'
                 : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
             }`}
           >
+            {activeTab === 'PDF' && (
+              <motion.div
+                layoutId="resume-tab-active-pill"
+                className="absolute inset-0 bg-electric-blue rounded -z-10 shadow-[0_0_12px_rgba(0,240,255,0.35)]"
+                transition={APPLE_SPRINGS.pill}
+              />
+            )}
             <FileText className="w-3.5 h-3.5" />
             <span>ORIGINAL PDF VIEW</span>
-          </button>
-          <button
+          </motion.button>
+          <motion.button
             type="button"
+            whileTap={{ scale: 0.95 }}
             onClick={() => setActiveTab('INTERACTIVE')}
-            className={`flex items-center gap-2 px-4 py-2 text-xs font-mono rounded transition-all cursor-pointer ${
+            className={`relative flex items-center gap-2 px-4 py-2 text-xs font-mono rounded transition-colors cursor-pointer z-10 ${
               activeTab === 'INTERACTIVE'
-                ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
+                ? 'text-deep-navy font-bold'
                 : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
             }`}
           >
+            {activeTab === 'INTERACTIVE' && (
+              <motion.div
+                layoutId="resume-tab-active-pill"
+                className="absolute inset-0 bg-electric-blue rounded -z-10 shadow-[0_0_12px_rgba(0,240,255,0.35)]"
+                transition={APPLE_SPRINGS.pill}
+              />
+            )}
             <Award className="w-3.5 h-3.5" />
             <span>INTERACTIVE DOSSIER</span>
-          </button>
+          </motion.button>
         </div>
 
-        {/* TAB 1: Authentic PDF Document View */}
-        {activeTab === 'PDF' && (
-          <div className="space-y-3">
-            <div className="flex items-center justify-between px-2 text-xs font-mono text-warm-ivory-dim">
-              <span className="text-sky-light">Authoritative Document // Tan_IG_CV.pdf (2 Pages)</span>
-              <a
-                href="/Tan_IG_CV.pdf"
-                target="_blank"
-                rel="noreferrer"
-                className="text-electric-blue hover:underline flex items-center gap-1"
-              >
-                <span>Open in Full Tab</span>
-                <ExternalLink className="w-3 h-3" />
-              </a>
-            </div>
+        <AnimatePresence mode="wait">
+          {/* TAB 1: Authentic PDF Document View */}
+          {activeTab === 'PDF' && (
+            <motion.div
+              key="resume-pdf-tab"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22, ease: APPLE_EASE }}
+              className="space-y-3"
+            >
+              <div className="flex items-center justify-between px-2 text-xs font-mono text-warm-ivory-dim">
+                <span className="text-sky-light">Authoritative Document // Tan_IG_CV.pdf (2 Pages)</span>
+                <a
+                  href="/Tan_IG_CV.pdf"
+                  target="_blank"
+                  rel="noreferrer"
+                  className="text-electric-blue hover:underline flex items-center gap-1"
+                >
+                  <span>Open in Full Tab</span>
+                  <ExternalLink className="w-3 h-3" />
+                </a>
+              </div>
 
-            <div className="w-full rounded border border-sky-blue/30 overflow-hidden bg-slate-900 shadow-inner">
-              <iframe
-                src="/Tan_IG_CV.pdf"
-                className="w-full h-[62vh] min-h-[500px]"
-                title="Ina Grace D. Tan - Curriculum Vitae"
-              />
-            </div>
+              <div className="w-full rounded border border-sky-blue/30 overflow-hidden bg-slate-900 shadow-inner">
+                <iframe
+                  src="/Tan_IG_CV.pdf"
+                  className="w-full h-[62vh] min-h-[500px]"
+                  title="Ina Grace D. Tan - Curriculum Vitae"
+                />
+              </div>
 
-            <p className="text-[11px] font-mono text-warm-ivory-dim/70 text-center">
-              Viewing authentic original PDF document. If preview is not supported on your mobile browser, click{' '}
-              <a href="/Tan_IG_CV.pdf" download="Tan_IG_CV.pdf" className="text-electric-blue underline">
-                Download PDF
-              </a>{' '}
-              or switch to the Interactive Dossier tab.
-            </p>
-          </div>
-        )}
+              <p className="text-[11px] font-mono text-warm-ivory-dim/70 text-center">
+                Viewing authentic original PDF document. If preview is not supported on your mobile browser, click{' '}
+                <a href="/Tan_IG_CV.pdf" download="Tan_IG_CV.pdf" className="text-electric-blue underline">
+                  Download PDF
+                </a>{' '}
+                or switch to the Interactive Dossier tab.
+              </p>
+            </motion.div>
+          )}
 
-        {/* TAB 2: Structured Interactive Dossier View */}
-        {activeTab === 'INTERACTIVE' && (
-          <div className="space-y-6 pt-1">
+          {/* TAB 2: Structured Interactive Dossier View */}
+          {activeTab === 'INTERACTIVE' && (
+            <motion.div
+              key="resume-interactive-tab"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              transition={{ duration: 0.22, ease: APPLE_EASE }}
+              className="space-y-6 pt-1"
+            >
             {/* Professional Summary */}
             <div>
               <h4 className="font-mono text-xs text-sky-light font-semibold tracking-wider mb-2 uppercase">
@@ -313,9 +346,10 @@ export const ResumeModal: React.FC = () => {
                 ))}
               </div>
             </div>
-          </div>
+          </motion.div>
         )}
-      </div>
-    </Modal>
+      </AnimatePresence>
+    </div>
+  </Modal>
   )
 }

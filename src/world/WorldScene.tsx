@@ -1,4 +1,4 @@
-import React, { useRef } from 'react'
+import React, { useRef, useState, useEffect } from 'react'
 import { useFrame } from '@react-three/fiber'
 import * as THREE from 'three'
 import { EnvironmentLighting } from './EnvironmentLighting'
@@ -17,11 +17,31 @@ import { InteractiveAnchor } from './environment/InteractiveAnchor'
 import { PlayerAvatar } from '@/characters/PlayerAvatar'
 import { locationsData } from '@/locations/locationsData'
 import { INTERACTIVE_OBJECTS } from '@/interactions/interactiveObjectsData'
+import { gameStore } from '@/hooks/useGameStore'
 
 export const WorldScene: React.FC = () => {
   const worldGroupRef = useRef<THREE.Group>(null)
+  const isFirstRender = useRef(true)
+  const [secondaryLoaded, setSecondaryLoaded] = useState(false)
+
+  // Progressive background loading: mount essential Main Island first,
+  // then hydrate secondary distant islands and connecting paths in background
+  useEffect(() => {
+    // Schedule background hydration after initial paint
+    const timer = setTimeout(() => {
+      setSecondaryLoaded(true)
+      gameStore.setLoadingProgress(100, 'ALL ARCHIPELAGO SECTORS SYNCHRONIZED')
+    }, 60)
+    return () => clearTimeout(timer)
+  }, [])
 
   useFrame((state) => {
+    // Signal essential readiness on the very first rendered frame
+    if (isFirstRender.current) {
+      isFirstRender.current = false
+      gameStore.setEssentialReady(true)
+    }
+
     // Respect system reduced-motion accessibility preference
     const prefersReducedMotion =
       typeof window !== 'undefined' &&
@@ -50,26 +70,31 @@ export const WorldScene: React.FC = () => {
         {/* Island Bedrock & Elevated Terraces */}
         <IslandTerrain />
 
-        {/* Bridges & Inter-Island Connecting Paths */}
-        <ConnectingPaths />
+        {/* Bridges & Inter-Island Connecting Paths (Progressively loaded) */}
+        {secondaryLoaded && <ConnectingPaths />}
 
         {/* ========================================================
             THE 5 EXPLORABLE LOCATIONS
             ======================================================== */}
-        {/* 1. Personal Workspace (Faithfully modeled from 3d.jpeg) */}
+        {/* 1. Essential Main Island (Personal Workspace modeled from 3d.jpeg) */}
         <PersonalWorkspace />
 
-        {/* 2. Project Lab (Creative dev & project showcase) */}
-        <ProjectLab />
+        {/* Secondary Locations (Loaded progressively in background) */}
+        {secondaryLoaded && (
+          <>
+            {/* 2. Project Lab (Creative dev & project showcase) */}
+            <ProjectLab />
 
-        {/* 3. Tech Center (Technology-themed environment for skills) */}
-        <TechCenter />
+            {/* 3. Tech Center (Technology-themed environment for skills) */}
+            <TechCenter />
 
-        {/* 4. University Building (Academic environment for education) */}
-        <UniversityBuilding />
+            {/* 4. University Building (Academic environment for education) */}
+            <UniversityBuilding />
 
-        {/* 5. Contact Station (Welcoming communications lounge & beacon) */}
-        <ContactStation />
+            {/* 5. Contact Station (Welcoming communications lounge & beacon) */}
+            <ContactStation />
+          </>
+        )}
 
         {/* ========================================================
             PLAYABLE 3D CHARACTER AVATAR

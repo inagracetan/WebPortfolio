@@ -6,6 +6,7 @@ import { DESTINATION_WAYPOINTS } from '@/characters/spawnConfig'
 import { useGameStore } from '@/hooks/useGameStore'
 import { locationsData } from '@/locations/locationsData'
 import { soundEngine } from '@/utilities/audio'
+import { APPLE_SPRINGS, APPLE_EASE } from '@/styles/motion'
 
 export const Minimap: React.FC = () => {
   const [isExpanded, setIsExpanded] = useState(true)
@@ -97,6 +98,7 @@ export const Minimap: React.FC = () => {
               initial={{ height: 0, opacity: 0 }}
               animate={{ height: 128, opacity: 1 }}
               exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.28, ease: APPLE_EASE }}
               className="relative w-32 h-32 bg-deep-navy/95 overflow-hidden"
             >
               {/* Radar sweep lines & concentric circles */}
@@ -112,25 +114,28 @@ export const Minimap: React.FC = () => {
                 const nodePos = toMinimap(loc.coordinates[0], loc.coordinates[2])
                 const isSelected = activeLocation.id === loc.id
                 return (
-                  <button
+                  <motion.button
                     key={loc.id}
                     type="button"
                     title={`Teleport to ${loc.name}`}
+                    whileHover={{ scale: 1.25 }}
+                    whileTap={{ scale: 0.88 }}
+                    transition={APPLE_SPRINGS.snappy}
                     onClick={() => handleSelectDestination(loc.id)}
                     style={{
                       left: `${nodePos.x}px`,
                       top: `${nodePos.y}px`,
                       transform: 'translate(-50%, -50%)',
                     }}
-                    className={`absolute rounded-full border flex items-center justify-center transition-transform hover:scale-125 cursor-pointer ${
-                      isSelected ? 'w-4 h-4 border-electric-blue shadow-[0_0_8px_rgba(0,240,255,0.8)] scale-110' : 'w-3.5 h-3.5 border-sky-blue/40'
+                    className={`absolute rounded-full border flex items-center justify-center cursor-pointer ${
+                      isSelected ? 'w-4 h-4 border-electric-blue shadow-[0_0_8px_rgba(0,240,255,0.8)]' : 'w-3.5 h-3.5 border-sky-blue/40'
                     }`}
                   >
                     <span
                       className="w-2 h-2 rounded-full"
                       style={{ backgroundColor: loc.color }}
                     />
-                  </button>
+                  </motion.button>
                 )
               })}
 

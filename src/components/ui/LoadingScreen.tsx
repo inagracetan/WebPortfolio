@@ -1,6 +1,6 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect, useState, useRef } from 'react'
 import { motion } from 'framer-motion'
-import { soundEngine } from '@/utilities/audio'
+import { useGameStore, gameStore } from '@/hooks/useGameStore'
 
 interface LoadingScreenProps {
   onComplete: () => void
@@ -16,31 +16,53 @@ const BOOT_LOGS = [
 ]
 
 export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
-  const [progress, setProgress] = useState(0)
+  const { isEssentialReady, loadingProgress, loadingStage } = useGameStore()
+  const [displayProgress, setDisplayProgress] = useState(15)
+  const hasCompleted = useRef(false)
+
+  // Smoothly lerp displayed progress toward real store progress
+  useEffect(() => {
+    const target = isEssentialReady ? 100 : loadingProgress
+    const interval = setInterval(() => {
+      setDisplayProgress((prev) => {
+        if (prev < target) {
+          return Math.min(target, prev + Math.max(2, Math.ceil((target - prev) * 0.25)))
+        }
+        return prev
+      })
+    }, 30)
+
+    return () => clearInterval(interval)
+  }, [loadingProgress, isEssentialReady])
+
+  // Complete and enter as soon as essential world is ready
+  useEffect(() => {
+    if ((isEssentialReady || displayProgress >= 100) && !hasCompleted.current) {
+      hasCompleted.current = true
+      const timer = setTimeout(() => {
+        onComplete()
+      }, 200)
+      return () => clearTimeout(timer)
+    }
+  }, [isEssentialReady, displayProgress, onComplete])
+
+  // Failsafe watchdog timer: ensure loading never stalls indefinitely on low-tier or restricted hardware
+  useEffect(() => {
+    const failsafe = setTimeout(() => {
+      if (!hasCompleted.current) {
+        hasCompleted.current = true
+        gameStore.setEssentialReady(true)
+        onComplete()
+      }
+    }, 2200)
+
+    return () => clearTimeout(failsafe)
+  }, [onComplete])
+
   const logIndex = Math.min(
-    Math.floor((progress / 100) * BOOT_LOGS.length),
+    Math.floor((displayProgress / 100) * BOOT_LOGS.length),
     BOOT_LOGS.length - 1
   )
-
-  useEffect(() => {
-    const timer = setInterval(() => {
-      setProgress((prev) => {
-        if (prev >= 100) {
-          clearInterval(timer)
-          setTimeout(() => {
-            soundEngine.playEnter()
-            onComplete()
-          }, 350)
-          return 100
-        }
-        const step = Math.floor(Math.random() * 12) + 6
-        const next = Math.min(prev + step, 100)
-        return next
-      })
-    }, 110)
-
-    return () => clearInterval(timer)
-  }, [onComplete])
 
 
 
@@ -114,13 +136,13 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
         {/* Progress Bar Container */}
         <div className="w-full max-w-xs mb-3">
           <div className="flex justify-between items-center text-xs font-mono mb-2 text-sky-light">
-            <span className="break-words pr-2">{BOOT_LOGS[logIndex]}</span>
-            <span className="font-bold text-electric-blue">{progress}%</span>
+            <span className="break-words pr-2 truncate">{loadingStage || BOOT_LOGS[logIndex]}</span>
+            <span className="font-bold text-electric-blue">{displayProgress}%</span>
           </div>
 
           <div
             role="progressbar"
-            aria-valuenow={progress}
+            aria-valuenow={displayProgress}
             aria-valuemin={0}
             aria-valuemax={100}
             aria-label="Portfolio asset and world loading progress"
@@ -128,7 +150,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
           >
             <motion.div
               className="h-full bg-gradient-to-r from-sky-blue to-electric-blue rounded-full shadow-[0_0_10px_rgba(0,240,255,0.7)]"
-              style={{ width: `${progress}%` }}
+              style={{ width: `${displayProgress}%` }}
               transition={{ ease: 'easeOut' }}
             />
           </div>
@@ -136,7 +158,7 @@ export const LoadingScreen: React.FC<LoadingScreenProps> = ({ onComplete }) => {
 
         {/* Status Prompt */}
         <div className="font-mono text-[11px] text-warm-ivory-dim/60 tracking-wider">
-          {progress === 100 ? 'INITIALIZATION COMPLETE' : 'CALIBRATING FLOATING ISLANDS'}
+          {displayProgress >= 100 ? 'INITIALIZATION COMPLETE' : 'CALIBRATING FLOATING ARCHIPELAGO'}
         </div>
       </div>
     </motion.div>

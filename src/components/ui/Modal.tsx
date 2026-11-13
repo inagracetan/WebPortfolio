@@ -2,6 +2,7 @@ import React, { useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { Terminal, ShieldCheck } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
+import { modalBackdropVariants, modalChassisVariants } from '@/styles/motion'
 
 export interface ModalProps {
   isOpen: boolean
@@ -59,18 +60,18 @@ export const Modal: React.FC<ModalProps> = ({
   return (
     <AnimatePresence>
       {isOpen && (
-        <div
+        <motion.div
           role="dialog"
           aria-modal="true"
           aria-labelledby="modal-title"
+          initial="hidden"
+          animate="visible"
+          exit="exit"
           className="fixed inset-0 z-50 flex items-center justify-center p-2.5 sm:p-5 overflow-y-auto select-none"
         >
           {/* Backdrop with dark CRT vignette */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
+            variants={modalBackdropVariants}
             onClick={onClose}
             className="fixed inset-0 bg-deep-navy/85 backdrop-blur-md"
             aria-hidden="true"
@@ -78,13 +79,14 @@ export const Modal: React.FC<ModalProps> = ({
 
           {/* Retro Computer Window Chassis */}
           <motion.div
-            initial={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 10 }}
-            animate={prefersReducedMotion ? { opacity: 1 } : { opacity: 1, scale: 1, y: 0 }}
-            exit={prefersReducedMotion ? { opacity: 0 } : { opacity: 0, scale: 0.96, y: 8 }}
-            transition={
+            variants={
               prefersReducedMotion
-                ? { duration: 0.12 }
-                : { type: 'spring', damping: 28, stiffness: 380 }
+                ? {
+                    hidden: { opacity: 0 },
+                    visible: { opacity: 1 },
+                    exit: { opacity: 0 },
+                  }
+                : modalChassisVariants
             }
             className={`relative w-full ${maxWidthClass} z-10 bg-[#0a0e17] border border-sky-blue/35 rounded-xs shadow-[0_25px_60px_rgba(0,0,0,0.95),0_0_20px_rgba(0,240,255,0.12)] overflow-hidden flex flex-col max-h-[94vh] sm:max-h-[90vh]`}
           >
@@ -163,7 +165,7 @@ export const Modal: React.FC<ModalProps> = ({
               </span>
             </div>
           </motion.div>
-        </div>
+        </motion.div>
       )}
     </AnimatePresence>
   )

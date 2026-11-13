@@ -19,7 +19,6 @@ import {
   ArrowUp,
   Sparkles,
   Layers,
-  Send,
   ShieldCheck,
   Palette,
   Maximize2,
@@ -37,6 +36,8 @@ import { multimediaData, type MultimediaCategory, type MultimediaItem } from '@/
 import { CredlyBadge } from './CredlyBadge'
 import { TechLogo } from './TechLogo'
 import { DirectPortfolioNav } from './DirectPortfolioNav'
+import { TransmissionForm } from './TransmissionForm'
+import { APPLE_SPRINGS } from '@/styles/motion'
 
 // Helper for category-appropriate project simulation icons
 const getProjectDemoIcon = (project: { category: string }) => {
@@ -90,13 +91,11 @@ export const DirectPortfolioView: React.FC = () => {
   const [activeSection, setActiveSection] = useState<string>('home')
   const [multimediaFilter, setMultimediaFilter] = useState<'All Works' | MultimediaCategory>('All Works')
   const [selectedMedia, setSelectedMedia] = useState<MultimediaItem | null>(null)
-  const [formSent, setFormSent] = useState(false)
-  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const parallaxGlowRef = useRef<HTMLDivElement>(null)
   const parallaxGridRef = useRef<HTMLDivElement>(null)
 
-  // Single lightweight IntersectionObserver for panel and card entrance transitions (GPU-accelerated, runs once)
+  // Single lightweight IntersectionObserver for panel and card entrance transitions (GPU-accelerated, runs once per element)
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
@@ -109,20 +108,24 @@ export const DirectPortfolioView: React.FC = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-revealed')
-            observer.unobserve(entry.target) // Unobserve immediately: zero continuous overhead!
+            observer.unobserve(entry.target) // Unobserve immediately: once revealed, stays revealed permanently
           }
         })
       },
       {
         root: container,
-        rootMargin: '0px 0px -40px 0px',
-        threshold: 0.08,
+        rootMargin: '0px 0px -30px 0px',
+        threshold: 0.05,
       }
     )
 
-    elements.forEach((el) => observer.observe(el))
+    elements.forEach((el) => {
+      if (el.classList.contains('is-revealed')) return
+      observer.observe(el)
+    })
+
     return () => observer.disconnect()
-  }, [])
+  }, [multimediaFilter])
 
   // IntersectionObserver for scroll-spy activeSection (zero layout thrashing)
   useEffect(() => {
@@ -155,14 +158,15 @@ export const DirectPortfolioView: React.FC = () => {
     return () => observer.disconnect()
   }, [])
 
-  // Apple-Inspired Subtle Parallax Background (RAF-throttled, GPU compositor only)
+  // Apple-Inspired Subtle Parallax Background (RAF-throttled, GPU compositor only, skipped on mobile)
   useEffect(() => {
     const container = scrollContainerRef.current
     const glowEl = parallaxGlowRef.current
     const gridEl = parallaxGridRef.current
     if (!container || !glowEl || !gridEl) return
 
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || isMobile) {
       return
     }
 
@@ -216,11 +220,19 @@ export const DirectPortfolioView: React.FC = () => {
       ? multimediaData
       : multimediaData.filter((m) => m.category === multimediaFilter)
 
+  const activeScrollRaf = useRef<number | null>(null)
+
   // Apple-inspired smooth scroll with quintic ease-out physics and sticky offset
   const scrollToSection = (id: string) => {
     const container = scrollContainerRef.current
     const el = document.getElementById(id)
     if (!container || !el) return
+
+    // Cancel any in-flight navigation scroll immediately to prevent fighting loops
+    if (activeScrollRaf.current !== null) {
+      cancelAnimationFrame(activeScrollRaf.current)
+      activeScrollRaf.current = null
+    }
 
     const containerRect = container.getBoundingClientRect()
     const elRect = el.getBoundingClientRect()
@@ -242,14 +254,13 @@ export const DirectPortfolioView: React.FC = () => {
     const distance = targetTop - startTop
     if (Math.abs(distance) < 2) return
 
-    // Dynamic duration based on travel distance: short glides (~450ms), long traversals (~750ms)
-    const duration = Math.min(750, Math.max(450, Math.abs(distance) * 0.35))
+    // Dynamic duration based on travel distance: short glides (~380ms), long traversals (~650ms)
+    const duration = Math.min(650, Math.max(380, Math.abs(distance) * 0.3))
     const startTime = performance.now()
 
     // Apple quintic ease-out: brisk initial movement, prolonged silky deceleration
     const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5)
 
-    let animId: number
     const animateScroll = (currentTime: number) => {
       const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
@@ -258,29 +269,25 @@ export const DirectPortfolioView: React.FC = () => {
       container.scrollTop = startTop + distance * eased
 
       if (progress < 1) {
-        animId = requestAnimationFrame(animateScroll)
+        activeScrollRaf.current = requestAnimationFrame(animateScroll)
+      } else {
+        activeScrollRaf.current = null
       }
     }
 
-    animId = requestAnimationFrame(animateScroll)
+    activeScrollRaf.current = requestAnimationFrame(animateScroll)
 
     // Cancel animation gracefully if user intervenes with mousewheel or touch
     const cancelScroll = () => {
-      cancelAnimationFrame(animId)
+      if (activeScrollRaf.current !== null) {
+        cancelAnimationFrame(activeScrollRaf.current)
+        activeScrollRaf.current = null
+      }
       container.removeEventListener('wheel', cancelScroll)
       container.removeEventListener('touchstart', cancelScroll)
     }
     container.addEventListener('wheel', cancelScroll, { passive: true, once: true })
     container.addEventListener('touchstart', cancelScroll, { passive: true, once: true })
-  }
-
-  const handleFormSubmit = (e: React.FormEvent) => {
-    e.preventDefault()
-    setFormSent(true)
-    setTimeout(() => {
-      setFormData({ name: '', email: '', message: '' })
-      setFormSent(false)
-    }, 4500)
   }
 
   return (
@@ -412,13 +419,17 @@ export const DirectPortfolioView: React.FC = () => {
                 <div className="relative group w-44 h-44 sm:w-48 sm:h-48 flex-shrink-0">
                   <div className="relative w-full h-full rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 via-sky-400 to-electric-blue shadow-[0_0_30px_rgba(0,240,255,0.35)] transition-all group-hover:shadow-[0_0_45px_rgba(0,240,255,0.6)]">
                     <div className="w-full h-full rounded-[14px] overflow-hidden bg-deep-navy border border-electric-blue/50">
-                      <img
-                        src="/profile.jpg"
-                        alt="Ina Grace Tan — Candidate Portrait"
-                        width={200}
-                        height={200}
-                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                      />
+                      <picture>
+                        <source srcSet="/profile.webp" type="image/webp" />
+                        <img
+                          src="/profile.jpg"
+                          alt="Ina Grace Tan — Candidate Portrait"
+                          width={200}
+                          height={200}
+                          decoding="async"
+                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                        />
+                      </picture>
                     </div>
                     {/* Status Pill Badge */}
                     <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-deep-navy-card/95 border border-electric-blue/60 font-mono text-[10px] text-electric-blue font-bold tracking-wider shadow-lg whitespace-nowrap flex items-center gap-1.5">
@@ -1247,20 +1258,31 @@ export const DirectPortfolioView: React.FC = () => {
 
               {/* Category Filter Pills (Only categories with actual uploaded works) */}
               <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs">
-                {availableCategories.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setMultimediaFilter(cat)}
-                    className={`px-3 py-1.5 rounded-full transition-all cursor-pointer active:scale-95 ${
-                      multimediaFilter === cat
-                        ? 'bg-cyber-yellow text-deep-navy font-bold shadow-[0_0_12px_rgba(255,215,0,0.4)]'
-                        : 'bg-deep-navy/80 border border-sky-blue/20 text-warm-ivory-dim hover:text-warm-ivory hover:border-sky-blue'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
+                {availableCategories.map((cat) => {
+                  const isActive = multimediaFilter === cat
+                  return (
+                    <motion.button
+                      key={cat}
+                      type="button"
+                      whileTap={{ scale: 0.95 }}
+                      onClick={() => setMultimediaFilter(cat)}
+                      className={`relative px-3 py-1.5 rounded-full transition-colors cursor-pointer z-10 ${
+                        isActive
+                          ? 'text-deep-navy font-bold'
+                          : 'bg-deep-navy/80 border border-sky-blue/20 text-warm-ivory-dim hover:text-warm-ivory hover:border-sky-blue'
+                      }`}
+                    >
+                      {isActive && (
+                        <motion.div
+                          layoutId="media-filter-active-pill"
+                          className="absolute inset-0 bg-cyber-yellow rounded-full -z-10 shadow-[0_0_14px_rgba(255,215,0,0.45)]"
+                          transition={APPLE_SPRINGS.pill}
+                        />
+                      )}
+                      <span>{cat}</span>
+                    </motion.button>
+                  )
+                })}
               </div>
             </div>
           </div>
@@ -1292,9 +1314,15 @@ export const DirectPortfolioView: React.FC = () => {
                     >
                       <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden">
                         <img
-                          src={item.mediaUrl}
+                          src={item.thumbnailUrl || item.mediaUrl}
                           alt={item.title}
                           loading="lazy"
+                          decoding="async"
+                          onError={(e) => {
+                            if (item.fallbackUrl && e.currentTarget.src !== item.fallbackUrl) {
+                              e.currentTarget.src = item.fallbackUrl
+                            }
+                          }}
                           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img:scale-105"
                         />
                       </div>
@@ -1466,76 +1494,15 @@ export const DirectPortfolioView: React.FC = () => {
 
             {/* Quick Interactive Message Form */}
             <div className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
-              <h3 className="font-display font-bold text-lg text-warm-ivory">
-                SEND DIRECT TRANSMISSION
-              </h3>
-
-              {formSent ? (
-                <div className="p-6 rounded-lg bg-muted-green/20 border border-muted-green text-center space-y-2">
-                  <CheckCircle2 className="w-8 h-8 text-muted-green-light mx-auto" />
-                  <div className="font-mono font-bold text-sm text-warm-ivory">
-                    TRANSMISSION RECEIVED
-                  </div>
-                  <p className="font-sans text-xs text-warm-ivory-dim">
-                    Thank you for reaching out. Ina Grace Tan will review your message shortly.
-                  </p>
-                </div>
-              ) : (
-                <form onSubmit={handleFormSubmit} className="space-y-4 font-mono text-xs">
-                  <div className="space-y-1">
-                    <label htmlFor="name" className="block text-sky-light">
-                      YOUR NAME
-                    </label>
-                    <input
-                      id="name"
-                      type="text"
-                      required
-                      value={formData.name}
-                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                      placeholder="e.g. Jane Doe"
-                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label htmlFor="email" className="block text-sky-light">
-                      YOUR EMAIL
-                    </label>
-                    <input
-                      id="email"
-                      type="email"
-                      required
-                      value={formData.email}
-                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                      placeholder="e.g. recruiter@company.com"
-                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors"
-                    />
-                  </div>
-
-                  <div className="space-y-1">
-                    <label htmlFor="message" className="block text-sky-light">
-                      MESSAGE / INQUIRY
-                    </label>
-                    <textarea
-                      id="message"
-                      rows={4}
-                      required
-                      value={formData.message}
-                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                      placeholder="Detail your inquiry or interview invitation here"
-                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none resize-none transition-colors"
-                    />
-                  </div>
-
-                  <button
-                    type="submit"
-                    className="w-full py-2.5 rounded bg-electric-blue hover:bg-white text-deep-navy font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
-                  >
-                    <Send className="w-4 h-4" />
-                    <span>SEND TRANSMISSION</span>
-                  </button>
-                </form>
-              )}
+              <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
+                <h3 className="font-display font-bold text-lg text-warm-ivory">
+                  SEND DIRECT TRANSMISSION
+                </h3>
+                <span className="font-mono text-[10px] text-electric-blue uppercase tracking-widest px-2 py-0.5 rounded bg-electric-blue/10 border border-electric-blue/30">
+                  ONLINE RELAY
+                </span>
+              </div>
+              <TransmissionForm />
             </div>
           </div>
         </section>
@@ -1592,6 +1559,12 @@ export const DirectPortfolioView: React.FC = () => {
                   <img
                     src={selectedMedia.mediaUrl}
                     alt={selectedMedia.title}
+                    decoding="async"
+                    onError={(e) => {
+                      if (selectedMedia.fallbackUrl && e.currentTarget.src !== selectedMedia.fallbackUrl) {
+                        e.currentTarget.src = selectedMedia.fallbackUrl
+                      }
+                    }}
                     className="max-h-[65vh] w-auto max-w-full rounded object-contain shadow-2xl border border-sky-blue/20"
                   />
                 </div>

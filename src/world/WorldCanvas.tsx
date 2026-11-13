@@ -2,10 +2,11 @@ import React, { Suspense, useMemo } from 'react'
 import { Canvas } from '@react-three/fiber'
 import { WorldScene } from './WorldScene'
 import { CameraRig } from './CameraRig'
-import { useGameStore } from '@/hooks/useGameStore'
+import { useGameStore, gameStore } from '@/hooks/useGameStore'
 
 export const WorldCanvas: React.FC = () => {
-  const { graphicsQuality } = useGameStore()
+  const { graphicsQuality, currentScreen } = useGameStore()
+  const isDirectPortfolio = currentScreen === 'DIRECT_PORTFOLIO'
 
   // Adaptive device pixel ratio:
   // - High: capped at 2.0 (crisp high-DPI desktop/iPad)
@@ -17,6 +18,7 @@ export const WorldCanvas: React.FC = () => {
   return (
     <div className="absolute inset-0 w-full h-full pointer-events-auto">
       <Canvas
+        frameloop={isDirectPortfolio ? 'never' : 'always'}
         shadows={graphicsQuality === 'high'}
         dpr={dpr}
         camera={{ position: [12, 10, 12], fov: 42 }}
@@ -24,6 +26,9 @@ export const WorldCanvas: React.FC = () => {
           antialias: graphicsQuality === 'high',
           alpha: true,
           powerPreference: graphicsQuality === 'high' ? 'high-performance' : 'default',
+        }}
+        onCreated={() => {
+          gameStore.setLoadingProgress(50, 'WEBGL PIPELINE INITIALIZED')
         }}
         className="w-full h-full"
       >

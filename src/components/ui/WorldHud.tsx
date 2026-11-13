@@ -3,6 +3,7 @@ import { motion, AnimatePresence } from 'framer-motion'
 import { Compass, Info, Camera, RefreshCcw, Sparkles } from 'lucide-react'
 import { useGameStore, type ActiveModal } from '@/hooks/useGameStore'
 import { characterStore, useCharacterStore } from '@/characters/useCharacterStore'
+import { APPLE_SPRINGS } from '@/styles/motion'
 
 export const WorldHud: React.FC = () => {
   const {
@@ -97,38 +98,47 @@ export const WorldHud: React.FC = () => {
 
             {/* Actions: View Details, Camera, Respawn */}
             <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-              <button
+              <motion.button
                 type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.94 }}
+                transition={APPLE_SPRINGS.snappy}
                 onClick={handleInspectLocation}
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-bold text-xs transition-all cursor-pointer shadow-sm active:scale-95 min-h-[38px] min-w-[38px] justify-center"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-electric-blue/15 hover:bg-electric-blue text-electric-blue hover:text-deep-navy border border-electric-blue/40 rounded-full font-bold text-xs transition-colors cursor-pointer shadow-sm min-h-[38px] min-w-[38px] justify-center"
                 title={`View ${activeLocation.name} portfolio details`}
                 aria-label="View Location Details"
               >
                 <Info className="w-4 h-4" />
                 <span className="hidden md:inline">DETAILS</span>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
                 type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.94 }}
+                transition={APPLE_SPRINGS.snappy}
                 onClick={toggleCameraMode}
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-sky-blue text-warm-ivory-dim hover:text-warm-ivory rounded-full text-xs transition-colors cursor-pointer active:scale-95 min-h-[38px] min-w-[38px] justify-center"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-sky-blue text-warm-ivory-dim hover:text-warm-ivory rounded-full text-xs transition-colors cursor-pointer min-h-[38px] min-w-[38px] justify-center"
                 title={cameraMode === 'FOLLOW' ? 'Switch to Free Orbit camera' : 'Switch to Follow camera'}
                 aria-label={cameraMode === 'FOLLOW' ? 'Camera Mode: Follow' : 'Camera Mode: Orbit'}
               >
                 <Camera className={`w-4 h-4 ${cameraMode === 'FOLLOW' ? 'text-electric-blue' : 'text-warm-ivory-dim'}`} />
                 <span className="hidden md:inline">{cameraMode === 'FOLLOW' ? 'FOLLOW' : 'ORBIT'}</span>
-              </button>
+              </motion.button>
 
-              <button
+              <motion.button
                 type="button"
+                whileHover={{ scale: 1.05 }}
+                whileTap={{ scale: 0.94 }}
+                transition={APPLE_SPRINGS.snappy}
                 onClick={handleRespawn}
-                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full text-xs transition-colors cursor-pointer active:scale-95 min-h-[38px] min-w-[38px] justify-center"
+                className="flex items-center gap-1 px-2.5 py-1.5 sm:px-3 sm:py-1.5 bg-deep-navy/80 hover:bg-deep-navy border border-sky-blue/20 hover:border-electric-blue text-warm-ivory-dim hover:text-electric-blue rounded-full text-xs transition-colors cursor-pointer min-h-[38px] min-w-[38px] justify-center"
                 title="Respawn avatar at Main Island spawn point"
                 aria-label="Respawn Character on Main Island"
               >
                 <RefreshCcw className="w-4 h-4" />
                 <span className="hidden md:inline">RESPAWN</span>
-              </button>
+              </motion.button>
             </div>
           </motion.div>
         </div>

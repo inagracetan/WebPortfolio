@@ -1,9 +1,11 @@
 import React, { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { Modal } from '@/components/ui/Modal'
 import { experienceData } from '@/data/experience'
 import { educationData, seminarsTrainingsData } from '@/data/education'
 import { useGameStore } from '@/hooks/useGameStore'
 import { Briefcase, GraduationCap, MapPin, Calendar, CheckCircle2, Info, BookOpen, Award } from 'lucide-react'
+import { APPLE_SPRINGS, APPLE_EASE } from '@/styles/motion'
 
 export const ExperienceModal: React.FC = () => {
   const { activeModal, closeModal } = useGameStore()
@@ -21,47 +23,79 @@ export const ExperienceModal: React.FC = () => {
     >
       {/* Tab Switcher */}
       <div className="flex flex-wrap items-center gap-2 pb-3 border-b border-sky-blue/15">
-        <button
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={() => setActiveTab('EXPERIENCE')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
+          className={`relative flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-colors cursor-pointer z-10 ${
             activeTab === 'EXPERIENCE'
-              ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
+              ? 'text-deep-navy font-bold'
               : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
           }`}
         >
+          {activeTab === 'EXPERIENCE' && (
+            <motion.div
+              layoutId="experience-tab-active-pill"
+              className="absolute inset-0 bg-electric-blue rounded -z-10 shadow-[0_0_12px_rgba(0,240,255,0.35)]"
+              transition={APPLE_SPRINGS.pill}
+            />
+          )}
           <Briefcase className="w-3.5 h-3.5" />
           <span>WORK EXPERIENCE</span>
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={() => setActiveTab('EDUCATION')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
+          className={`relative flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-colors cursor-pointer z-10 ${
             activeTab === 'EDUCATION'
-              ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
+              ? 'text-deep-navy font-bold'
               : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
           }`}
         >
+          {activeTab === 'EDUCATION' && (
+            <motion.div
+              layoutId="experience-tab-active-pill"
+              className="absolute inset-0 bg-electric-blue rounded -z-10 shadow-[0_0_12px_rgba(0,240,255,0.35)]"
+              transition={APPLE_SPRINGS.pill}
+            />
+          )}
           <GraduationCap className="w-3.5 h-3.5" />
           <span>EDUCATION &amp; COURSEWORK</span>
-        </button>
-        <button
+        </motion.button>
+        <motion.button
           type="button"
+          whileTap={{ scale: 0.95 }}
           onClick={() => setActiveTab('SEMINARS')}
-          className={`flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-all cursor-pointer ${
+          className={`relative flex items-center gap-2 px-3.5 py-1.5 text-xs font-mono rounded transition-colors cursor-pointer z-10 ${
             activeTab === 'SEMINARS'
-              ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_10px_rgba(0,240,255,0.3)]'
+              ? 'text-deep-navy font-bold'
               : 'bg-deep-navy/60 text-warm-ivory-dim hover:text-warm-ivory hover:bg-deep-navy border border-sky-blue/20'
           }`}
         >
+          {activeTab === 'SEMINARS' && (
+            <motion.div
+              layoutId="experience-tab-active-pill"
+              className="absolute inset-0 bg-electric-blue rounded -z-10 shadow-[0_0_12px_rgba(0,240,255,0.35)]"
+              transition={APPLE_SPRINGS.pill}
+            />
+          )}
           <Award className="w-3.5 h-3.5" />
           <span>SEMINARS &amp; TRAININGS</span>
-        </button>
+        </motion.button>
       </div>
 
       {/* Content */}
-      <div className="space-y-6 pt-2">
-        {activeTab === 'EXPERIENCE' && (
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={activeTab}
+          initial={{ opacity: 0, y: 8 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -6 }}
+          transition={{ duration: 0.22, ease: APPLE_EASE }}
+          className="space-y-6 pt-2"
+        >
+          {activeTab === 'EXPERIENCE' && (
           <div className="space-y-4">
             <div className="p-3 bg-deep-navy/80 border border-sky-blue/20 rounded-sm flex items-start gap-2.5 text-xs text-sky-light">
               <Info className="w-4 h-4 text-electric-blue flex-shrink-0 mt-0.5" />
@@ -228,7 +262,8 @@ export const ExperienceModal: React.FC = () => {
             </div>
           </div>
         )}
-      </div>
-    </Modal>
+      </motion.div>
+    </AnimatePresence>
+  </Modal>
   )
 }

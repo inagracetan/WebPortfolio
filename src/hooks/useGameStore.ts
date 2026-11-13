@@ -29,6 +29,9 @@ interface GameState {
   hasEnteredWorld: boolean
   graphicsQuality: GraphicsQuality
   isUiModalOpen: boolean
+  isEssentialReady: boolean
+  loadingProgress: number
+  loadingStage: string
 }
 
 type Listener = (state: GameState) => void
@@ -52,6 +55,9 @@ let state: GameState = {
   hasEnteredWorld: false,
   graphicsQuality: detectDefaultGraphics(),
   isUiModalOpen: false,
+  isEssentialReady: false,
+  loadingProgress: 15,
+  loadingStage: 'INITIALIZING INA.EXE KERNEL',
 }
 
 const listeners = new Set<Listener>()
@@ -62,6 +68,23 @@ function notify() {
 
 export const gameStore = {
   getState: () => state,
+  setLoadingProgress: (progress: number, stage?: string) => {
+    state = {
+      ...state,
+      loadingProgress: Math.min(100, Math.max(state.loadingProgress, progress)),
+      loadingStage: stage || state.loadingStage,
+    }
+    notify()
+  },
+  setEssentialReady: (ready: boolean) => {
+    state = {
+      ...state,
+      isEssentialReady: ready,
+      loadingProgress: ready ? 100 : state.loadingProgress,
+      loadingStage: ready ? 'ESSENTIAL ASSETS READY' : state.loadingStage,
+    }
+    notify()
+  },
   setScreen: (screen: AppScreen) => {
     state = { ...state, currentScreen: screen }
     if (screen === 'WORLD') {
