@@ -1,3 +1,8 @@
+export interface TechStackGroup {
+  category: string
+  items: string[]
+}
+
 export interface Project {
   id: string
   title: string
@@ -8,6 +13,7 @@ export interface Project {
   metrics?: string
   role: string
   techStack: string[]
+  techStackGrouped?: TechStackGroup[]
   links: {
     github?: string
     demo?: string
@@ -16,8 +22,12 @@ export interface Project {
   featured: boolean
   locationId: string
   previewImage?: string
+  previewScreenshot?: string
+  logo?: string
   statusBadge?: string
   isCapstone?: boolean
+  isPersonalProject?: boolean
+  isDocumentationOnly?: boolean
   documentationNotes?: string
 }
 
