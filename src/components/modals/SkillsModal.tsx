@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { skillGroupsData } from '@/data/skills'
 import { useGameStore } from '@/hooks/useGameStore'
+import { TechLogo } from '@/components/portfolio/TechLogo'
 import {
   Code2,
   Database,
@@ -123,14 +124,19 @@ export const SkillsModal: React.FC = () => {
               <div className="space-y-2 pt-2 border-t border-sky-blue/10">
                 {group.skills.map((skill) => (
                   <div key={skill.name} className="flex justify-between items-center text-xs font-mono py-0.5">
-                    <span className="text-warm-ivory flex items-center gap-1.5 font-medium">
-                      {skill.name}
-                      {skill.highlight && (
-                        <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
-                      )}
-                    </span>
+                    <div className="flex items-center gap-2.5 min-w-0">
+                      <div className="p-1 rounded bg-deep-navy flex-shrink-0">
+                        <TechLogo name={skill.logo || skill.name} className="w-4 h-4" />
+                      </div>
+                      <span className="text-warm-ivory flex items-center gap-1.5 font-medium">
+                        {skill.name}
+                        {skill.highlight && (
+                          <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
+                        )}
+                      </span>
+                    </div>
                     {skill.tag && (
-                      <span className="text-sky-light text-[10px] bg-sky-blue/10 px-2 py-0.5 rounded border border-sky-blue/20">
+                      <span className="text-sky-light text-[10px] bg-sky-blue/10 px-2 py-0.5 rounded border border-sky-blue/20 flex-shrink-0">
                         {skill.tag}
                       </span>
                     )}

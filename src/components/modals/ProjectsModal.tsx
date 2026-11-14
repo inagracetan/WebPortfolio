@@ -1,9 +1,25 @@
 import React, { useState } from 'react'
-import { ExternalLink, GitBranch, Sparkles, CheckCircle2, Info, FolderGit2 } from 'lucide-react'
+import { ExternalLink, Sparkles, CheckCircle2, Info, FolderGit2 } from 'lucide-react'
 import { Modal } from '@/components/ui/Modal'
 import { projectsData } from '@/data/projects'
 import type { Project } from '@/data/types'
 import { useGameStore } from '@/hooks/useGameStore'
+
+// Official GitHub icon component matching DirectPortfolioView
+const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    aria-hidden="true"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+    />
+  </svg>
+)
 
 export const ProjectsModal: React.FC = () => {
   const { activeModal, closeModal, selectedProjectId } = useGameStore()
@@ -65,11 +81,21 @@ export const ProjectsModal: React.FC = () => {
                 }`}
               >
                 <div className="flex items-center justify-between gap-2 mb-1">
-                  <span className="font-display font-bold text-sm text-warm-ivory">
-                    {proj.title}
-                  </span>
+                  <div className="flex items-center gap-2 min-w-0">
+                    {proj.logo && (
+                      <img
+                        src={proj.logo}
+                        alt=""
+                        className="w-5 h-5 object-contain flex-shrink-0 rounded bg-deep-navy/80 p-0.5 border border-sky-blue/20"
+                        draggable={false}
+                      />
+                    )}
+                    <span className="font-display font-bold text-sm text-warm-ivory truncate">
+                      {proj.title}
+                    </span>
+                  </div>
                   {proj.statusBadge && (
-                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-electric-blue/15 text-electric-blue border border-electric-blue/30 whitespace-nowrap">
+                    <span className="text-[9px] font-mono px-1.5 py-0.5 rounded bg-electric-blue/15 text-electric-blue border border-electric-blue/30 whitespace-nowrap flex-shrink-0">
                       {proj.statusBadge.split(' // ')[0]}
                     </span>
                   )}
@@ -94,6 +120,47 @@ export const ProjectsModal: React.FC = () => {
 
         {/* Project Deep Dive (Right) */}
         <div className="lg:col-span-7 bg-deep-navy/70 border border-sky-blue/20 rounded-sm p-5 space-y-4">
+          {/* Screenshot / Preview Container Above Title */}
+          {(activeProject.previewScreenshot || activeProject.logo) && (
+            <div className="relative w-full aspect-[2/1] rounded overflow-hidden border border-sky-blue/25 bg-deep-navy shadow-inner group/preview">
+              {activeProject.previewScreenshot ? (
+                <>
+                  <img
+                    src={activeProject.previewScreenshot}
+                    alt={`${activeProject.title} preview`}
+                    className="w-full h-full object-cover object-top transition-transform duration-500 group-hover/preview:scale-[1.03]"
+                    draggable={false}
+                  />
+                  <div className="absolute bottom-0 left-0 right-0 h-10 bg-gradient-to-t from-deep-navy/90 to-transparent pointer-events-none" />
+                </>
+              ) : (
+                <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-deep-navy-surface/80">
+                  <div className="absolute inset-0 bg-game-grid opacity-20 pointer-events-none" />
+                  {activeProject.logo && (
+                    <img
+                      src={activeProject.logo}
+                      alt={`${activeProject.title} logo`}
+                      className="max-h-16 max-w-[160px] object-contain drop-shadow-lg"
+                      draggable={false}
+                    />
+                  )}
+                  <span className="font-mono text-[10px] text-sky-light/70 mt-1">
+                    {activeProject.category}
+                  </span>
+                </div>
+              )}
+              {/* Live badge overlay matching Direct Portfolio View */}
+              {activeProject.links?.demo && (
+                <div className="absolute top-2.5 right-2.5">
+                  <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-red-500/20 border border-red-500/40 text-red-400 font-mono text-[9px] font-bold shadow-md">
+                    <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+                    LIVE
+                  </span>
+                </div>
+              )}
+            </div>
+          )}
+
           <div>
             <div className="flex flex-wrap items-center justify-between gap-2">
               <span className="text-xs font-mono text-electric-blue tracking-wider">
@@ -105,9 +172,22 @@ export const ProjectsModal: React.FC = () => {
                 </span>
               )}
             </div>
-            <h3 className="font-display font-extrabold text-2xl text-warm-ivory mt-1">
-              {activeProject.title}
-            </h3>
+
+            {/* Application Logo Beside Project Name */}
+            <div className="flex items-center gap-3 mt-1.5">
+              {activeProject.logo && (
+                <img
+                  src={activeProject.logo}
+                  alt={`${activeProject.title} logo`}
+                  className="w-9 h-9 object-contain flex-shrink-0 rounded-md bg-deep-navy/80 p-0.5 border border-sky-blue/20"
+                  draggable={false}
+                />
+              )}
+              <h3 className="font-display font-extrabold text-2xl text-warm-ivory leading-snug">
+                {activeProject.title}
+              </h3>
+            </div>
+
             <p className="text-sm text-sky-light mt-1 font-medium">
               {activeProject.subtitle}
             </p>
@@ -164,35 +244,42 @@ export const ProjectsModal: React.FC = () => {
             </div>
           </div>
 
-          {/* Action Links / Placeholders */}
+          {/* Action Links: Official GitHub Logo + Red Live Button */}
           <div className="pt-2 flex flex-wrap items-center gap-3">
-            {activeProject.links.github ? (
+            {activeProject.links.github && (
               <a
                 href={activeProject.links.github}
                 target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-deep-navy hover:bg-deep-navy-surface border border-sky-blue/30 text-warm-ivory hover:text-electric-blue text-xs font-mono rounded tracking-wider transition-colors"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 font-mono text-[11px] px-3.5 py-1.5 rounded bg-deep-navy hover:bg-deep-navy-surface border border-sky-blue/30 text-warm-ivory hover:text-white hover:border-white/50 transition-colors shadow-sm"
+                title={`View ${activeProject.title} on GitHub`}
+                aria-label={`View ${activeProject.title} repository on GitHub`}
               >
-                <GitBranch className="w-3.5 h-3.5" />
-                <span>REPOSITORY</span>
+                <GithubIcon className="w-3.5 h-3.5" />
+                <span>GitHub</span>
               </a>
-            ) : (
-              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-deep-navy border border-sky-blue/15 text-warm-ivory-dim/70 text-xs font-mono rounded">
-                <FolderGit2 className="w-3.5 h-3.5 text-sky-light/50" />
-                <span>CODE REPOSITORY: ON FILE // AVAILABLE UPON REQUEST</span>
-              </span>
             )}
 
             {activeProject.links.demo && (
               <a
                 href={activeProject.links.demo}
                 target="_blank"
-                rel="noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2 bg-electric-blue hover:bg-sky-light text-deep-navy text-xs font-mono font-bold rounded tracking-wider transition-colors shadow-[0_0_15px_rgba(0,240,255,0.4)]"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-1.5 font-mono text-[11px] px-3.5 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-bold border border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.4)] transition-all active:scale-95"
+                title={`Launch ${activeProject.title} Live Demo`}
+                aria-label={`Launch ${activeProject.title} Live Demo`}
               >
-                <ExternalLink className="w-3.5 h-3.5" />
-                <span>LAUNCH DEMO</span>
+                <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                <span>Live</span>
+                <ExternalLink className="w-3 h-3" />
               </a>
+            )}
+
+            {!activeProject.links.github && !activeProject.links.demo && (
+              <span className="inline-flex items-center gap-2 px-3 py-1.5 bg-deep-navy border border-sky-blue/15 text-warm-ivory-dim/70 text-xs font-mono rounded">
+                <FolderGit2 className="w-3.5 h-3.5 text-sky-light/50" />
+                <span>DOCUMENTATION CASE STUDY // ON FILE</span>
+              </span>
             )}
           </div>
         </div>

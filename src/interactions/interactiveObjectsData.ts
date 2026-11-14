@@ -356,17 +356,4 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     targetModal: 'CONTACT',
     cameraTarget: [11, 2.0, -11.2],
   },
-  {
-    id: 'contact-resume',
-    name: 'Executive Dossier Tablet',
-    sublabel: 'Curriculum Vitae & Verified Record',
-    prompt: 'ACCESS RESUME DOSSIER',
-    locationId: 'contact',
-    position: [9.8, 1.45, -9.2],
-    radius: 2.6,
-    iconName: 'FileText',
-    modalType: 'RESUME',
-    targetModal: 'RESUME',
-    cameraTarget: [9.8, 1.45, -9.2],
-  },
 ]

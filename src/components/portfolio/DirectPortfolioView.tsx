@@ -38,11 +38,28 @@ import { experienceData } from '@/data/experience'
 import { educationData, seminarsTrainingsData } from '@/data/education'
 import { contactData } from '@/data/contact'
 import { certificationsData, academicTrainingData, CATEGORY_GRADIENTS } from '@/data/certifications'
-import { multimediaData, type MultimediaCategory, type MultimediaItem } from '@/data/multimedia'
+import { multimediaData, type MultimediaItem } from '@/data/multimedia'
 import { CredlyBadge } from './CredlyBadge'
 import { TechLogo } from './TechLogo'
 import { DirectPortfolioNav } from './DirectPortfolioNav'
 import { CertificateModal } from './CertificateModal'
+import { ProjectLivePreview } from './ProjectLivePreview'
+
+// Official GitHub icon component
+const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    aria-hidden="true"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+    />
+  </svg>
+)
 
 // Helper for category-appropriate project simulation icons
 const getProjectDemoIcon = (project: { category: string }) => {
@@ -96,7 +113,6 @@ const SECTIONS = [
 export const DirectPortfolioView: React.FC = () => {
   const { enterWorld } = useGameStore()
   const [activeSection, setActiveSection] = useState<string>('home')
-  const [multimediaFilter, setMultimediaFilter] = useState<'All Works' | MultimediaCategory>('All Works')
   const [selectedMedia, setSelectedMedia] = useState<MultimediaItem | null>(null)
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
@@ -219,17 +235,6 @@ export const DirectPortfolioView: React.FC = () => {
     window.addEventListener('keydown', handleKeyDown)
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
-
-  // Categories with actual uploaded creative works
-  const availableCategories: ('All Works' | MultimediaCategory)[] = [
-    'All Works',
-    ...Array.from(new Set(multimediaData.map((m) => m.category))),
-  ]
-
-  const filteredMedia =
-    multimediaFilter === 'All Works'
-      ? multimediaData
-      : multimediaData.filter((m) => m.category === multimediaFilter)
 
   // Apple-inspired smooth scroll with quintic ease-out physics and sticky offset
   const scrollToSection = (id: string) => {
@@ -1095,7 +1100,7 @@ export const DirectPortfolioView: React.FC = () => {
                     <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
                   </h2>
                   <p className="font-mono text-[11px] text-sky-light/70">
-                    5 Verified Academic, Capstone &amp; Enterprise Projects
+                    6 Projects &bull; Personal, Academic, Capstone &amp; Enterprise
                   </p>
                 </div>
               </div>
@@ -1113,6 +1118,61 @@ export const DirectPortfolioView: React.FC = () => {
                 style={{ '--stagger-delay': `${pIdx * 70}ms` } as React.CSSProperties}
               >
                 <div className="space-y-3.5">
+                  {/* ── Project Preview: Real Screenshot (for CPALE Tracker & MusuanTrack) or Prototype Box Above Title ── */}
+                  {project.previewScreenshot ? (
+                    <ProjectLivePreview
+                      url={project.links?.demo || project.links?.github || '#'}
+                      title={project.title}
+                      screenshot={project.previewScreenshot}
+                      logo={project.logo}
+                    />
+                  ) : (
+                    <div className="relative rounded-lg overflow-hidden bg-deep-navy-surface/90 border border-sky-blue/20 p-4 flex flex-col items-center justify-center text-center min-h-[145px] group/preview transition-all hover:border-sky-blue/40 shadow-inner">
+                      <div className="absolute inset-0 bg-game-grid opacity-25 pointer-events-none" />
+
+                      <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
+                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-deep-navy/90 border border-sky-blue/20 text-sky-light">
+                          <Terminal className="w-3 h-3 text-electric-blue" />
+                          <span>PROTOTYPE ENV</span>
+                        </span>
+                        {project.isDocumentationOnly ? (
+                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warm-ivory/10 border border-warm-ivory/20 text-warm-ivory-dim/70 font-semibold">
+                            CASE STUDY
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-sky-blue/10 border border-sky-blue/20 text-sky-light/80 font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-light/60" />
+                            <span>IN STAGING</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="relative z-10 flex flex-col items-center gap-2 pt-6 pb-2">
+                        {project.logo ? (
+                          <img
+                            src={project.logo}
+                            alt={`${project.title} logo`}
+                            className="max-h-12 max-w-[130px] w-auto object-contain drop-shadow-lg transition-transform duration-300 group-hover/preview:scale-105"
+                            draggable={false}
+                          />
+                        ) : (
+                          <div className="p-3 rounded-xl bg-deep-navy border border-sky-blue/25 shadow-inner group-hover/preview:border-electric-blue transition-colors">
+                            {getProjectDemoIcon(project)}
+                          </div>
+                        )}
+                        <div className="space-y-0.5">
+                          <div className="font-mono text-xs font-semibold text-warm-ivory">
+                            {project.category}
+                          </div>
+                          <div className="font-mono text-[10px] text-warm-ivory-dim/60">
+                            {project.isDocumentationOnly ? 'Institutional Case Study' : 'Institutional Software System'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Category and Role */}
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-electric-blue/15 text-electric-blue border border-electric-blue/30 uppercase font-semibold">
                       {project.category}
@@ -1122,69 +1182,26 @@ export const DirectPortfolioView: React.FC = () => {
                     </span>
                   </div>
 
-                  <h3 className="font-display font-bold text-lg text-warm-ivory leading-snug">
-                    {project.title}
-                  </h3>
+                  {/* Project Title & Logo beside title */}
+                  <div className="flex items-center gap-3">
+                    {project.logo && (
+                      <img
+                        src={project.logo}
+                        alt={`${project.title} logo`}
+                        className="w-9 h-9 object-contain flex-shrink-0 rounded-md bg-deep-navy/80 p-0.5 border border-sky-blue/20"
+                        draggable={false}
+                      />
+                    )}
+                    <h3 className="font-display font-bold text-lg text-warm-ivory leading-snug">
+                      {project.title}
+                    </h3>
+                  </div>
 
                   <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed">
                     {project.description}
                   </p>
 
-                  {/* Clean Dark-Themed Project Demo Preview Container */}
-                  <div className="relative rounded-lg overflow-hidden bg-deep-navy-surface/90 border border-sky-blue/20 p-4 flex flex-col items-center justify-center text-center min-h-[145px] group/preview transition-all hover:border-sky-blue/40 shadow-inner">
-                    <div className="absolute inset-0 bg-game-grid opacity-25 pointer-events-none" />
-
-                    <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
-                      <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-deep-navy/90 border border-sky-blue/20 text-sky-light">
-                        <Terminal className="w-3 h-3 text-electric-blue" />
-                        <span>PROTOTYPE ENV</span>
-                      </span>
-                      {project.links?.demo ? (
-                        <span className="flex items-center gap-1 px-2 py-0.5 rounded bg-emerald-500/15 border border-emerald-500/30 text-emerald-400 font-bold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
-                          <span>LIVE DEMO</span>
-                        </span>
-                      ) : (
-                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-sky-blue/10 border border-sky-blue/20 text-sky-light/80 font-semibold">
-                          <span className="w-1.5 h-1.5 rounded-full bg-sky-light/60" />
-                          <span>DEMO COMING SOON</span>
-                        </span>
-                      )}
-                    </div>
-
-                    <div className="relative z-10 flex flex-col items-center gap-2 pt-6 pb-2">
-                      <div className="p-3 rounded-xl bg-deep-navy border border-sky-blue/25 shadow-inner group-hover/preview:border-electric-blue transition-colors">
-                        {getProjectDemoIcon(project)}
-                      </div>
-                      <div className="space-y-0.5">
-                        <div className="font-mono text-xs font-semibold text-warm-ivory">
-                          {project.category}
-                        </div>
-                        <div className="font-mono text-[10px] text-warm-ivory-dim/60">
-                          Institutional Software Prototype
-                        </div>
-                      </div>
-                    </div>
-
-                    <div className="relative z-10 w-full pt-2.5 border-t border-sky-blue/10 flex items-center justify-center">
-                      {project.links?.demo ? (
-                        <a
-                          href={project.links.demo}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[11px] font-bold text-deep-navy bg-electric-blue hover:bg-white px-3 py-1 rounded transition-colors active:scale-95"
-                        >
-                          <span>LAUNCH INTERACTIVE DEMO</span>
-                          <ExternalLink className="w-3 h-3" />
-                        </a>
-                      ) : (
-                        <div className="inline-flex items-center gap-1.5 font-mono text-[10px] text-warm-ivory-dim/60 cursor-default">
-                          <span>Public Web Simulator Under Staging</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
+                  {/* Highlights */}
                   <div className="space-y-1.5 pt-1">
                     <div className="font-mono text-[10px] font-bold text-sky-light uppercase">
                       Key Highlights:
@@ -1200,7 +1217,8 @@ export const DirectPortfolioView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-sky-blue/15 space-y-2.5">
+                {/* Footer: Tech Stack + GitHub & Red Live Buttons */}
+                <div className="pt-4 border-t border-sky-blue/15 space-y-3">
                   <div className="flex flex-wrap gap-1.5">
                     {project.techStack.map((tech) => (
                       <span
@@ -1212,9 +1230,43 @@ export const DirectPortfolioView: React.FC = () => {
                     ))}
                   </div>
 
-                  <div className="font-mono text-[10px] text-electric-blue flex items-center justify-between">
-                    <span>{project.statusBadge}</span>
-                    <span className="text-warm-ivory-dim/60">{project.metrics}</span>
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* GitHub Link Button with official GitHub Logo */}
+                      {project.links?.github && (
+                        <a
+                          href={project.links.github}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] px-3 py-1.5 rounded bg-deep-navy hover:bg-deep-navy-surface border border-sky-blue/30 text-warm-ivory hover:text-white hover:border-white/50 transition-colors shadow-sm"
+                          title={`View ${project.title} source code on GitHub`}
+                          aria-label={`View ${project.title} repository on GitHub`}
+                        >
+                          <GithubIcon className="w-3.5 h-3.5" />
+                          <span>GitHub</span>
+                        </a>
+                      )}
+
+                      {/* Red Live Button */}
+                      {project.links?.demo && (
+                        <a
+                          href={project.links.demo}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] px-3.5 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-bold border border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.4)] transition-all active:scale-95"
+                          title={`Launch ${project.title} Live Demo`}
+                          aria-label={`Launch ${project.title} Live Demo`}
+                        >
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                          <span>Live</span>
+                          <ExternalLink className="w-3 h-3" />
+                        </a>
+                      )}
+                    </div>
+
+                    <div className="font-mono text-[10px] text-electric-blue flex items-center gap-2 ml-auto">
+                      <span>{project.statusBadge}</span>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -1458,38 +1510,15 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Category Filter Pills (Only categories with actual uploaded works) */}
-              <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs">
-                {availableCategories.map((cat) => (
-                  <button
-                    key={cat}
-                    type="button"
-                    onClick={() => setMultimediaFilter(cat)}
-                    className={`px-3 py-1.5 rounded-full transition-all cursor-pointer active:scale-95 ${
-                      multimediaFilter === cat
-                        ? 'bg-cyber-yellow text-deep-navy font-bold shadow-[0_0_12px_rgba(255,215,0,0.4)]'
-                        : 'bg-deep-navy/80 border border-sky-blue/20 text-warm-ivory-dim hover:text-warm-ivory hover:border-sky-blue'
-                    }`}
-                  >
-                    {cat}
-                  </button>
-                ))}
-              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 10
+              </span>
             </div>
           </div>
 
           {/* Gallery Grid */}
-          {filteredMedia.length === 0 ? (
-            <div className="p-12 text-center rounded-lg bg-deep-navy-card/60 border border-dashed border-sky-blue/30 space-y-3">
-              <Palette className="w-10 h-10 text-sky-light/40 mx-auto" />
-              <h3 className="font-mono font-bold text-sm text-warm-ivory">NO CREATIVE WORKS IN THIS CATEGORY</h3>
-              <p className="font-sans text-xs text-warm-ivory-dim/70 max-w-md mx-auto">
-                No items have been uploaded under this category yet.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMedia.map((item, mIdx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {multimediaData.map((item, mIdx) => (
                 <div
                   key={item.id}
                   className="reveal-card apple-card-hover rounded-lg bg-deep-navy-card/85 border border-sky-blue/25 shadow-xl overflow-hidden flex flex-col justify-between transition-all group"
@@ -1578,7 +1607,6 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               ))}
             </div>
-          )}
         </section>
 
         {/* ========================================================= */}

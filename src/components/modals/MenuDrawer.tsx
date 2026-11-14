@@ -65,15 +65,6 @@ export const MenuDrawer: React.FC = () => {
       badge: 'INA GRACE TAN',
     },
     {
-      label: 'Curriculum Vitae (CV)',
-      action: () => {
-        openModal('RESUME')
-        setMenuOpen(false)
-      },
-      icon: <FileUser className="w-4 h-4 text-electric-blue" />,
-      badge: 'PDF / PRINT',
-    },
-    {
       label: 'Featured Projects',
       action: () => {
         openModal('PROJECTS')

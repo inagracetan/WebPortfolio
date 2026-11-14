@@ -1,6 +1,7 @@
 import React from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
+import { TechLogo } from '@/components/portfolio/TechLogo'
 import { Code2, Database, Network, ShieldCheck, FileSpreadsheet, Layers, CheckCircle2 } from 'lucide-react'
 
 export const SkillDetailModal: React.FC = () => {
@@ -64,14 +65,19 @@ export const SkillDetailModal: React.FC = () => {
                 className="p-3.5 bg-deep-navy/50 border border-sky-blue/15 rounded space-y-2"
               >
                 <div className="flex flex-wrap justify-between items-center gap-2 text-xs font-mono">
-                  <span className="font-bold text-warm-ivory flex items-center gap-2">
-                    {skill.name}
-                    {skill.highlight && (
-                      <span className="px-1.5 py-0.2 text-[9px] bg-electric-blue/15 text-electric-blue border border-electric-blue/30 rounded">
-                        KEY FOCUS
-                      </span>
-                    )}
-                  </span>
+                  <div className="flex items-center gap-2.5 min-w-0">
+                    <div className="p-1 rounded bg-deep-navy flex-shrink-0">
+                      <TechLogo name={skill.logo || skill.name} className="w-4 h-4" />
+                    </div>
+                    <span className="font-bold text-warm-ivory flex items-center gap-2">
+                      {skill.name}
+                      {skill.highlight && (
+                        <span className="px-1.5 py-0.2 text-[9px] bg-electric-blue/15 text-electric-blue border border-electric-blue/30 rounded">
+                          KEY FOCUS
+                        </span>
+                      )}
+                    </span>
+                  </div>
                   <div className="flex items-center gap-2">
                     <span className="text-[10px] text-sky-light/90 bg-sky-blue/10 px-2 py-0.5 rounded font-mono">
                       {skill.proficiencyLabel}

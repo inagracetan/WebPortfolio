@@ -96,18 +96,7 @@ export const Navigation: React.FC = () => {
               <span>ABOUT</span>
             </button>
 
-            {/* 3. Resume (Opens authentic PDF CV without teleporting) */}
-            <button
-              type="button"
-              onClick={() => openModal('RESUME')}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-electric-blue/15 text-electric-blue font-bold border border-electric-blue/30 hover:bg-electric-blue hover:text-deep-navy transition-all cursor-pointer shadow-sm"
-              title="View & Download Curriculum Vitae"
-            >
-              <FileUser className="w-3.5 h-3.5" />
-              <span>RESUME</span>
-            </button>
-
-            {/* 4. Projects (Opens Project Showcase without teleporting) */}
+            {/* 3. Projects (Opens Project Showcase without teleporting) */}
             <button
               type="button"
               onClick={() => openModal('PROJECTS')}
