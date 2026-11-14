@@ -41,7 +41,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
   const portfolioRef = useRef<HTMLDivElement>(null)
 
   // Determine active parent state
-  const isCareerActive = ['resume', 'experience', 'education'].includes(activeSection)
+  const isCareerActive = ['resume', 'experience', 'education', 'seminars'].includes(activeSection)
   const isPortfolioActive = ['projects', 'skills', 'certifications', 'multimedia'].includes(activeSection)
 
   // Close dropdown on click outside
@@ -227,6 +227,19 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   >
                     <GraduationCap className="w-3.5 h-3.5 text-cyber-yellow flex-shrink-0" />
                     <span>Education (CMU)</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectSection('seminars')}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
+                      activeSection === 'seminars'
+                        ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
+                        : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
+                    }`}
+                  >
+                    <Award className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                    <span>Seminars &amp; Training</span>
                   </button>
                 </motion.div>
               )}
@@ -491,6 +504,19 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   >
                     <GraduationCap className="w-3.5 h-3.5" />
                     <span>Education</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectSection('seminars')}
+                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded text-left ${
+                      activeSection === 'seminars'
+                        ? 'text-electric-blue font-bold bg-electric-blue/15'
+                        : 'text-warm-ivory-dim hover:text-warm-ivory'
+                    }`}
+                  >
+                    <Award className="w-3.5 h-3.5" />
+                    <span>Seminars &amp; Training</span>
                   </button>
                 </div>
               )}

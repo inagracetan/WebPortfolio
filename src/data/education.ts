@@ -1,4 +1,6 @@
 import type { EducationItem, SeminarTrainingItem } from './types'
+import avalCert from '@/assets/aval.png'
+import certImg from '@/assets/cert.jpg'
 
 export const educationData: EducationItem[] = [
   {
@@ -68,25 +70,70 @@ export const seminarsTrainingsData: SeminarTrainingItem[] = [
     id: 'avalanche-team1',
     title: 'Avalanche Team1 University Connect',
     date: 'November 3, 2026',
+    organizer: 'Central Mindanao University / Avalanche Team1',
+    institution: 'Central Mindanao University',
     venue: 'Central Mindanao University, Bukidnon, Philippines',
-  },
-  {
-    id: 'dost-sarai',
-    title: 'DOST SARAI Training',
-    date: 'March 13, 2026',
-    venue: 'Department of Science and Technology',
-    details: ['SARAI System', 'Google Earth Engine'],
+    description:
+      'A university-based learning and engagement activity providing academic and professional exposure through technology-related learning and industry perspectives.',
+    recognition: 'Certificate of Attendance',
+    details: [
+      'Web3 & Blockchain Fundamentals',
+      'Smart Contract Architecture',
+      'Decentralized Application Ecosystems',
+      'Industry & Academic Perspectives',
+    ],
+    certificateUrl: avalCert,
+    hasCertificate: true,
   },
   {
     id: 'planting-seeds-excellence',
     title: 'Planting Seeds of Excellence: Customer Service for Agricultural Stakeholders (Seminar)',
     date: 'April 10, 2026',
-    venue: 'City Agriculture Office - LGU Malaybalay, Bukidnon',
+    organizer: 'City Agriculture Office – LGU Malaybalay, Bukidnon',
+    institution: 'City Agriculture Office – LGU Malaybalay',
+    venue: 'Farmers Training Center, City Agriculture Office, Casisang, Malaybalay City, Bukidnon',
+    description:
+      'Participated in a seminar focused on strengthening the knowledge, skills, and commitment of participants in delivering quality and responsive customer service to farmers and other agricultural stakeholders, promoting service excellence and professionalism in public service within the agricultural sector.',
+    recognition: 'Certificate of Participation',
+    details: [
+      'Quality and responsive customer service',
+      'Effective assistance to farmers and agricultural stakeholders',
+      'Professionalism and commitment in public service',
+      'Service excellence within the agricultural sector',
+    ],
+    certificateUrl: certImg,
+    hasCertificate: true,
+  },
+  {
+    id: 'dost-sarai',
+    title: 'DOST SARAI Training',
+    date: 'March 13, 2026',
+    organizer: 'Department of Science and Technology (DOST)',
+    institution: 'Department of Science and Technology',
+    venue: 'Department of Science and Technology',
+    description:
+      'A technical training focused on the use of the DOST Smarter Approaches to Reinvigorate Agriculture as an Industry (SARAI) system and Google Earth Engine, highlighting their relevance to agricultural information, geospatial data, and technology-assisted monitoring.',
+    details: [
+      'Introduction to the SARAI system',
+      'Familiarization with Google Earth Engine',
+      'Geospatial data and digital tools for agricultural monitoring',
+    ],
+    hasCertificate: false,
   },
   {
     id: 'cmu-it-seminars',
     title: 'Information Technology Seminars and Workshops',
     date: 'Academic Curriculum',
-    venue: 'Conducted by Central Mindanao University',
+    organizer: 'Central Mindanao University',
+    institution: 'Central Mindanao University',
+    venue: 'Conducted by Central Mindanao University, Bukidnon',
+    description:
+      'A collection of IT-related seminars and workshops attended during my academic experience, supporting continuous learning and exposure to information technology concepts and professional practices.',
+    details: [
+      'Network Administration & Infrastructure',
+      'Systems Maintenance & Tech Support',
+      'Academic IT Workshops',
+    ],
+    hasCertificate: false,
   },
 ]

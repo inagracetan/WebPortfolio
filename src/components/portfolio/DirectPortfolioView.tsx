@@ -22,6 +22,11 @@ import {
   Send,
   ShieldCheck,
   Palette,
+  Calendar,
+  Building2,
+  ChevronDown,
+  ChevronUp,
+  X,
   Maximize2,
   Smartphone,
   Terminal,
@@ -30,13 +35,14 @@ import { useGameStore } from '@/hooks/useGameStore'
 import { projectsData } from '@/data/projects'
 import { skillGroupsData } from '@/data/skills'
 import { experienceData } from '@/data/experience'
-import { educationData } from '@/data/education'
+import { educationData, seminarsTrainingsData } from '@/data/education'
 import { contactData } from '@/data/contact'
 import { certificationsData, academicTrainingData, CATEGORY_GRADIENTS } from '@/data/certifications'
 import { multimediaData, type MultimediaCategory, type MultimediaItem } from '@/data/multimedia'
 import { CredlyBadge } from './CredlyBadge'
 import { TechLogo } from './TechLogo'
 import { DirectPortfolioNav } from './DirectPortfolioNav'
+import { CertificateModal } from './CertificateModal'
 
 // Helper for category-appropriate project simulation icons
 const getProjectDemoIcon = (project: { category: string }) => {
@@ -63,6 +69,7 @@ const getSectionAmbientGlow = (section: string) => {
     case 'resume':
     case 'experience':
     case 'education':
+    case 'seminars':
       return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_25%,_rgba(56,189,248,0.13),_transparent_70%)]'
     case 'contact':
       return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,_rgba(0,240,255,0.14),_transparent_70%)]'
@@ -71,13 +78,14 @@ const getSectionAmbientGlow = (section: string) => {
   }
 }
 
-// Exact 10-section portfolio order
+// Exact 11-section portfolio order
 const SECTIONS = [
   { id: 'home', label: 'Home', icon: House },
   { id: 'about', label: 'About Me', icon: UserRound },
   { id: 'resume', label: 'Resume', icon: FileUser },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'education', label: 'Education', icon: GraduationCap },
+  { id: 'seminars', label: 'Seminars & Training', icon: Award },
   { id: 'projects', label: 'Projects', icon: FolderKanban },
   { id: 'skills', label: 'Technical Skills', icon: Brain },
   { id: 'certifications', label: 'Certifications & Badges', icon: Award },
@@ -92,6 +100,13 @@ export const DirectPortfolioView: React.FC = () => {
   const [selectedMedia, setSelectedMedia] = useState<MultimediaItem | null>(null)
   const [formSent, setFormSent] = useState(false)
   const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [expandedCertId, setExpandedCertId] = useState<string | null>(null)
+  const [modalCert, setModalCert] = useState<{
+    imageSrc: string
+    title: string
+    date?: string
+    organizer?: string
+  } | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const parallaxGlowRef = useRef<HTMLDivElement>(null)
   const parallaxGridRef = useRef<HTMLDivElement>(null)
@@ -867,7 +882,205 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 6: PROJECTS */}
+        {/* SECTION 6: SEMINARS & TRAINING */}
+        {/* ========================================================= */}
+        <section id="seminars" className="reveal-panel scroll-mt-24 space-y-6">
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>SEMINARS &amp; TRAINING</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Verified Technology Seminars, Workshops &amp; Professional Training Records
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-electric-blue/15 border border-electric-blue/30 font-mono text-[11px] text-electric-blue font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">OFFICIAL CERTIFICATES</span>
+                </span>
+                <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                  CHAPTER // 06
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {seminarsTrainingsData.map((st, sIdx) => {
+              const isCertExpanded = expandedCertId === st.id
+              const hasCert = Boolean(st.hasCertificate && st.certificateUrl)
+
+              return (
+                <div
+                  key={st.id}
+                  className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/90 border border-sky-blue/20 shadow-xl backdrop-blur-md flex flex-col justify-between space-y-4 transition-all"
+                  style={{ '--stagger-delay': `${sIdx * 80}ms` } as React.CSSProperties}
+                >
+                  <div className="space-y-3.5">
+                    {/* Header: Title & Badges */}
+                    <div className="space-y-2 border-b border-white/10 pb-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-display font-bold text-base sm:text-lg text-warm-ivory leading-snug">
+                          {st.title}
+                        </h3>
+                        {st.recognition && (
+                          <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex-shrink-0">
+                            {st.recognition}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
+                        {st.organizer && (
+                          <span className="flex items-center gap-1.5 text-warm-ivory-dim">
+                            <Building2 className="w-3.5 h-3.5 text-electric-blue flex-shrink-0" />
+                            <span>{st.organizer}</span>
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1.5 text-electric-blue font-semibold">
+                          <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span>{st.date}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Venue */}
+                    {st.venue && (
+                      <div className="flex items-center gap-1.5 font-mono text-[11px] text-sky-light/80">
+                        <MapPin className="w-3.5 h-3.5 text-sky-light/60 flex-shrink-0" />
+                        <span>{st.venue}</span>
+                      </div>
+                    )}
+
+                    {/* Description */}
+                    {st.description && (
+                      <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed">
+                        {st.description}
+                      </p>
+                    )}
+
+                    {/* Details / Covered topics */}
+                    {st.details && st.details.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {st.details.map((d, i) => (
+                          <span
+                            key={i}
+                            className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-deep-navy/80 border border-sky-blue/20 text-sky-light"
+                          >
+                            {d}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Footer: View Certificate Button & Preview */}
+                  <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      {hasCert ? (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCertId(isCertExpanded ? null : st.id)}
+                          className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+                            isCertExpanded
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              : 'bg-electric-blue/15 text-electric-blue hover:bg-electric-blue/25 border border-electric-blue/35'
+                          }`}
+                          aria-expanded={isCertExpanded}
+                        >
+                          <Award className="w-3.5 h-3.5" />
+                          <span>{isCertExpanded ? 'Hide Certificate' : 'View Certificate'}</span>
+                          {isCertExpanded ? (
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-warm-ivory-dim/60 font-mono text-[11px]">
+                          <ShieldCheck className="w-3.5 h-3.5 text-sky-light/60" />
+                          <span>Institutional Record (From Official CV)</span>
+                        </div>
+                      )}
+
+                      {hasCert && isCertExpanded && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setModalCert({
+                              imageSrc: st.certificateUrl!,
+                              title: st.title,
+                              date: st.date,
+                              organizer: st.organizer,
+                            })
+                          }
+                          className="inline-flex items-center gap-1 font-mono text-[11px] text-sky-light hover:text-electric-blue transition-colors cursor-pointer"
+                          title="Fullscreen Certificate Inspection"
+                        >
+                          <Maximize2 className="w-3 h-3" />
+                          <span className="hidden sm:inline">Fullscreen</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Expandable Certificate Preview Container (Hidden by default, shown on demand) */}
+                    {hasCert && isCertExpanded && (
+                      <div className="mt-3 p-3.5 rounded-lg bg-black/40 border border-sky-blue/30 space-y-2">
+                        <div className="flex items-center justify-between pb-1.5 text-[10px] font-mono text-sky-light border-b border-white/10">
+                          <span className="font-semibold tracking-wider">OFFICIAL CERTIFICATE PREVIEW</span>
+                          <button
+                            type="button"
+                            onClick={() => setExpandedCertId(null)}
+                            className="flex items-center gap-1 text-rose-300 hover:text-rose-200 transition-colors cursor-pointer"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                            <span>Close</span>
+                          </button>
+                        </div>
+
+                        <div
+                          className="flex items-center justify-center overflow-hidden cursor-zoom-in group"
+                          onClick={() =>
+                            setModalCert({
+                              imageSrc: st.certificateUrl!,
+                              title: st.title,
+                              date: st.date,
+                              organizer: st.organizer,
+                            })
+                          }
+                        >
+                          <img
+                            src={st.certificateUrl}
+                            alt={`Certificate for ${st.title}`}
+                            className="w-full max-h-[450px] object-contain rounded border border-sky-blue/20 shadow-xl group-hover:opacity-95 transition-opacity"
+                            draggable={false}
+                          />
+                        </div>
+
+                        <p className="text-[10px] text-center text-warm-ivory-dim/70 font-mono">
+                          Click certificate image or &quot;Fullscreen&quot; to inspect in high resolution
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* SECTION 7: PROJECTS */}
         {/* ========================================================= */}
         <section id="projects" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -887,7 +1100,7 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               </div>
               <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
-                CHAPTER // 06
+                CHAPTER // 07
               </span>
             </div>
           </div>
@@ -1010,7 +1223,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 7: TECHNICAL SKILLS */}
+        {/* SECTION 8: TECHNICAL SKILLS */}
         {/* ========================================================= */}
         <section id="skills" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1030,7 +1243,7 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               </div>
               <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
-                CHAPTER // 07
+                CHAPTER // 08
               </span>
             </div>
           </div>
@@ -1082,7 +1295,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 8: CERTIFICATIONS & BADGES */}
+        {/* SECTION 9: CERTIFICATIONS & BADGES */}
         {/* ========================================================= */}
         <section id="certifications" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1108,7 +1321,7 @@ export const DirectPortfolioView: React.FC = () => {
                   <span className="hidden sm:inline">OFFICIAL CREDLY VERIFIED</span>
                 </span>
                 <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden md:inline-block">
-                  CHAPTER // 08
+                  CHAPTER // 09
                 </span>
               </div>
             </div>
@@ -1225,7 +1438,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 9: MULTIMEDIA & CREATIVE WORKS */}
+        {/* SECTION 10: MULTIMEDIA & CREATIVE WORKS */}
         {/* ========================================================= */}
         <section id="multimedia" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1369,7 +1582,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 10: CONTACT */}
+        {/* SECTION 11: CONTACT */}
         {/* ========================================================= */}
         <section id="contact" className="reveal-panel scroll-mt-24 space-y-6 pb-12">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1389,7 +1602,7 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               </div>
               <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
-                CHAPTER // 10
+                CHAPTER // 11
               </span>
             </div>
           </div>
@@ -1650,6 +1863,18 @@ export const DirectPortfolioView: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Lightbox Certificate Modal */}
+      {modalCert && (
+        <CertificateModal
+          isOpen={Boolean(modalCert)}
+          onClose={() => setModalCert(null)}
+          imageSrc={modalCert.imageSrc}
+          title={modalCert.title}
+          date={modalCert.date}
+          organizer={modalCert.organizer}
+        />
+      )}
 
       {/* FOOTER */}
       <footer className="border-t border-sky-blue/20 bg-deep-navy-card/90 py-8 text-center font-mono text-xs text-warm-ivory-dim/70 space-y-3">
