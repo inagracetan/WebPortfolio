@@ -83,8 +83,8 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
     }
   }
 
-  // Show floating label ONLY for current location when nearby or hovered
-  const showLabel = isCurrentLocation && (isNearby || isHovered)
+  // Show floating label for current location or when hovered
+  const showLabel = isCurrentLocation || isHovered
 
   return (
     <group position={[position[0], 0, position[2]]}>
