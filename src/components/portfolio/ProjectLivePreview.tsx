@@ -1,25 +1,26 @@
+import React from 'react'
 import { ExternalLink, Globe } from 'lucide-react'
 
 interface ProjectLivePreviewProps {
   url: string
   title: string
-  screenshot: string   // static screenshot image (bundled asset)
+  screenshot: string
   logo?: string
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// ProjectLivePreview — mini browser window with a static website screenshot.
-//
-// Uses a pre-captured screenshot instead of an iframe to avoid browser
-// security policy blocks (X-Frame-Options / CSP frame-ancestors restrictions).
-// Clicking anywhere on the preview opens the actual live site in a new tab.
-// ─────────────────────────────────────────────────────────────────────────────
+const CHROME_H = 32
 
-const CHROME_H = 32 // height of the fake browser bar (px)
-
-export function ProjectLivePreview({ url, title, screenshot }: ProjectLivePreviewProps) {
+export const ProjectLivePreview: React.FC<ProjectLivePreviewProps> = ({
+  url,
+  title,
+  screenshot,
+}) => {
   const hostname = (() => {
-    try { return new URL(url).hostname } catch { return url }
+    try {
+      return new URL(url).hostname
+    } catch {
+      return url
+    }
   })()
 
   return (
@@ -27,11 +28,11 @@ export function ProjectLivePreview({ url, title, screenshot }: ProjectLivePrevie
       href={url}
       target="_blank"
       rel="noopener noreferrer"
-      className="group/preview block w-full rounded-lg overflow-hidden border border-sky-blue/25 hover:border-electric-blue/50 bg-deep-navy shadow-inner transition-colors"
+      className="group/preview block w-full rounded-lg overflow-hidden border border-sky-blue/25 hover:border-red-500/50 bg-deep-navy shadow-inner transition-colors"
       aria-label={`Open ${title} live site`}
       title={`Visit ${title}`}
     >
-      {/* ── Fake browser chrome ─────────────────────────────────────── */}
+      {/* Fake browser chrome */}
       <div
         className="flex items-center gap-2 px-3 border-b border-sky-blue/20 bg-deep-navy/95 flex-shrink-0"
         style={{ height: CHROME_H }}
@@ -49,12 +50,18 @@ export function ProjectLivePreview({ url, title, screenshot }: ProjectLivePrevie
           <span className="font-mono text-[9px] text-sky-light/60 truncate">{hostname}</span>
         </div>
 
+        {/* Live indicator tag in chrome */}
+        <span className="flex items-center gap-1 px-1.5 py-0.5 rounded bg-red-500/20 text-red-400 font-mono text-[9px] font-bold flex-shrink-0 border border-red-500/30">
+          <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />
+          <span>LIVE</span>
+        </span>
+
         {/* Open in tab icon */}
-        <ExternalLink className="w-3 h-3 text-sky-light/30 group-hover/preview:text-electric-blue transition-colors flex-shrink-0" />
+        <ExternalLink className="w-3 h-3 text-sky-light/40 group-hover/preview:text-red-400 transition-colors flex-shrink-0" />
       </div>
 
-      {/* ── Screenshot ──────────────────────────────────────────────── */}
-      <div className="relative w-full overflow-hidden" style={{ height: 170 }}>
+      {/* Screenshot */}
+      <div className="relative w-full overflow-hidden aspect-[2/1] bg-black/40">
         <img
           src={screenshot}
           alt={`${title} website preview`}
@@ -67,3 +74,4 @@ export function ProjectLivePreview({ url, title, screenshot }: ProjectLivePrevie
     </a>
   )
 }
+

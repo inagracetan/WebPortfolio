@@ -99,5 +99,11 @@ export interface SeminarTrainingItem {
   title: string
   date: string
   venue: string
+  organizer?: string
+  institution?: string
+  description?: string
+  recognition?: string
   details?: string[]
+  certificateUrl?: string
+  hasCertificate?: boolean
 }

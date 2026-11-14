@@ -19,7 +19,6 @@ import {
   X,
 } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
-import { APPLE_SPRINGS } from '@/styles/motion'
 
 interface DirectPortfolioNavProps {
   activeSection: string
@@ -42,7 +41,7 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
   const portfolioRef = useRef<HTMLDivElement>(null)
 
   // Determine active parent state
-  const isCareerActive = ['resume', 'experience', 'education'].includes(activeSection)
+  const isCareerActive = ['resume', 'experience', 'education', 'seminars'].includes(activeSection)
   const isPortfolioActive = ['projects', 'skills', 'certifications', 'multimedia'].includes(activeSection)
 
   // Close dropdown on click outside
@@ -100,17 +99,13 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
         >
           {/* Official IT Logo */}
           <div className="relative h-9 flex items-center justify-center">
-            <picture>
-              <source srcSet="/IT_Logo.webp" type="image/webp" />
-              <img
-                src="/IT_Logo.png"
-                alt="IT Logo"
-                width={54}
-                height={36}
-                decoding="async"
-                className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(0,240,255,0.45)] group-hover:scale-105 transition-transform"
-              />
-            </picture>
+            <img
+              src="/IT_Logo.png"
+              alt="IT Logo"
+              width={54}
+              height={36}
+              className="h-8 sm:h-9 w-auto object-contain drop-shadow-[0_0_12px_rgba(0,240,255,0.45)] group-hover:scale-105 transition-transform"
+            />
           </div>
 
           <div>
@@ -125,85 +120,61 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
         </button>
 
         {/* ========================================================= */}
-        {/* CENTER: DESKTOP NAVIGATION BAR (WITH ANIMATED SLIDING PILL) */}
+        {/* CENTER: DESKTOP NAVIGATION BAR (WITH DROPDOWNS) */}
         {/* ========================================================= */}
         <nav
           aria-label="Portfolio Main Navigation"
-          className="hidden lg:flex items-center gap-1 px-3 py-1 bg-deep-navy-card/85 border border-sky-blue/20 rounded-full shadow-lg backdrop-blur-md text-xs relative"
+          className="hidden lg:flex items-center gap-1.5 px-3 py-1 bg-deep-navy-card/85 border border-sky-blue/20 rounded-full shadow-lg backdrop-blur-md text-xs"
         >
           {/* 1. Home */}
-          <motion.button
+          <button
             type="button"
-            whileTap={{ scale: 0.95 }}
             onClick={() => handleSelectSection('home')}
-            className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-colors cursor-pointer z-10 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
               activeSection === 'home'
-                ? 'text-deep-navy font-bold'
+                ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_12px_rgba(0,240,255,0.4)]'
                 : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/5'
             }`}
           >
-            {activeSection === 'home' && (
-              <motion.div
-                layoutId="direct-nav-active-pill"
-                className="absolute inset-0 bg-electric-blue rounded-full -z-10 shadow-[0_0_12px_rgba(0,240,255,0.4)]"
-                transition={APPLE_SPRINGS.pill}
-              />
-            )}
             <House className="w-3.5 h-3.5" />
             <span>Home</span>
-          </motion.button>
+          </button>
 
           {/* 2. About */}
-          <motion.button
+          <button
             type="button"
-            whileTap={{ scale: 0.95 }}
             onClick={() => handleSelectSection('about')}
-            className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-colors cursor-pointer z-10 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
               activeSection === 'about'
-                ? 'text-deep-navy font-bold'
+                ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_12px_rgba(0,240,255,0.4)]'
                 : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/5'
             }`}
           >
-            {activeSection === 'about' && (
-              <motion.div
-                layoutId="direct-nav-active-pill"
-                className="absolute inset-0 bg-electric-blue rounded-full -z-10 shadow-[0_0_12px_rgba(0,240,255,0.4)]"
-                transition={APPLE_SPRINGS.pill}
-              />
-            )}
             <UserRound className="w-3.5 h-3.5" />
             <span>About</span>
-          </motion.button>
+          </button>
 
           {/* 3. Career (Dropdown: Resume, Experience, Education) */}
           <div ref={careerRef} className="relative">
-            <motion.button
+            <button
               type="button"
-              whileTap={{ scale: 0.95 }}
               onClick={() => toggleDropdown('career')}
               aria-haspopup="true"
               aria-expanded={openDropdown === 'career'}
-              className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-colors cursor-pointer z-10 ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
                 isCareerActive
-                  ? 'text-deep-navy font-bold'
+                  ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/50 shadow-[0_0_10px_rgba(0,240,255,0.25)]'
                   : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/5'
               }`}
             >
-              {isCareerActive && (
-                <motion.div
-                  layoutId="direct-nav-active-pill"
-                  className="absolute inset-0 bg-electric-blue rounded-full -z-10 shadow-[0_0_12px_rgba(0,240,255,0.4)]"
-                  transition={APPLE_SPRINGS.pill}
-                />
-              )}
               <Briefcase className="w-3.5 h-3.5" />
               <span>Career</span>
               <ChevronDown
                 className={`w-3 h-3 transition-transform duration-200 ${
-                  openDropdown === 'career' ? 'rotate-180' : ''
+                  openDropdown === 'career' ? 'rotate-180 text-electric-blue' : ''
                 }`}
               />
-            </motion.button>
+            </button>
 
             {/* Career Dropdown Menu */}
             <AnimatePresence>
@@ -257,6 +228,19 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                     <GraduationCap className="w-3.5 h-3.5 text-cyber-yellow flex-shrink-0" />
                     <span>Education (CMU)</span>
                   </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectSection('seminars')}
+                    className={`w-full flex items-center gap-2.5 px-3 py-2 rounded text-left transition-all duration-200 hover:translate-x-1 cursor-pointer text-xs ${
+                      activeSection === 'seminars'
+                        ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/30'
+                        : 'text-warm-ivory hover:text-electric-blue hover:bg-white/5'
+                    }`}
+                  >
+                    <Award className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                    <span>Seminars &amp; Training</span>
+                  </button>
                 </motion.div>
               )}
             </AnimatePresence>
@@ -264,33 +248,25 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
 
           {/* 4. Portfolio (Dropdown: Projects, Technical Skills, Certifications & Badges) */}
           <div ref={portfolioRef} className="relative">
-            <motion.button
+            <button
               type="button"
-              whileTap={{ scale: 0.95 }}
               onClick={() => toggleDropdown('portfolio')}
               aria-haspopup="true"
               aria-expanded={openDropdown === 'portfolio'}
-              className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-colors cursor-pointer z-10 ${
+              className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
                 isPortfolioActive
-                  ? 'text-deep-navy font-bold'
+                  ? 'bg-electric-blue/20 text-electric-blue font-bold border border-electric-blue/50 shadow-[0_0_10px_rgba(0,240,255,0.25)]'
                   : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/5'
               }`}
             >
-              {isPortfolioActive && (
-                <motion.div
-                  layoutId="direct-nav-active-pill"
-                  className="absolute inset-0 bg-electric-blue rounded-full -z-10 shadow-[0_0_12px_rgba(0,240,255,0.4)]"
-                  transition={APPLE_SPRINGS.pill}
-                />
-              )}
               <FolderKanban className="w-3.5 h-3.5" />
               <span>Portfolio</span>
               <ChevronDown
                 className={`w-3 h-3 transition-transform duration-200 ${
-                  openDropdown === 'portfolio' ? 'rotate-180' : ''
+                  openDropdown === 'portfolio' ? 'rotate-180 text-electric-blue' : ''
                 }`}
               />
-            </motion.button>
+            </button>
 
             {/* Portfolio Dropdown Menu */}
             <AnimatePresence>
@@ -363,26 +339,18 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
           </div>
 
           {/* 5. Contact */}
-          <motion.button
+          <button
             type="button"
-            whileTap={{ scale: 0.95 }}
             onClick={() => handleSelectSection('contact')}
-            className={`relative flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-colors cursor-pointer z-10 ${
+            className={`flex items-center gap-1.5 px-3.5 py-1.5 rounded-full transition-all cursor-pointer ${
               activeSection === 'contact'
-                ? 'text-deep-navy font-bold'
+                ? 'bg-electric-blue text-deep-navy font-bold shadow-[0_0_12px_rgba(0,240,255,0.4)]'
                 : 'text-warm-ivory-dim hover:text-warm-ivory hover:bg-white/5'
             }`}
           >
-            {activeSection === 'contact' && (
-              <motion.div
-                layoutId="direct-nav-active-pill"
-                className="absolute inset-0 bg-electric-blue rounded-full -z-10 shadow-[0_0_12px_rgba(0,240,255,0.4)]"
-                transition={APPLE_SPRINGS.pill}
-              />
-            )}
             <Mail className="w-3.5 h-3.5" />
             <span>Contact</span>
-          </motion.button>
+          </button>
         </nav>
 
         {/* ========================================================= */}
@@ -536,6 +504,19 @@ export const DirectPortfolioNav: React.FC<DirectPortfolioNavProps> = ({
                   >
                     <GraduationCap className="w-3.5 h-3.5" />
                     <span>Education</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => handleSelectSection('seminars')}
+                    className={`w-full flex items-center gap-2 px-2.5 py-2 rounded text-left ${
+                      activeSection === 'seminars'
+                        ? 'text-electric-blue font-bold bg-electric-blue/15'
+                        : 'text-warm-ivory-dim hover:text-warm-ivory'
+                    }`}
+                  >
+                    <Award className="w-3.5 h-3.5" />
+                    <span>Seminars &amp; Training</span>
                   </button>
                 </div>
               )}

@@ -19,28 +19,47 @@ import {
   ArrowUp,
   Sparkles,
   Layers,
+  Send,
   ShieldCheck,
   Palette,
+  Calendar,
+  Building2,
+  ChevronDown,
+  ChevronUp,
+  X,
   Maximize2,
   Smartphone,
   Terminal,
-  Code2,
 } from 'lucide-react'
 import { useGameStore } from '@/hooks/useGameStore'
 import { projectsData } from '@/data/projects'
 import { skillGroupsData } from '@/data/skills'
 import { experienceData } from '@/data/experience'
-import { educationData } from '@/data/education'
+import { educationData, seminarsTrainingsData } from '@/data/education'
 import { contactData } from '@/data/contact'
 import { certificationsData, academicTrainingData, CATEGORY_GRADIENTS } from '@/data/certifications'
-import { multimediaData, type MultimediaCategory, type MultimediaItem } from '@/data/multimedia'
+import { multimediaData, type MultimediaItem } from '@/data/multimedia'
 import { CredlyBadge } from './CredlyBadge'
 import { TechLogo } from './TechLogo'
-import { TechTag } from './TechTag'
-import { ProjectLivePreview } from './ProjectLivePreview'
 import { DirectPortfolioNav } from './DirectPortfolioNav'
-import { TransmissionForm } from './TransmissionForm'
-import { APPLE_SPRINGS } from '@/styles/motion'
+import { CertificateModal } from './CertificateModal'
+import { ProjectLivePreview } from './ProjectLivePreview'
+
+// Official GitHub icon component
+const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
+  <svg
+    viewBox="0 0 24 24"
+    fill="currentColor"
+    className={className}
+    aria-hidden="true"
+  >
+    <path
+      fillRule="evenodd"
+      clipRule="evenodd"
+      d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.53 1.032 1.53 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+    />
+  </svg>
+)
 
 // Helper for category-appropriate project simulation icons
 const getProjectDemoIcon = (project: { category: string }) => {
@@ -49,9 +68,6 @@ const getProjectDemoIcon = (project: { category: string }) => {
   }
   if (project.category.includes('Cybersecurity')) {
     return <ShieldCheck className="w-5 h-5 text-emerald-400" />
-  }
-  if (project.category.includes('Web')) {
-    return <Globe2 className="w-5 h-5 text-electric-blue" />
   }
   return <Terminal className="w-5 h-5 text-sky-light" />
 }
@@ -70,6 +86,7 @@ const getSectionAmbientGlow = (section: string) => {
     case 'resume':
     case 'experience':
     case 'education':
+    case 'seminars':
       return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_25%,_rgba(56,189,248,0.13),_transparent_70%)]'
     case 'contact':
       return 'bg-[radial-gradient(ellipse_80%_60%_at_50%_50%,_rgba(0,240,255,0.14),_transparent_70%)]'
@@ -78,13 +95,14 @@ const getSectionAmbientGlow = (section: string) => {
   }
 }
 
-// Exact 10-section portfolio order
+// Exact 11-section portfolio order
 const SECTIONS = [
   { id: 'home', label: 'Home', icon: House },
   { id: 'about', label: 'About Me', icon: UserRound },
   { id: 'resume', label: 'Resume', icon: FileUser },
   { id: 'experience', label: 'Experience', icon: Briefcase },
   { id: 'education', label: 'Education', icon: GraduationCap },
+  { id: 'seminars', label: 'Seminars & Training', icon: Award },
   { id: 'projects', label: 'Projects', icon: FolderKanban },
   { id: 'skills', label: 'Technical Skills', icon: Brain },
   { id: 'certifications', label: 'Certifications & Badges', icon: Award },
@@ -95,13 +113,21 @@ const SECTIONS = [
 export const DirectPortfolioView: React.FC = () => {
   const { enterWorld } = useGameStore()
   const [activeSection, setActiveSection] = useState<string>('home')
-  const [multimediaFilter, setMultimediaFilter] = useState<'All Works' | MultimediaCategory>('All Works')
   const [selectedMedia, setSelectedMedia] = useState<MultimediaItem | null>(null)
+  const [formSent, setFormSent] = useState(false)
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [expandedCertId, setExpandedCertId] = useState<string | null>(null)
+  const [modalCert, setModalCert] = useState<{
+    imageSrc: string
+    title: string
+    date?: string
+    organizer?: string
+  } | null>(null)
   const scrollContainerRef = useRef<HTMLDivElement>(null)
   const parallaxGlowRef = useRef<HTMLDivElement>(null)
   const parallaxGridRef = useRef<HTMLDivElement>(null)
 
-  // Single lightweight IntersectionObserver for panel and card entrance transitions (GPU-accelerated, runs once per element)
+  // Single lightweight IntersectionObserver for panel and card entrance transitions (GPU-accelerated, runs once)
   useEffect(() => {
     const container = scrollContainerRef.current
     if (!container) return
@@ -114,24 +140,20 @@ export const DirectPortfolioView: React.FC = () => {
         entries.forEach((entry) => {
           if (entry.isIntersecting) {
             entry.target.classList.add('is-revealed')
-            observer.unobserve(entry.target) // Unobserve immediately: once revealed, stays revealed permanently
+            observer.unobserve(entry.target) // Unobserve immediately: zero continuous overhead!
           }
         })
       },
       {
         root: container,
-        rootMargin: '0px 0px -30px 0px',
-        threshold: 0.05,
+        rootMargin: '0px 0px -40px 0px',
+        threshold: 0.08,
       }
     )
 
-    elements.forEach((el) => {
-      if (el.classList.contains('is-revealed')) return
-      observer.observe(el)
-    })
-
+    elements.forEach((el) => observer.observe(el))
     return () => observer.disconnect()
-  }, [multimediaFilter])
+  }, [])
 
   // IntersectionObserver for scroll-spy activeSection (zero layout thrashing)
   useEffect(() => {
@@ -164,15 +186,14 @@ export const DirectPortfolioView: React.FC = () => {
     return () => observer.disconnect()
   }, [])
 
-  // Apple-Inspired Subtle Parallax Background (RAF-throttled, GPU compositor only, skipped on mobile)
+  // Apple-Inspired Subtle Parallax Background (RAF-throttled, GPU compositor only)
   useEffect(() => {
     const container = scrollContainerRef.current
     const glowEl = parallaxGlowRef.current
     const gridEl = parallaxGridRef.current
     if (!container || !glowEl || !gridEl) return
 
-    const isMobile = typeof window !== 'undefined' && window.innerWidth < 768
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches || isMobile) {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
       return
     }
 
@@ -215,30 +236,11 @@ export const DirectPortfolioView: React.FC = () => {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [])
 
-  // Categories with actual uploaded creative works
-  const availableCategories: ('All Works' | MultimediaCategory)[] = [
-    'All Works',
-    ...Array.from(new Set(multimediaData.map((m) => m.category))),
-  ]
-
-  const filteredMedia =
-    multimediaFilter === 'All Works'
-      ? multimediaData
-      : multimediaData.filter((m) => m.category === multimediaFilter)
-
-  const activeScrollRaf = useRef<number | null>(null)
-
   // Apple-inspired smooth scroll with quintic ease-out physics and sticky offset
   const scrollToSection = (id: string) => {
     const container = scrollContainerRef.current
     const el = document.getElementById(id)
     if (!container || !el) return
-
-    // Cancel any in-flight navigation scroll immediately to prevent fighting loops
-    if (activeScrollRaf.current !== null) {
-      cancelAnimationFrame(activeScrollRaf.current)
-      activeScrollRaf.current = null
-    }
 
     const containerRect = container.getBoundingClientRect()
     const elRect = el.getBoundingClientRect()
@@ -260,13 +262,14 @@ export const DirectPortfolioView: React.FC = () => {
     const distance = targetTop - startTop
     if (Math.abs(distance) < 2) return
 
-    // Dynamic duration based on travel distance: short glides (~380ms), long traversals (~650ms)
-    const duration = Math.min(650, Math.max(380, Math.abs(distance) * 0.3))
+    // Dynamic duration based on travel distance: short glides (~450ms), long traversals (~750ms)
+    const duration = Math.min(750, Math.max(450, Math.abs(distance) * 0.35))
     const startTime = performance.now()
 
     // Apple quintic ease-out: brisk initial movement, prolonged silky deceleration
     const easeOutQuint = (t: number) => 1 - Math.pow(1 - t, 5)
 
+    let animId: number
     const animateScroll = (currentTime: number) => {
       const elapsed = currentTime - startTime
       const progress = Math.min(elapsed / duration, 1)
@@ -275,25 +278,29 @@ export const DirectPortfolioView: React.FC = () => {
       container.scrollTop = startTop + distance * eased
 
       if (progress < 1) {
-        activeScrollRaf.current = requestAnimationFrame(animateScroll)
-      } else {
-        activeScrollRaf.current = null
+        animId = requestAnimationFrame(animateScroll)
       }
     }
 
-    activeScrollRaf.current = requestAnimationFrame(animateScroll)
+    animId = requestAnimationFrame(animateScroll)
 
     // Cancel animation gracefully if user intervenes with mousewheel or touch
     const cancelScroll = () => {
-      if (activeScrollRaf.current !== null) {
-        cancelAnimationFrame(activeScrollRaf.current)
-        activeScrollRaf.current = null
-      }
+      cancelAnimationFrame(animId)
       container.removeEventListener('wheel', cancelScroll)
       container.removeEventListener('touchstart', cancelScroll)
     }
     container.addEventListener('wheel', cancelScroll, { passive: true, once: true })
     container.addEventListener('touchstart', cancelScroll, { passive: true, once: true })
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormSent(true)
+    setTimeout(() => {
+      setFormData({ name: '', email: '', message: '' })
+      setFormSent(false)
+    }, 4500)
   }
 
   return (
@@ -425,17 +432,13 @@ export const DirectPortfolioView: React.FC = () => {
                 <div className="relative group w-44 h-44 sm:w-48 sm:h-48 flex-shrink-0">
                   <div className="relative w-full h-full rounded-2xl p-1 bg-gradient-to-tr from-cyan-500 via-sky-400 to-electric-blue shadow-[0_0_30px_rgba(0,240,255,0.35)] transition-all group-hover:shadow-[0_0_45px_rgba(0,240,255,0.6)]">
                     <div className="w-full h-full rounded-[14px] overflow-hidden bg-deep-navy border border-electric-blue/50">
-                      <picture>
-                        <source srcSet="/profile.webp" type="image/webp" />
-                        <img
-                          src="/profile.jpg"
-                          alt="Ina Grace Tan — Candidate Portrait"
-                          width={200}
-                          height={200}
-                          decoding="async"
-                          className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
-                        />
-                      </picture>
+                      <img
+                        src="/profile.jpg"
+                        alt="Ina Grace Tan — Candidate Portrait"
+                        width={200}
+                        height={200}
+                        className="w-full h-full object-cover object-top transition-transform duration-500 group-hover:scale-105"
+                      />
                     </div>
                     {/* Status Pill Badge */}
                     <div className="absolute -bottom-2.5 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-deep-navy-card/95 border border-electric-blue/60 font-mono text-[10px] text-electric-blue font-bold tracking-wider shadow-lg whitespace-nowrap flex items-center gap-1.5">
@@ -884,7 +887,205 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 6: PROJECTS */}
+        {/* SECTION 6: SEMINARS & TRAINING */}
+        {/* ========================================================= */}
+        <section id="seminars" className="reveal-panel scroll-mt-24 space-y-6">
+          <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <div className="p-1.5 rounded-lg bg-electric-blue/15 border border-electric-blue/30 text-electric-blue flex-shrink-0">
+                  <Award className="w-5 h-5" />
+                </div>
+                <div>
+                  <h2 className="font-display font-bold text-xl sm:text-2xl text-warm-ivory tracking-wide flex items-center gap-2">
+                    <span>SEMINARS &amp; TRAINING</span>
+                    <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
+                  </h2>
+                  <p className="font-mono text-[11px] text-sky-light/70">
+                    Verified Technology Seminars, Workshops &amp; Professional Training Records
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-2">
+                <span className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-electric-blue/15 border border-electric-blue/30 font-mono text-[11px] text-electric-blue font-bold">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  <span className="hidden sm:inline">OFFICIAL CERTIFICATES</span>
+                </span>
+                <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                  CHAPTER // 06
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* Cards Grid */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+            {seminarsTrainingsData.map((st, sIdx) => {
+              const isCertExpanded = expandedCertId === st.id
+              const hasCert = Boolean(st.hasCertificate && st.certificateUrl)
+
+              return (
+                <div
+                  key={st.id}
+                  className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/90 border border-sky-blue/20 shadow-xl backdrop-blur-md flex flex-col justify-between space-y-4 transition-all"
+                  style={{ '--stagger-delay': `${sIdx * 80}ms` } as React.CSSProperties}
+                >
+                  <div className="space-y-3.5">
+                    {/* Header: Title & Badges */}
+                    <div className="space-y-2 border-b border-white/10 pb-3">
+                      <div className="flex items-start justify-between gap-2">
+                        <h3 className="font-display font-bold text-base sm:text-lg text-warm-ivory leading-snug">
+                          {st.title}
+                        </h3>
+                        {st.recognition && (
+                          <span className="px-2.5 py-0.5 rounded-full font-mono text-[10px] font-bold uppercase bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex-shrink-0">
+                            {st.recognition}
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="flex flex-wrap items-center gap-3 font-mono text-xs">
+                        {st.organizer && (
+                          <span className="flex items-center gap-1.5 text-warm-ivory-dim">
+                            <Building2 className="w-3.5 h-3.5 text-electric-blue flex-shrink-0" />
+                            <span>{st.organizer}</span>
+                          </span>
+                        )}
+                        <span className="flex items-center gap-1.5 text-electric-blue font-semibold">
+                          <Calendar className="w-3.5 h-3.5 flex-shrink-0" />
+                          <span>{st.date}</span>
+                        </span>
+                      </div>
+                    </div>
+
+                    {/* Venue */}
+                    {st.venue && (
+                      <div className="flex items-center gap-1.5 font-mono text-[11px] text-sky-light/80">
+                        <MapPin className="w-3.5 h-3.5 text-sky-light/60 flex-shrink-0" />
+                        <span>{st.venue}</span>
+                      </div>
+                    )}
+
+                    {/* Description */}
+                    {st.description && (
+                      <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed">
+                        {st.description}
+                      </p>
+                    )}
+
+                    {/* Details / Covered topics */}
+                    {st.details && st.details.length > 0 && (
+                      <div className="flex flex-wrap gap-1.5 pt-1">
+                        {st.details.map((d, i) => (
+                          <span
+                            key={i}
+                            className="font-mono text-[10px] px-2.5 py-0.5 rounded bg-deep-navy/80 border border-sky-blue/20 text-sky-light"
+                          >
+                            {d}
+                          </span>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Card Footer: View Certificate Button & Preview */}
+                  <div className="pt-3 border-t border-white/10 flex flex-col gap-2">
+                    <div className="flex items-center justify-between gap-2">
+                      {hasCert ? (
+                        <button
+                          type="button"
+                          onClick={() => setExpandedCertId(isCertExpanded ? null : st.id)}
+                          className={`inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full text-xs font-mono font-semibold transition-all cursor-pointer ${
+                            isCertExpanded
+                              ? 'bg-rose-500/20 text-rose-300 border border-rose-500/40'
+                              : 'bg-electric-blue/15 text-electric-blue hover:bg-electric-blue/25 border border-electric-blue/35'
+                          }`}
+                          aria-expanded={isCertExpanded}
+                        >
+                          <Award className="w-3.5 h-3.5" />
+                          <span>{isCertExpanded ? 'Hide Certificate' : 'View Certificate'}</span>
+                          {isCertExpanded ? (
+                            <ChevronUp className="w-3.5 h-3.5" />
+                          ) : (
+                            <ChevronDown className="w-3.5 h-3.5" />
+                          )}
+                        </button>
+                      ) : (
+                        <div className="flex items-center gap-1.5 text-warm-ivory-dim/60 font-mono text-[11px]">
+                          <ShieldCheck className="w-3.5 h-3.5 text-sky-light/60" />
+                          <span>Institutional Record (From Official CV)</span>
+                        </div>
+                      )}
+
+                      {hasCert && isCertExpanded && (
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setModalCert({
+                              imageSrc: st.certificateUrl!,
+                              title: st.title,
+                              date: st.date,
+                              organizer: st.organizer,
+                            })
+                          }
+                          className="inline-flex items-center gap-1 font-mono text-[11px] text-sky-light hover:text-electric-blue transition-colors cursor-pointer"
+                          title="Fullscreen Certificate Inspection"
+                        >
+                          <Maximize2 className="w-3 h-3" />
+                          <span className="hidden sm:inline">Fullscreen</span>
+                        </button>
+                      )}
+                    </div>
+
+                    {/* Expandable Certificate Preview Container (Hidden by default, shown on demand) */}
+                    {hasCert && isCertExpanded && (
+                      <div className="mt-3 p-3.5 rounded-lg bg-black/40 border border-sky-blue/30 space-y-2">
+                        <div className="flex items-center justify-between pb-1.5 text-[10px] font-mono text-sky-light border-b border-white/10">
+                          <span className="font-semibold tracking-wider">OFFICIAL CERTIFICATE PREVIEW</span>
+                          <button
+                            type="button"
+                            onClick={() => setExpandedCertId(null)}
+                            className="flex items-center gap-1 text-rose-300 hover:text-rose-200 transition-colors cursor-pointer"
+                          >
+                            <X className="w-3.5 h-3.5" />
+                            <span>Close</span>
+                          </button>
+                        </div>
+
+                        <div
+                          className="flex items-center justify-center overflow-hidden cursor-zoom-in group"
+                          onClick={() =>
+                            setModalCert({
+                              imageSrc: st.certificateUrl!,
+                              title: st.title,
+                              date: st.date,
+                              organizer: st.organizer,
+                            })
+                          }
+                        >
+                          <img
+                            src={st.certificateUrl}
+                            alt={`Certificate for ${st.title}`}
+                            className="w-full max-h-[450px] object-contain rounded border border-sky-blue/20 shadow-xl group-hover:opacity-95 transition-opacity"
+                            draggable={false}
+                          />
+                        </div>
+
+                        <p className="text-[10px] text-center text-warm-ivory-dim/70 font-mono">
+                          Click certificate image or &quot;Fullscreen&quot; to inspect in high resolution
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                </div>
+              )
+            })}
+          </div>
+        </section>
+
+        {/* ========================================================= */}
+        {/* SECTION 7: PROJECTS */}
         {/* ========================================================= */}
         <section id="projects" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -899,12 +1100,12 @@ export const DirectPortfolioView: React.FC = () => {
                     <span className="w-1.5 h-1.5 rounded-full bg-electric-blue animate-pulse" />
                   </h2>
                   <p className="font-mono text-[11px] text-sky-light/70">
-                    6 Projects — Personal, Academic, Capstone &amp; Enterprise
+                    6 Projects &bull; Personal, Academic, Capstone &amp; Enterprise
                   </p>
                 </div>
               </div>
               <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
-                CHAPTER // 06
+                CHAPTER // 07
               </span>
             </div>
           </div>
@@ -913,55 +1114,81 @@ export const DirectPortfolioView: React.FC = () => {
             {projectsData.map((project, pIdx) => (
               <div
                 key={project.id}
-                className={[
-                  'reveal-card apple-card-hover p-6 rounded-lg flex flex-col justify-between space-y-5 shadow-lg transition-colors',
-                  project.links?.demo
-                    ? 'bg-deep-navy-card/80 border border-electric-blue/30 hover:border-electric-blue/60'
-                    : 'bg-deep-navy-card/70 border border-sky-blue/20 hover:border-electric-blue/50',
-                ].join(' ')}
+                className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/70 border border-sky-blue/20 flex flex-col justify-between space-y-5 hover:border-electric-blue/50 transition-colors shadow-lg"
                 style={{ '--stagger-delay': `${pIdx * 70}ms` } as React.CSSProperties}
               >
                 <div className="space-y-3.5">
-
-                  {/* ── Live website preview (projects with screenshot) ── */}
-                  {project.links?.demo && project.previewScreenshot && (
+                  {/* ── Project Preview: Real Screenshot (for CPALE Tracker & MusuanTrack) or Prototype Box Above Title ── */}
+                  {project.previewScreenshot ? (
                     <ProjectLivePreview
-                      url={project.links.demo}
+                      url={project.links?.demo || project.links?.github || '#'}
                       title={project.title}
                       screenshot={project.previewScreenshot}
                       logo={project.logo}
                     />
+                  ) : (
+                    <div className="relative rounded-lg overflow-hidden bg-deep-navy-surface/90 border border-sky-blue/20 p-4 flex flex-col items-center justify-center text-center min-h-[145px] group/preview transition-all hover:border-sky-blue/40 shadow-inner">
+                      <div className="absolute inset-0 bg-game-grid opacity-25 pointer-events-none" />
+
+                      <div className="absolute top-2.5 left-2.5 right-2.5 flex items-center justify-between text-[10px] font-mono pointer-events-none">
+                        <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-deep-navy/90 border border-sky-blue/20 text-sky-light">
+                          <Terminal className="w-3 h-3 text-electric-blue" />
+                          <span>PROTOTYPE ENV</span>
+                        </span>
+                        {project.isDocumentationOnly ? (
+                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warm-ivory/10 border border-warm-ivory/20 text-warm-ivory-dim/70 font-semibold">
+                            CASE STUDY
+                          </span>
+                        ) : (
+                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-sky-blue/10 border border-sky-blue/20 text-sky-light/80 font-semibold">
+                            <span className="w-1.5 h-1.5 rounded-full bg-sky-light/60" />
+                            <span>IN STAGING</span>
+                          </span>
+                        )}
+                      </div>
+
+                      <div className="relative z-10 flex flex-col items-center gap-2 pt-6 pb-2">
+                        {project.logo ? (
+                          <img
+                            src={project.logo}
+                            alt={`${project.title} logo`}
+                            className="max-h-12 max-w-[130px] w-auto object-contain drop-shadow-lg transition-transform duration-300 group-hover/preview:scale-105"
+                            draggable={false}
+                          />
+                        ) : (
+                          <div className="p-3 rounded-xl bg-deep-navy border border-sky-blue/25 shadow-inner group-hover/preview:border-electric-blue transition-colors">
+                            {getProjectDemoIcon(project)}
+                          </div>
+                        )}
+                        <div className="space-y-0.5">
+                          <div className="font-mono text-xs font-semibold text-warm-ivory">
+                            {project.category}
+                          </div>
+                          <div className="font-mono text-[10px] text-warm-ivory-dim/60">
+                            {project.isDocumentationOnly ? 'Institutional Case Study' : 'Institutional Software System'}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
                   )}
 
-                  {/* ── Category + badges row ─────────────────────────── */}
+                  {/* Category and Role */}
                   <div className="flex items-start justify-between gap-2">
                     <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-electric-blue/15 text-electric-blue border border-electric-blue/30 uppercase font-semibold">
                       {project.category}
                     </span>
-                    <div className="flex items-center gap-1.5 flex-wrap justify-end">
-                      {project.isPersonalProject && (
-                        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-sky-blue/15 text-sky-light border border-sky-blue/30 font-semibold">
-                          Personal Project
-                        </span>
-                      )}
-                      {project.isDocumentationOnly && (
-                        <span className="font-mono text-[10px] px-2 py-0.5 rounded bg-warm-ivory/10 text-warm-ivory-dim/60 border border-warm-ivory/15 font-semibold">
-                          Case Study
-                        </span>
-                      )}
-                      <span className="font-mono text-[10px] text-warm-ivory-dim/70">
-                        {project.role}
-                      </span>
-                    </div>
+                    <span className="font-mono text-[10px] text-warm-ivory-dim/70">
+                      {project.role}
+                    </span>
                   </div>
 
-                  {/* ── Title row: logo + title ───────────────────────── */}
+                  {/* Project Title & Logo beside title */}
                   <div className="flex items-center gap-3">
                     {project.logo && (
                       <img
                         src={project.logo}
                         alt={`${project.title} logo`}
-                        className="w-9 h-9 object-contain flex-shrink-0 rounded-md"
+                        className="w-9 h-9 object-contain flex-shrink-0 rounded-md bg-deep-navy/80 p-0.5 border border-sky-blue/20"
                         draggable={false}
                       />
                     )}
@@ -974,48 +1201,7 @@ export const DirectPortfolioView: React.FC = () => {
                     {project.description}
                   </p>
 
-                  {/* ── Static preview card (non-demo projects only) ──── */}
-                  {!project.links?.demo && (
-                    <div className="relative rounded-lg overflow-hidden bg-deep-navy-surface/90 border border-sky-blue/20 flex flex-col items-center justify-center text-center min-h-[120px] group/preview transition-all hover:border-sky-blue/40 shadow-inner">
-                      <div className="absolute inset-0 bg-game-grid opacity-20 pointer-events-none" />
-
-                      {/* Status badge */}
-                      <div className="absolute top-2.5 right-2.5 text-[10px] font-mono pointer-events-none z-10">
-                        {project.isDocumentationOnly ? (
-                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-warm-ivory/10 border border-warm-ivory/20 text-warm-ivory-dim/70 font-semibold">
-                            CASE STUDY
-                          </span>
-                        ) : (
-                          <span className="flex items-center gap-1.5 px-2 py-0.5 rounded bg-sky-blue/10 border border-sky-blue/20 text-sky-light/80 font-semibold">
-                            <span className="w-1.5 h-1.5 rounded-full bg-sky-light/60" />
-                            IN REVIEW
-                          </span>
-                        )}
-                      </div>
-
-                      <div className="relative z-10 flex flex-col items-center gap-2 py-5 px-4 w-full">
-                        {project.logo ? (
-                          <img
-                            src={project.logo}
-                            alt={`${project.title} logo`}
-                            className="max-h-14 max-w-[140px] w-auto object-contain drop-shadow-lg transition-transform duration-300 group-hover/preview:scale-105"
-                            draggable={false}
-                          />
-                        ) : (
-                          <div className="p-3 rounded-xl bg-deep-navy border border-sky-blue/25 shadow-inner group-hover/preview:border-electric-blue transition-colors">
-                            {getProjectDemoIcon(project)}
-                          </div>
-                        )}
-                        {project.isDocumentationOnly && (
-                          <span className="font-mono text-[9px] px-2 py-0.5 rounded border border-warm-ivory/15 text-warm-ivory-dim/50 tracking-wider uppercase">
-                            Documentation Only
-                          </span>
-                        )}
-                      </div>
-                    </div>
-                  )}
-
-                  {/* ── Key highlights ────────────────────────────────── */}
+                  {/* Highlights */}
                   <div className="space-y-1.5 pt-1">
                     <div className="font-mono text-[10px] font-bold text-sky-light uppercase">
                       Key Highlights:
@@ -1031,41 +1217,54 @@ export const DirectPortfolioView: React.FC = () => {
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-sky-blue/15 space-y-2.5">
-                  {/* Tech Stack: logo + name tags — consistent across all project cards */}
+                {/* Footer: Tech Stack + GitHub & Red Live Buttons */}
+                <div className="pt-4 border-t border-sky-blue/15 space-y-3">
                   <div className="flex flex-wrap gap-1.5">
                     {project.techStack.map((tech) => (
-                      <TechTag key={tech} name={tech} />
+                      <span
+                        key={tech}
+                        className="font-mono text-[10px] px-2 py-0.5 rounded bg-deep-navy/80 border border-sky-blue/20 text-sky-light"
+                      >
+                        {tech}
+                      </span>
                     ))}
                   </div>
 
-                  {/* Footer row: links + status */}
-                  <div className="flex flex-wrap items-center justify-between gap-2 pt-1">
-                    <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center justify-between gap-2.5 pt-1">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* GitHub Link Button with official GitHub Logo */}
                       {project.links?.github && (
                         <a
                           href={project.links.github}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1 rounded bg-deep-navy border border-sky-blue/25 text-warm-ivory hover:text-electric-blue hover:border-electric-blue/40 transition-colors"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] px-3 py-1.5 rounded bg-deep-navy hover:bg-deep-navy-surface border border-sky-blue/30 text-warm-ivory hover:text-white hover:border-white/50 transition-colors shadow-sm"
+                          title={`View ${project.title} source code on GitHub`}
+                          aria-label={`View ${project.title} repository on GitHub`}
                         >
-                          <Code2 className="w-3 h-3" />
+                          <GithubIcon className="w-3.5 h-3.5" />
                           <span>GitHub</span>
                         </a>
                       )}
+
+                      {/* Red Live Button */}
                       {project.links?.demo && (
                         <a
                           href={project.links.demo}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 font-mono text-[10px] px-2.5 py-1 rounded bg-electric-blue/15 border border-electric-blue/30 text-electric-blue hover:bg-electric-blue hover:text-deep-navy font-bold transition-colors"
+                          className="inline-flex items-center gap-1.5 font-mono text-[10px] sm:text-[11px] px-3.5 py-1.5 rounded bg-red-600 hover:bg-red-500 text-white font-bold border border-red-500 shadow-[0_0_12px_rgba(239,68,68,0.4)] transition-all active:scale-95"
+                          title={`Launch ${project.title} Live Demo`}
+                          aria-label={`Launch ${project.title} Live Demo`}
                         >
-                          <Globe2 className="w-3 h-3" />
-                          <span>Live Demo</span>
+                          <span className="w-1.5 h-1.5 rounded-full bg-white animate-pulse" />
+                          <span>Live</span>
+                          <ExternalLink className="w-3 h-3" />
                         </a>
                       )}
                     </div>
-                    <div className="font-mono text-[10px] text-electric-blue text-right">
+
+                    <div className="font-mono text-[10px] text-electric-blue flex items-center gap-2 ml-auto">
                       <span>{project.statusBadge}</span>
                     </div>
                   </div>
@@ -1076,7 +1275,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 7: TECHNICAL SKILLS */}
+        {/* SECTION 8: TECHNICAL SKILLS */}
         {/* ========================================================= */}
         <section id="skills" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1096,7 +1295,7 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               </div>
               <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
-                CHAPTER // 07
+                CHAPTER // 08
               </span>
             </div>
           </div>
@@ -1148,7 +1347,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 8: CERTIFICATIONS & BADGES */}
+        {/* SECTION 9: CERTIFICATIONS & BADGES */}
         {/* ========================================================= */}
         <section id="certifications" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1174,7 +1373,7 @@ export const DirectPortfolioView: React.FC = () => {
                   <span className="hidden sm:inline">OFFICIAL CREDLY VERIFIED</span>
                 </span>
                 <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden md:inline-block">
-                  CHAPTER // 08
+                  CHAPTER // 09
                 </span>
               </div>
             </div>
@@ -1291,7 +1490,7 @@ export const DirectPortfolioView: React.FC = () => {
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 9: MULTIMEDIA & CREATIVE WORKS */}
+        {/* SECTION 10: MULTIMEDIA & CREATIVE WORKS */}
         {/* ========================================================= */}
         <section id="multimedia" className="reveal-panel scroll-mt-24 space-y-6">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1311,49 +1510,15 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               </div>
 
-              {/* Category Filter Pills (Only categories with actual uploaded works) */}
-              <div className="flex flex-wrap items-center gap-1.5 font-mono text-xs">
-                {availableCategories.map((cat) => {
-                  const isActive = multimediaFilter === cat
-                  return (
-                    <motion.button
-                      key={cat}
-                      type="button"
-                      whileTap={{ scale: 0.95 }}
-                      onClick={() => setMultimediaFilter(cat)}
-                      className={`relative px-3 py-1.5 rounded-full transition-colors cursor-pointer z-10 ${
-                        isActive
-                          ? 'text-deep-navy font-bold'
-                          : 'bg-deep-navy/80 border border-sky-blue/20 text-warm-ivory-dim hover:text-warm-ivory hover:border-sky-blue'
-                      }`}
-                    >
-                      {isActive && (
-                        <motion.div
-                          layoutId="media-filter-active-pill"
-                          className="absolute inset-0 bg-cyber-yellow rounded-full -z-10 shadow-[0_0_14px_rgba(255,215,0,0.45)]"
-                          transition={APPLE_SPRINGS.pill}
-                        />
-                      )}
-                      <span>{cat}</span>
-                    </motion.button>
-                  )
-                })}
-              </div>
+              <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
+                CHAPTER // 10
+              </span>
             </div>
           </div>
 
           {/* Gallery Grid */}
-          {filteredMedia.length === 0 ? (
-            <div className="p-12 text-center rounded-lg bg-deep-navy-card/60 border border-dashed border-sky-blue/30 space-y-3">
-              <Palette className="w-10 h-10 text-sky-light/40 mx-auto" />
-              <h3 className="font-mono font-bold text-sm text-warm-ivory">NO CREATIVE WORKS IN THIS CATEGORY</h3>
-              <p className="font-sans text-xs text-warm-ivory-dim/70 max-w-md mx-auto">
-                No items have been uploaded under this category yet.
-              </p>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {filteredMedia.map((item, mIdx) => (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {multimediaData.map((item, mIdx) => (
                 <div
                   key={item.id}
                   className="reveal-card apple-card-hover rounded-lg bg-deep-navy-card/85 border border-sky-blue/25 shadow-xl overflow-hidden flex flex-col justify-between transition-all group"
@@ -1369,15 +1534,9 @@ export const DirectPortfolioView: React.FC = () => {
                     >
                       <div className="aspect-[4/3] w-full bg-deep-navy/90 flex items-center justify-center overflow-hidden">
                         <img
-                          src={item.thumbnailUrl || item.mediaUrl}
+                          src={item.mediaUrl}
                           alt={item.title}
                           loading="lazy"
-                          decoding="async"
-                          onError={(e) => {
-                            if (item.fallbackUrl && e.currentTarget.src !== item.fallbackUrl) {
-                              e.currentTarget.src = item.fallbackUrl
-                            }
-                          }}
                           className="w-full h-full object-cover transition-transform duration-500 ease-out group-hover/img:scale-105"
                         />
                       </div>
@@ -1448,11 +1607,10 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               ))}
             </div>
-          )}
         </section>
 
         {/* ========================================================= */}
-        {/* SECTION 10: CONTACT */}
+        {/* SECTION 11: CONTACT */}
         {/* ========================================================= */}
         <section id="contact" className="reveal-panel scroll-mt-24 space-y-6 pb-12">
           <div className="story-header py-3.5 -mx-4 px-4 sm:-mx-6 sm:px-6 rounded-t-lg border-b border-sky-blue/20">
@@ -1472,7 +1630,7 @@ export const DirectPortfolioView: React.FC = () => {
                 </div>
               </div>
               <span className="font-mono text-[10px] px-2.5 py-1 rounded-full bg-deep-navy border border-sky-blue/25 text-sky-light hidden sm:inline-block">
-                CHAPTER // 10
+                CHAPTER // 11
               </span>
             </div>
           </div>
@@ -1549,15 +1707,76 @@ export const DirectPortfolioView: React.FC = () => {
 
             {/* Quick Interactive Message Form */}
             <div className="reveal-card apple-card-hover p-6 rounded-lg bg-deep-navy-card/80 border border-sky-blue/25 space-y-4 shadow-xl" style={{ '--stagger-delay': '80ms' } as React.CSSProperties}>
-              <div className="flex items-center justify-between border-b border-sky-blue/20 pb-3">
-                <h3 className="font-display font-bold text-lg text-warm-ivory">
-                  SEND DIRECT TRANSMISSION
-                </h3>
-                <span className="font-mono text-[10px] text-electric-blue uppercase tracking-widest px-2 py-0.5 rounded bg-electric-blue/10 border border-electric-blue/30">
-                  ONLINE RELAY
-                </span>
-              </div>
-              <TransmissionForm />
+              <h3 className="font-display font-bold text-lg text-warm-ivory">
+                SEND DIRECT TRANSMISSION
+              </h3>
+
+              {formSent ? (
+                <div className="p-6 rounded-lg bg-muted-green/20 border border-muted-green text-center space-y-2">
+                  <CheckCircle2 className="w-8 h-8 text-muted-green-light mx-auto" />
+                  <div className="font-mono font-bold text-sm text-warm-ivory">
+                    TRANSMISSION RECEIVED
+                  </div>
+                  <p className="font-sans text-xs text-warm-ivory-dim">
+                    Thank you for reaching out. Ina Grace Tan will review your message shortly.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleFormSubmit} className="space-y-4 font-mono text-xs">
+                  <div className="space-y-1">
+                    <label htmlFor="name" className="block text-sky-light">
+                      YOUR NAME
+                    </label>
+                    <input
+                      id="name"
+                      type="text"
+                      required
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      placeholder="e.g. Jane Doe"
+                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label htmlFor="email" className="block text-sky-light">
+                      YOUR EMAIL
+                    </label>
+                    <input
+                      id="email"
+                      type="email"
+                      required
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      placeholder="e.g. recruiter@company.com"
+                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors"
+                    />
+                  </div>
+
+                  <div className="space-y-1">
+                    <label htmlFor="message" className="block text-sky-light">
+                      MESSAGE / INQUIRY
+                    </label>
+                    <textarea
+                      id="message"
+                      rows={4}
+                      required
+                      value={formData.message}
+                      onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                      placeholder="Detail your inquiry or interview invitation here"
+                      className="w-full px-3 py-2 rounded bg-deep-navy/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none resize-none transition-colors"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    className="w-full py-2.5 rounded bg-electric-blue hover:bg-white text-deep-navy font-bold transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>SEND TRANSMISSION</span>
+                  </button>
+                </form>
+              )}
             </div>
           </div>
         </section>
@@ -1614,12 +1833,6 @@ export const DirectPortfolioView: React.FC = () => {
                   <img
                     src={selectedMedia.mediaUrl}
                     alt={selectedMedia.title}
-                    decoding="async"
-                    onError={(e) => {
-                      if (selectedMedia.fallbackUrl && e.currentTarget.src !== selectedMedia.fallbackUrl) {
-                        e.currentTarget.src = selectedMedia.fallbackUrl
-                      }
-                    }}
                     className="max-h-[65vh] w-auto max-w-full rounded object-contain shadow-2xl border border-sky-blue/20"
                   />
                 </div>
@@ -1678,6 +1891,18 @@ export const DirectPortfolioView: React.FC = () => {
           </motion.div>
         )}
       </AnimatePresence>
+
+      {/* Lightbox Certificate Modal */}
+      {modalCert && (
+        <CertificateModal
+          isOpen={Boolean(modalCert)}
+          onClose={() => setModalCert(null)}
+          imageSrc={modalCert.imageSrc}
+          title={modalCert.title}
+          date={modalCert.date}
+          organizer={modalCert.organizer}
+        />
+      )}
 
       {/* FOOTER */}
       <footer className="border-t border-sky-blue/20 bg-deep-navy-card/90 py-8 text-center font-mono text-xs text-warm-ivory-dim/70 space-y-3">

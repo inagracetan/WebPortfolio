@@ -13,7 +13,6 @@ import {
   House,
 } from 'lucide-react'
 import { useGameStore, type ActiveModal } from '@/hooks/useGameStore'
-import { APPLE_SPRINGS, staggerContainerVariants, staggerItemVariants } from '@/styles/motion'
 
 export const MenuDrawer: React.FC = () => {
   const {
@@ -66,15 +65,6 @@ export const MenuDrawer: React.FC = () => {
       badge: 'INA GRACE TAN',
     },
     {
-      label: 'Curriculum Vitae (CV)',
-      action: () => {
-        openModal('RESUME')
-        setMenuOpen(false)
-      },
-      icon: <FileUser className="w-4 h-4 text-electric-blue" />,
-      badge: 'PDF / PRINT',
-    },
-    {
       label: 'Featured Projects',
       action: () => {
         openModal('PROJECTS')
@@ -122,18 +112,12 @@ export const MenuDrawer: React.FC = () => {
   return (
     <AnimatePresence>
       {isMenuOpen && (
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 overflow-hidden select-none"
-        >
+        <div className="fixed inset-0 z-50 overflow-hidden select-none">
           {/* Backdrop */}
           <motion.div
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            transition={{ duration: 0.25 }}
             onClick={() => setMenuOpen(false)}
             className="absolute inset-0 bg-deep-navy/80 backdrop-blur-sm"
           />
@@ -143,7 +127,7 @@ export const MenuDrawer: React.FC = () => {
             initial={{ x: '100%' }}
             animate={{ x: 0 }}
             exit={{ x: '100%' }}
-            transition={{ type: 'spring', damping: 30, stiffness: 350 }}
+            transition={{ type: 'spring', damping: 28, stiffness: 300 }}
             className="absolute right-0 top-0 bottom-0 w-full max-w-sm bg-deep-navy-card/95 border-l border-sky-blue/25 shadow-2xl backdrop-blur-xl p-6 flex flex-col justify-between overflow-y-auto"
           >
             <div>
@@ -169,22 +153,13 @@ export const MenuDrawer: React.FC = () => {
               </div>
 
               {/* Navigation Items (6 Core Sections) */}
-              <motion.div
-                variants={staggerContainerVariants}
-                initial="hidden"
-                animate="visible"
-                className="space-y-1.5 mb-6"
-              >
+              <div className="space-y-1.5 mb-6">
                 {navItems.map((item, idx) => (
-                  <motion.button
+                  <button
                     key={idx}
                     type="button"
-                    variants={staggerItemVariants}
-                    whileTap={{ scale: 0.98 }}
-                    whileHover={{ x: 3 }}
-                    transition={APPLE_SPRINGS.snappy}
                     onClick={item.action}
-                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-sm border transition-colors font-mono text-xs tracking-wider group text-left cursor-pointer ${
+                    className={`w-full flex items-center justify-between px-3.5 py-2.5 rounded-sm border transition-all font-mono text-xs tracking-wider group text-left cursor-pointer ${
                       item.isPrimary
                         ? 'bg-electric-blue/15 hover:bg-electric-blue border-electric-blue text-electric-blue hover:text-deep-navy font-bold'
                         : 'bg-deep-navy/60 hover:bg-deep-navy border-sky-blue/10 hover:border-sky-blue/40 text-warm-ivory hover:text-electric-blue'
@@ -203,9 +178,9 @@ export const MenuDrawer: React.FC = () => {
                         {item.badge}
                       </span>
                     )}
-                  </motion.button>
+                  </button>
                 ))}
-              </motion.div>
+              </div>
             </div>
 
             {/* Footer */}
@@ -214,7 +189,7 @@ export const MenuDrawer: React.FC = () => {
               <span className="text-electric-blue font-bold">READY FOR ROLES</span>
             </div>
           </motion.aside>
-        </motion.div>
+        </div>
       )}
     </AnimatePresence>
   )
