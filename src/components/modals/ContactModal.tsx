@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { contactData } from '@/data/contact'
 import { useGameStore } from '@/hooks/useGameStore'
+import { useObjectInspection } from '@/interactions/useObjectInspection'
 import {
   Mail,
   Copy,
@@ -16,8 +17,18 @@ import {
 
 export const ContactModal: React.FC = () => {
   const { activeModal, closeModal } = useGameStore()
+  const { activeInspectionModal, closeInspection } = useObjectInspection()
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
+
+  const isContactOpen = activeModal === 'CONTACT' || activeInspectionModal === 'CONTACT'
+
+  const handleContactClose = () => {
+    closeModal()
+    if (activeInspectionModal === 'CONTACT') {
+      closeInspection()
+    }
+  }
 
   const handleCopyEmail = () => {
     navigator.clipboard.writeText(contactData.email)
@@ -33,8 +44,8 @@ export const ContactModal: React.FC = () => {
 
   return (
     <Modal
-      isOpen={activeModal === 'CONTACT'}
-      onClose={closeModal}
+      isOpen={isContactOpen}
+      onClose={handleContactClose}
       title="CONTACT_STATION // TRANSMISSIONS_TERMINAL.EXE"
       subtitle="Direct cellular telephone line, secure email link & collaboration channels"
       badge="0955-290-0484"

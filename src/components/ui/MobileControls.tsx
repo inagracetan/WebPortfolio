@@ -22,7 +22,7 @@ export const MobileControls: React.FC = () => {
   const hasNearbyTarget = useMemo(() => {
     const [px, , pz] = playerPosition
     return INTERACTIVE_OBJECTS.some(
-      (t) => Math.hypot(px - t.position[0], pz - t.position[2]) <= t.radius
+      (t) => Math.hypot(px - t.position[0], pz - t.position[2]) <= t.radius + 0.5
     )
   }, [playerPosition])
 
@@ -120,7 +120,7 @@ export const MobileControls: React.FC = () => {
     touchControlsStore.triggerInteract()
     const [px, , pz] = playerPosition
     for (const obj of INTERACTIVE_OBJECTS) {
-      if (Math.hypot(px - obj.position[0], pz - obj.position[2]) <= obj.radius) {
+      if (Math.hypot(px - obj.position[0], pz - obj.position[2]) <= obj.radius + 0.5) {
         objectInspectionStore.openInspection(obj)
         break
       }

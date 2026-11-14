@@ -4,6 +4,7 @@ import { Modal } from '@/components/ui/Modal'
 import { projectsData } from '@/data/projects'
 import type { Project } from '@/data/types'
 import { useGameStore } from '@/hooks/useGameStore'
+import { useObjectInspection } from '@/interactions/useObjectInspection'
 
 // Official GitHub icon component matching DirectPortfolioView
 const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5' }) => (
@@ -23,7 +24,17 @@ const GithubIcon: React.FC<{ className?: string }> = ({ className = 'w-3.5 h-3.5
 
 export const ProjectsModal: React.FC = () => {
   const { activeModal, closeModal, selectedProjectId } = useGameStore()
+  const { activeInspectionModal, closeInspection } = useObjectInspection()
   const [selectedCategory, setSelectedCategory] = useState<string>('ALL')
+
+  const isProjectsOpen = activeModal === 'PROJECTS' || (activeInspectionModal as any) === 'PROJECTS'
+
+  const handleProjectsClose = () => {
+    closeModal()
+    if ((activeInspectionModal as any) === 'PROJECTS') {
+      closeInspection()
+    }
+  }
 
   const categories = ['ALL', ...Array.from(new Set(projectsData.map((p) => p.category)))]
 
@@ -38,8 +49,8 @@ export const ProjectsModal: React.FC = () => {
 
   return (
     <Modal
-      isOpen={activeModal === 'PROJECTS'}
-      onClose={closeModal}
+      isOpen={isProjectsOpen}
+      onClose={handleProjectsClose}
       title="PROJECT_LAB // SHOWCASE_ARCHIVE.EXE"
       subtitle="Academic capstones, mobile applications, cybersecurity analysis & enterprise systems"
       badge="5 PROJECTS"

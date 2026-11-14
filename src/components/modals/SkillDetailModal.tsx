@@ -1,13 +1,16 @@
 import React from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
+import { skillGroupsData } from '@/data/skills'
 import { TechLogo } from '@/components/portfolio/TechLogo'
 import { Code2, Database, Network, ShieldCheck, FileSpreadsheet, Layers, CheckCircle2 } from 'lucide-react'
 
 export const SkillDetailModal: React.FC = () => {
   const { activeInspectionModal, activeSkillGroupDetail, closeInspection } = useObjectInspection()
 
-  if (!activeSkillGroupDetail) return null
+  const currentSkillGroup = activeSkillGroupDetail || (activeInspectionModal === 'SKILL_DETAIL' ? skillGroupsData[0] : null)
+
+  if (!currentSkillGroup) return null
 
   const getIcon = (iconName: string) => {
     switch (iconName) {
@@ -30,8 +33,8 @@ export const SkillDetailModal: React.FC = () => {
     <Modal
       isOpen={activeInspectionModal === 'SKILL_DETAIL'}
       onClose={closeInspection}
-      title={`TECH_CENTER // ${activeSkillGroupDetail.title}.DAT`}
-      subtitle={activeSkillGroupDetail.description}
+      title={`TECH_CENTER // ${currentSkillGroup.title}.DAT`}
+      subtitle={currentSkillGroup.description}
       badge="CAPABILITY DOMAIN"
       locationTag="TECH CENTER"
       maxWidth="3xl"
@@ -40,14 +43,14 @@ export const SkillDetailModal: React.FC = () => {
         {/* Domain Overview Header */}
         <div className="p-4 bg-deep-navy/80 border border-sky-blue/20 rounded-sm flex items-center gap-3.5">
           <div className="p-2.5 bg-sky-blue/10 border border-sky-blue/30 rounded text-electric-blue">
-            {getIcon(activeSkillGroupDetail.icon)}
+            {getIcon(currentSkillGroup.icon)}
           </div>
           <div>
             <h4 className="font-display font-bold text-lg text-warm-ivory">
-              {activeSkillGroupDetail.title}
+              {currentSkillGroup.title}
             </h4>
             <p className="text-xs text-sky-light font-mono mt-0.5">
-              {activeSkillGroupDetail.description}
+              {currentSkillGroup.description}
             </p>
           </div>
         </div>
@@ -59,7 +62,7 @@ export const SkillDetailModal: React.FC = () => {
           </h4>
 
           <div className="space-y-3">
-            {activeSkillGroupDetail.skills.map((skill) => (
+            {currentSkillGroup.skills.map((skill) => (
               <div
                 key={skill.name}
                 className="p-3.5 bg-deep-navy/50 border border-sky-blue/15 rounded space-y-2"

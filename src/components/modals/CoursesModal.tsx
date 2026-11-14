@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
+import { useGameStore } from '@/hooks/useGameStore'
 import { educationData, seminarsTrainingsData } from '@/data/education'
 import { certificationsData, CATEGORY_GRADIENTS } from '@/data/certifications'
 import { CredlyBadge } from '@/components/portfolio/CredlyBadge'
@@ -26,6 +27,7 @@ import {
 
 export const CoursesModal: React.FC = () => {
   const { activeInspectionModal, closeInspection } = useObjectInspection()
+  const { activeModal, closeModal } = useGameStore()
   const [activeTab, setActiveTab] = useState<'COURSEWORK' | 'SEMINARS' | 'BADGES'>('COURSEWORK')
   const [expandedCertId, setExpandedCertId] = useState<string | null>(null)
   const [modalCert, setModalCert] = useState<{
@@ -34,6 +36,15 @@ export const CoursesModal: React.FC = () => {
     date?: string
     organizer?: string
   } | null>(null)
+
+  const isCoursesOpen = activeInspectionModal === 'COURSES' || (activeModal as any) === 'COURSES'
+
+  const handleCoursesClose = () => {
+    closeInspection()
+    if ((activeModal as any) === 'COURSES') {
+      closeModal()
+    }
+  }
 
   const toggleCertificate = (id: string) => {
     setExpandedCertId((prev) => (prev === id ? null : id))
@@ -57,8 +68,8 @@ export const CoursesModal: React.FC = () => {
   return (
     <>
       <Modal
-        isOpen={activeInspectionModal === 'COURSES'}
-        onClose={closeInspection}
+        isOpen={isCoursesOpen}
+        onClose={handleCoursesClose}
         title="ACADEMIA // COURSEWORK_RECORDS.DAT"
         subtitle="Institutional IT coursework, cloud foundations, directory services, verified seminars & digital badges"
         badge="ACADEMIC COURSEWORK"

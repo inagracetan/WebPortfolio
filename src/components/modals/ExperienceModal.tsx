@@ -6,6 +6,7 @@ import { certificationsData, CATEGORY_GRADIENTS } from '@/data/certifications'
 import { CredlyBadge } from '@/components/portfolio/CredlyBadge'
 import { CertificateModal } from '@/components/portfolio/CertificateModal'
 import { useGameStore } from '@/hooks/useGameStore'
+import { useObjectInspection } from '@/interactions/useObjectInspection'
 import {
   Briefcase,
   GraduationCap,
@@ -26,6 +27,7 @@ import {
 
 export const ExperienceModal: React.FC = () => {
   const { activeModal, closeModal } = useGameStore()
+  const { activeInspectionModal, closeInspection } = useObjectInspection()
   const [activeTab, setActiveTab] = useState<'EXPERIENCE' | 'EDUCATION' | 'SEMINARS' | 'BADGES'>('EXPERIENCE')
   const [expandedCertId, setExpandedCertId] = useState<string | null>(null)
   const [modalCert, setModalCert] = useState<{
@@ -35,6 +37,18 @@ export const ExperienceModal: React.FC = () => {
     organizer?: string
   } | null>(null)
 
+  const isExperienceOpen =
+    activeModal === 'EXPERIENCE' ||
+    activeInspectionModal === 'EDUCATION' ||
+    (activeInspectionModal as any) === 'EXPERIENCE'
+
+  const handleExperienceClose = () => {
+    closeModal()
+    if (activeInspectionModal === 'EDUCATION' || (activeInspectionModal as any) === 'EXPERIENCE') {
+      closeInspection()
+    }
+  }
+
   const toggleCertificate = (id: string) => {
     setExpandedCertId((prev) => (prev === id ? null : id))
   }
@@ -42,8 +56,8 @@ export const ExperienceModal: React.FC = () => {
   return (
     <>
       <Modal
-        isOpen={activeModal === 'EXPERIENCE'}
-        onClose={closeModal}
+        isOpen={isExperienceOpen}
+        onClose={handleExperienceClose}
         title="UNIVERSITY_BUILDING // ACADEMIA_ARCHIVES.EXE"
         subtitle="Verified academic record at Central Mindanao University, freelance work history, specialized seminars & official badges"
         badge="CENTRAL MINDANAO UNIV"

@@ -44,7 +44,7 @@ export function useProximityInteractions() {
     let currentIslandLoc = activeLoc
     for (const loc of locationsData) {
       const d = Math.hypot(px - loc.coordinates[0], pz - loc.coordinates[2])
-      if (d <= 5.8) {
+      if (d <= 7.5) {
         currentIslandLoc = loc
         if (activeLoc.id !== loc.id) {
           gameStore.setLocation(loc.id)
