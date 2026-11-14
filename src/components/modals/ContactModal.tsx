@@ -13,6 +13,8 @@ import {
   Phone,
   PhoneCall,
   MapPin,
+  Send,
+  CheckCircle2,
 } from 'lucide-react'
 
 export const ContactModal: React.FC = () => {
@@ -20,6 +22,8 @@ export const ContactModal: React.FC = () => {
   const { activeInspectionModal, closeInspection } = useObjectInspection()
   const [copiedEmail, setCopiedEmail] = useState(false)
   const [copiedPhone, setCopiedPhone] = useState(false)
+  const [formData, setFormData] = useState({ name: '', email: '', message: '' })
+  const [formSent, setFormSent] = useState(false)
 
   const isContactOpen = activeModal === 'CONTACT' || activeInspectionModal === 'CONTACT'
 
@@ -40,6 +44,15 @@ export const ContactModal: React.FC = () => {
     navigator.clipboard.writeText(contactData.phoneFormatted)
     setCopiedPhone(true)
     setTimeout(() => setCopiedPhone(false), 2000)
+  }
+
+  const handleFormSubmit = (e: React.FormEvent) => {
+    e.preventDefault()
+    setFormSent(true)
+    setTimeout(() => {
+      setFormData({ name: '', email: '', message: '' })
+      setFormSent(false)
+    }, 4500)
   }
 
   return (
@@ -170,6 +183,89 @@ export const ContactModal: React.FC = () => {
               </span>
             </div>
           </div>
+        </div>
+
+        {/* 4. Direct Transmission Terminal Form */}
+        <div className="p-4 bg-deep-navy/90 border border-electric-blue/35 rounded-sm space-y-3.5 shadow-md">
+          <div className="flex items-center justify-between border-b border-sky-blue/20 pb-2.5">
+            <div className="flex items-center gap-2">
+              <Send className="w-4 h-4 text-electric-blue" />
+              <h4 className="font-mono text-xs text-warm-ivory font-bold tracking-wider uppercase">
+                DIRECT TRANSMISSION TERMINAL
+              </h4>
+            </div>
+            <span className="text-[10px] font-mono text-electric-blue bg-electric-blue/10 px-2 py-0.5 rounded border border-electric-blue/30 tracking-wider">
+              ONLINE // READY
+            </span>
+          </div>
+
+          {formSent ? (
+            <div className="p-5 rounded bg-muted-green/20 border border-muted-green text-center space-y-2">
+              <CheckCircle2 className="w-7 h-7 text-muted-green-light mx-auto" />
+              <div className="font-mono font-bold text-xs text-warm-ivory uppercase tracking-wider">
+                TRANSMISSION RECEIVED // DISPATCH CONFIRMED
+              </div>
+              <p className="font-sans text-xs text-warm-ivory-dim leading-relaxed">
+                Thank you for reaching out. Ina Grace Tan will review your message shortly.
+              </p>
+            </div>
+          ) : (
+            <form onSubmit={handleFormSubmit} className="space-y-3 font-mono text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div className="space-y-1">
+                  <label htmlFor="modal-contact-name" className="block text-[10px] text-sky-light uppercase tracking-wider font-semibold">
+                    Sender Name
+                  </label>
+                  <input
+                    id="modal-contact-name"
+                    type="text"
+                    required
+                    value={formData.name}
+                    onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                    placeholder="e.g. Recruiter / Client"
+                    className="w-full px-3 py-2 rounded bg-deep-navy-card/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors text-xs"
+                  />
+                </div>
+                <div className="space-y-1">
+                  <label htmlFor="modal-contact-email" className="block text-[10px] text-sky-light uppercase tracking-wider font-semibold">
+                    Return Email / Contact
+                  </label>
+                  <input
+                    id="modal-contact-email"
+                    type="email"
+                    required
+                    value={formData.email}
+                    onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                    placeholder="e.g. contact@company.com"
+                    className="w-full px-3 py-2 rounded bg-deep-navy-card/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none transition-colors text-xs"
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="modal-contact-message" className="block text-[10px] text-sky-light uppercase tracking-wider font-semibold">
+                  Transmission Message / Inquiry
+                </label>
+                <textarea
+                  id="modal-contact-message"
+                  rows={3}
+                  required
+                  value={formData.message}
+                  onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                  placeholder="Detail your IT project, job opportunity, or inquiry..."
+                  className="w-full px-3 py-2 rounded bg-deep-navy-card/90 border border-sky-blue/25 text-warm-ivory placeholder-warm-ivory-dim/40 focus:border-electric-blue focus:outline-none resize-none transition-colors text-xs"
+                />
+              </div>
+
+              <button
+                type="submit"
+                className="w-full py-2.5 rounded bg-electric-blue hover:bg-white text-deep-navy font-bold font-mono text-xs transition-all shadow-[0_0_12px_rgba(0,240,255,0.25)] flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+              >
+                <Send className="w-3.5 h-3.5" />
+                <span>DISPATCH TRANSMISSION</span>
+              </button>
+            </form>
+          )}
         </div>
 
         {/* Social channels */}
