@@ -49,8 +49,8 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
     return null
   }
 
-  const handleTrigger = (e: React.MouseEvent) => {
-    e.stopPropagation()
+  const handleTrigger = (e?: React.SyntheticEvent | any) => {
+    if (e && e.stopPropagation) e.stopPropagation()
     playClick()
 
     const [px, , pz] = characterStore.getState().playerPosition
@@ -76,6 +76,7 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
         position={[0, item.position[1] + 0.35, 0]}
         scale={showPrompt ? 1.2 : 0.8}
         onClick={handleTrigger}
+        onPointerDown={handleTrigger}
         onPointerOver={() => {
           setIsHovered(true)
           if (typeof document !== 'undefined') document.body.style.cursor = 'pointer'
@@ -102,30 +103,40 @@ export const InteractiveAnchor: React.FC<InteractiveAnchorProps> = ({ item }) =>
           ref={ringRef}
           position={[0, item.position[1] + 0.35, 0]}
           rotation={[Math.PI / 2, 0, 0]}
+          onClick={handleTrigger}
+          onPointerDown={handleTrigger}
         >
           <torusGeometry args={[0.22, 0.015, 6, 16]} />
           <meshBasicMaterial color="#38bdf8" />
         </mesh>
       )}
 
-      {/* Simplified, Minimalist Floating Prompt (Layering priority z-15; strictly below z-40 navigation) */}
+      {/* Simplified, Minimalist Floating Prompt (Layering priority z-25; strictly below z-40 navigation & z-50 modals) */}
       {showPrompt && (
         <Html
           position={[0, item.position[1] + 0.65, 0]}
           center
           distanceFactor={18}
-          zIndexRange={[15, 0]}
+          zIndexRange={[25, 10]}
         >
           <button
             type="button"
             onClick={handleTrigger}
+            onPointerDown={(e) => {
+              e.stopPropagation()
+              handleTrigger(e)
+            }}
+            onTouchEnd={(e) => {
+              e.stopPropagation()
+              handleTrigger(e)
+            }}
             onMouseEnter={() => {
               setIsHovered(true)
               playHover()
             }}
             onMouseLeave={() => setIsHovered(false)}
             aria-label={item.name}
-            className="pointer-events-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-deep-navy-card/90 hover:bg-deep-navy border border-electric-blue/40 text-warm-ivory shadow-[0_0_12px_rgba(0,240,255,0.25)] backdrop-blur-md text-[11px] font-mono whitespace-nowrap transition-all hover:scale-105 cursor-pointer select-none"
+            className="pointer-events-auto flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-deep-navy-card/90 hover:bg-deep-navy border border-electric-blue/40 text-warm-ivory shadow-[0_0_12px_rgba(0,240,255,0.25)] backdrop-blur-md text-[11px] font-mono whitespace-nowrap transition-all hover:scale-105 active:scale-95 cursor-pointer select-none"
           >
             <span className="w-1.5 h-1.5 rounded-full bg-electric-blue shadow-[0_0_6px_rgba(0,240,255,0.8)]" />
             <span className="font-bold text-electric-blue">[E]</span>

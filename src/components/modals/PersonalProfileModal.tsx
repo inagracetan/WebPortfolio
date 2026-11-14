@@ -1,10 +1,21 @@
 import React from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { useObjectInspection } from '@/interactions/useObjectInspection'
+import { useGameStore } from '@/hooks/useGameStore'
 import { BookOpen, Laptop, Clock, Globe2, Sparkles, CheckCircle2 } from 'lucide-react'
 
 export const PersonalProfileModal: React.FC = () => {
   const { activeInspectionModal, closeInspection } = useObjectInspection()
+  const { activeModal, closeModal } = useGameStore()
+
+  const isProfileOpen = activeInspectionModal === 'PROFILE' || (activeModal as any) === 'PROFILE'
+
+  const handleProfileClose = () => {
+    closeInspection()
+    if ((activeModal as any) === 'PROFILE') {
+      closeModal()
+    }
+  }
 
   const fastFacts = [
     {
@@ -50,8 +61,8 @@ export const PersonalProfileModal: React.FC = () => {
 
   return (
     <Modal
-      isOpen={activeInspectionModal === 'PROFILE'}
-      onClose={closeInspection}
+      isOpen={isProfileOpen}
+      onClose={handleProfileClose}
       title="WORKSPACE // NOTEBOOK_PROFILE.DAT"
       subtitle="Verified facts, technical competencies, daily toolchain & professional focus"
       badge="PROFILE DOSSIER"

@@ -52,8 +52,16 @@ export const InteractionPrompt: React.FC = () => {
           transition={{ duration: 0.18 }}
           type="button"
           onClick={handleTrigger}
+          onPointerDown={(e) => {
+            e.stopPropagation()
+            handleTrigger()
+          }}
+          onTouchEnd={(e) => {
+            e.stopPropagation()
+            handleTrigger()
+          }}
           onMouseEnter={playHover}
-          className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-electric-blue/40 hover:border-electric-blue rounded-full shadow-[0_0_15px_rgba(0,240,255,0.25)] backdrop-blur-md text-xs font-mono text-warm-ivory group cursor-pointer transition-all"
+          className="pointer-events-auto flex items-center gap-2 px-3 py-1.5 bg-deep-navy-card/90 hover:bg-deep-navy border border-electric-blue/40 hover:border-electric-blue rounded-full shadow-[0_0_15px_rgba(0,240,255,0.25)] backdrop-blur-md text-xs font-mono text-warm-ivory group cursor-pointer transition-all active:scale-95"
         >
           {/* Key indicator badge */}
           <span className="px-1.5 py-0.2 bg-electric-blue text-deep-navy font-mono font-bold text-[10px] rounded shadow-sm">

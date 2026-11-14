@@ -94,6 +94,7 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
         position={[0, position[1], 0]}
         scale={isCurrentLocation || isHovered ? 1.25 : 0.9}
         onClick={handleClick}
+        onPointerDown={handleClick}
         onPointerOver={handlePointerEnter}
         onPointerOut={handlePointerLeave}
       >
@@ -113,6 +114,7 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
         position={[0, position[1], 0]}
         rotation={[Math.PI / 2, 0, 0]}
         onClick={handleClick}
+        onPointerDown={handleClick}
         onPointerOver={handlePointerEnter}
         onPointerOut={handlePointerLeave}
       >
@@ -129,6 +131,7 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
         position={[0, 0.12, 0]}
         rotation={[-Math.PI / 2, 0, 0]}
         onClick={handleClick}
+        onPointerDown={handleClick}
         onPointerOver={handlePointerEnter}
         onPointerOut={handlePointerLeave}
       >
@@ -141,21 +144,29 @@ export const LocationMarker: React.FC<LocationMarkerProps> = ({ location, positi
         />
       </mesh>
 
-      {/* Simplified, Minimalist Location Label (Layering priority z-15; strictly below z-40 navigation) */}
+      {/* Simplified, Minimalist Location Label (Layering priority z-25; strictly below z-40 navigation & z-50 modals) */}
       {showLabel && (
         <Html
           position={[0, position[1] + 0.75, 0]}
           center
           distanceFactor={20}
-          zIndexRange={[15, 0]}
+          zIndexRange={[25, 10]}
         >
           <button
             type="button"
             onClick={handleClick}
+            onPointerDown={(e) => {
+              if (e && e.stopPropagation) e.stopPropagation()
+              handleClick(e)
+            }}
+            onTouchEnd={(e) => {
+              if (e && e.stopPropagation) e.stopPropagation()
+              handleClick(e)
+            }}
             onMouseEnter={handlePointerEnter}
             onMouseLeave={handlePointerLeave}
             aria-label={`View ${location.name} details`}
-            className="pointer-events-auto flex items-center gap-2 px-3 py-1 rounded-full border border-electric-blue/40 font-mono text-[11px] tracking-wider uppercase transition-all backdrop-blur-md cursor-pointer select-none shadow-lg whitespace-nowrap bg-deep-navy-card/90 text-warm-ivory hover:text-electric-blue hover:scale-105"
+            className="pointer-events-auto flex items-center gap-2 px-3 py-1 rounded-full border border-electric-blue/40 font-mono text-[11px] tracking-wider uppercase transition-all backdrop-blur-md cursor-pointer select-none shadow-lg whitespace-nowrap bg-deep-navy-card/90 text-warm-ivory hover:text-electric-blue hover:scale-105 active:scale-95"
           >
             <span
               className="w-2 h-2 rounded-full flex-shrink-0 shadow-[0_0_6px_rgba(0,240,255,0.8)]"

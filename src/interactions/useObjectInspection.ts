@@ -47,7 +47,28 @@ export const objectInspectionStore = {
 
     let skillGroup: SkillGroup | null = null
     if (item.skillGroupId) {
-      skillGroup = skillGroupsData.find((s) => s.id === item.skillGroupId) || null
+      skillGroup =
+        skillGroupsData.find((s) => s.id === item.skillGroupId) ||
+        skillGroupsData.find((s) => {
+          if (item.skillGroupId === 'programming-development') return s.id === 'programming-languages'
+          if (item.skillGroupId === 'database-backend') return s.id === 'database-systems'
+          if (item.skillGroupId === 'networking-it') return s.id === 'networking'
+          if (item.skillGroupId === 'cloud-security') return s.id === 'cloud-cybersecurity'
+          if (item.skillGroupId === 'productivity-creative') return s.id === 'software-tools' || s.id === 'technical-support'
+          return false
+        }) ||
+        null
+    }
+
+    // Defensive fallback: If modalType is SKILL_DETAIL and no skillGroup found, default to first skillGroup
+    if (item.modalType === 'SKILL_DETAIL' && !skillGroup && skillGroupsData.length > 0) {
+      skillGroup = skillGroupsData[0]
+    }
+
+    // Defensive fallback: If modalType is CUSTOM and no targetModal, open ABOUT
+    if (item.modalType === 'CUSTOM' && !item.targetModal) {
+      gameStore.openModal('ABOUT')
+      return
     }
 
     state = {

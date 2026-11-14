@@ -2,6 +2,7 @@ import React, { useState } from 'react'
 import { Modal } from '@/components/ui/Modal'
 import { skillGroupsData } from '@/data/skills'
 import { useGameStore } from '@/hooks/useGameStore'
+import { useObjectInspection } from '@/interactions/useObjectInspection'
 import { TechLogo } from '@/components/portfolio/TechLogo'
 import {
   Code2,
@@ -16,7 +17,21 @@ import {
 
 export const SkillsModal: React.FC = () => {
   const { activeModal, closeModal } = useGameStore()
+  const { activeInspectionModal, closeInspection } = useObjectInspection()
   const [selectedDomain, setSelectedDomain] = useState<string>('ALL')
+
+  const isSkillsOpen =
+    activeModal === 'SKILLS' ||
+    activeModal === 'TECH' ||
+    (activeInspectionModal as any) === 'SKILLS' ||
+    (activeInspectionModal as any) === 'TECH'
+
+  const handleSkillsClose = () => {
+    closeModal()
+    if ((activeInspectionModal as any) === 'SKILLS' || (activeInspectionModal as any) === 'TECH') {
+      closeInspection()
+    }
+  }
 
   const domains = ['ALL', ...skillGroupsData.map((g) => g.title)]
 
@@ -44,8 +59,8 @@ export const SkillsModal: React.FC = () => {
 
   return (
     <Modal
-      isOpen={activeModal === 'SKILLS' || activeModal === 'TECH'}
-      onClose={closeModal}
+      isOpen={isSkillsOpen}
+      onClose={handleSkillsClose}
       title="TECH_CENTER // CAPABILITIES_MATRIX.EXE"
       subtitle="Futuristic glass pavilion housing verified proficiencies across Data Networking, IT Systems, Software & Cloud"
       badge="VERIFIED SKILLS"

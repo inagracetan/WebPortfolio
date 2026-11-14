@@ -100,7 +100,8 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     position: [-1.4, 0.65, -0.2],
     radius: 2.4,
     iconName: 'Coffee',
-    modalType: 'CUSTOM',
+    modalType: 'ABOUT_ME',
+    targetModal: 'ABOUT',
     details: {
       heading: 'COZY STUDIO RETREAT',
       description:
@@ -203,7 +204,7 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     radius: 2.2,
     iconName: 'Code2',
     modalType: 'SKILL_DETAIL',
-    skillGroupId: 'programming-development',
+    skillGroupId: 'programming-languages',
     cameraTarget: [11.38, 1.2, 4.47],
   },
   {
@@ -216,7 +217,7 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     radius: 2.2,
     iconName: 'Database',
     modalType: 'SKILL_DETAIL',
-    skillGroupId: 'database-backend',
+    skillGroupId: 'database-systems',
     cameraTarget: [14.62, 1.2, 4.47],
   },
   {
@@ -229,7 +230,7 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     radius: 2.2,
     iconName: 'Network',
     modalType: 'SKILL_DETAIL',
-    skillGroupId: 'networking-it',
+    skillGroupId: 'networking',
     cameraTarget: [13, 1.2, 3.3],
   },
   {
@@ -242,7 +243,7 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     radius: 2.2,
     iconName: 'ShieldCheck',
     modalType: 'SKILL_DETAIL',
-    skillGroupId: 'cloud-security',
+    skillGroupId: 'cloud-cybersecurity',
     cameraTarget: [12.0, 1.2, 6.38],
   },
   {
@@ -255,7 +256,7 @@ export const INTERACTIVE_OBJECTS: InteractiveObjectItem[] = [
     radius: 2.2,
     iconName: 'FileSpreadsheet',
     modalType: 'SKILL_DETAIL',
-    skillGroupId: 'productivity-creative',
+    skillGroupId: 'software-tools',
     cameraTarget: [14.0, 1.2, 6.38],
   },
   {
